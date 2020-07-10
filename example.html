@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script type="module">
+    import { ready } from './dom.js';
+    import { get } from './network.js';
+    
+    ready(async () => {
+      console.log('hi');
+
+      const response = await get('http://api.lsong.me:8888/fanyi?q=hello');
+      const data = await response.json();
+      console.log(data);
+
+    });
+  </script>
+</head>
+
+<body>
+
+</body>
+
+</html>
