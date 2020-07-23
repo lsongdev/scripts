@@ -8,9 +8,18 @@
   <script type="module">
     import { ready } from './dom.js';
     import { get } from './network.js';
+    import { css } from './style.js';
+
+    const className = css(`
+      :host {
+        background: red;
+      }`);
     
     ready(async () => {
       console.log('hi');
+
+
+      document.body.className = className;
 
       const response = await get('http://api.lsong.me:8888/fanyi?q=hello');
       const data = await response.json();
