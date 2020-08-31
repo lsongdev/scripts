@@ -9,3 +9,7 @@ export const css = str => {
   document.head.appendChild(style);
   return className;
 };
+
+export const cls = () => {
+  
+};

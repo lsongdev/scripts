@@ -1,9 +1,9 @@
+import { render as R } from './render.js';
 
-
-export const querySelector = (el, selector) =>
+export const querySelector = (selector, el = document) =>
   el.querySelector(selector);
 
-export const querySelectorAll = (el, selector) =>
+export const querySelectorAll = (selector, el = document) =>
   el.querySelectorAll(selector);
 
 export const addEventListener = (el, type, fn, options) => {
@@ -15,8 +15,13 @@ export const removeEventListener = (el, type, fn, options) =>
   el.removeEventListener(type, fn, options);
 
 export const ready = fn => {
-  if(/loaded|complete/.test(document.readyState)) {
+  if (/loaded|complete/.test(document.readyState))
     return fn();
-  }
   return addEventListener(document, 'DOMContentLoaded', fn);
+};
+
+export const render = (templateId, obj) => {
+  const template = querySelector(templateId);
+  const str = template.innerHTML;
+  return R(str, obj);
 };

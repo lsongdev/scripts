@@ -4,33 +4,70 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>demo</title>
   <script type="module">
-    import { ready } from './dom.js';
-    import { get } from './network.js';
-    import { css } from './style.js';
+    import { ready, querySelector as $, render } from './dom.js';
+    import { router } from './router.js';
 
-    const className = css(`
-      :host {
-        background: red;
-      }`);
-    
-    ready(async () => {
-      console.log('hi');
+    router({
+      '/': () => $('#app').innerHTML = render('#home'),
+      '/user/:id': o => $('#app').innerHTML = render('#user', o)
+    })();
 
+    const component = fn => {
+      let dom, state = {};
+      return (props, children) => {
+        const setState = next => {
+          const newChild = render(Object.assign(state, next));
+          dom.parentNode.replaceChild(newChild, dom);
+          dom = newChild;
+        };
+        const render = fn(props, setState);
+        dom = render(state);
+        return dom;
+      };
+    };
 
-      document.body.className = className;
+    const div = (props, children) => {
+      if (!Array.isArray(children)) children = [children];
+      const element = document.createElement('div');
+      Object.keys(props).forEach(name => {
+        if(/^on/.test(name)) {
+          element[name] = props[name];
+        } else {
+          element.setAttribute(name, props[name])
+        }
+      });
+      children.forEach(child => {
+        if(typeof child === 'string')
+          child = document.createTextNode(child);
+        element.appendChild(child)
+      });
+      return element;
+    };
 
-      const response = await get('http://api.lsong.me:8888/fanyi?q=hello');
-      const data = await response.json();
-      console.log(data);
-
+    const App = component((props, setState) => {
+      const onclick = () => setState({ name: Math.random() });
+      return ({ name }) => div({ onclick }, `hello ${name}`);
     });
+
+    const dom = App({ name: 1 }, []);
+    console.log(dom);
+    document.body.appendChild(dom)
+
   </script>
 </head>
 
 <body>
-
+  <script id="home" type="text/template">
+    <h1>home</h1>
+  </script>
+  <script id="user" type="text/template">
+    <h1>user ${id}</h1>
+  </script>
+  <a href="#/">home</a>
+  <a href="#/user/1">user</a>
+  <div id="app"></div>
 </body>
 
 </html>
