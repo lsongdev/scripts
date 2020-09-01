@@ -1,3 +1,4 @@
+import { addEventListener } from './dom.js';
 
 export const readFileAsText = file => new Promise((resolve, reject) => {
   const reader = new FileReader();
