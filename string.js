@@ -5,3 +5,7 @@ export const leftpad = (str, width, char = '0') => {
     str = char + str;
   return str;
 };
+
+export const append = (s0, s1) => {
+  return s0 + s1;
+};

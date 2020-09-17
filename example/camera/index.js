@@ -1,5 +1,5 @@
-import { ready, querySelector as $, addEventListener } from '../dom.js';
-import { requestCamera, requestMicrophone } from '../media.js';
+import { ready, querySelector as $, addEventListener } from '../../dom.js';
+import { requestCamera, requestMicrophone } from '../../media.js';
 
 ready(() => {
 

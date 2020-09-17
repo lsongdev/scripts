@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Bluetooth</title>
+    <script type="module" src="./index.js"></script>
+</head>
+
+<body>
+    <input id="service" type="text" list="services" autofocus placeholder="Bluetooth Service" value="4fafc201-1fb5-459e-8fcc-c5c9c331914b" >
+    <input id="characteristic" type="text" list="characteristics" placeholder="Bluetooth Characteristic" value="beb5483e-36e1-4688-b7f5-ea07361b26a8" >
+    <button id="connect">connect</button>
+    <button id="disconnect" disabled>disconnect</button>
+    <div>
+      <textarea id="message" cols="30" rows="5"></textarea>
+    </div>
+    <button id="read" disabled>read</button>
+    <button id="send" disabled>send</button>
+    <button id="startNotifications" disabled>Start notifications</button>
+    <button id="stopNotifications" disabled>Stop notifications</button>
+</body>
+
+</html>

@@ -1,6 +1,5 @@
 export function encode(obj, pfx) {
   var k, i, tmp, str = '';
-
   for (k in obj) {
     if ((tmp = obj[k]) !== void 0) {
       if (Array.isArray(tmp)) {
@@ -14,7 +13,6 @@ export function encode(obj, pfx) {
       }
     }
   }
-
   return (pfx || '') + str;
 }
 
@@ -28,7 +26,6 @@ function toValue(mix) {
 
 export function decode(str) {
   var tmp, k, out = {}, arr = str.split('&');
-
   while (tmp = arr.shift()) {
     tmp = tmp.split('=');
     k = tmp.shift();
@@ -38,6 +35,8 @@ export function decode(str) {
       out[k] = toValue(tmp.shift());
     }
   }
-
   return out;
 }
+
+export const query =
+  decode(location.search.slice(1));

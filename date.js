@@ -1,5 +1,5 @@
 
-import { leftpad } from './string';
+import { leftpad } from './string.js';
 
 export const format = (pattern, date = new Date()) => {
   const _year = date.getYear();

@@ -1,4 +1,3 @@
-import { render as R } from './render.js';
 
 export const querySelector = (selector, el = document) =>
   el.querySelector(selector);
@@ -21,10 +20,4 @@ export const ready = fn => {
   if (/loaded|complete/.test(document.readyState))
     return fn();
   return addEventListener(document, 'DOMContentLoaded', fn);
-};
-
-export const render = (templateId, obj) => {
-  const template = querySelector(templateId);
-  const str = template.innerHTML;
-  return R(str, obj);
 };
