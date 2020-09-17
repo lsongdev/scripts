@@ -1,0 +1,12 @@
+@import url(https://lsong.org/stylesheets/theme/default.css);
+@import url(https://lsong.org/stylesheets/util.css);
+@import url(https://lsong.org/stylesheets/panel.css);
+@import url(https://lsong.org/stylesheets/button.css);
+
+#video, #screen {
+  width: 100px;
+  height: 50px;
+  display: block;
+  margin: 0;
+  padding: 0;
+}

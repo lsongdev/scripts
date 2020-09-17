@@ -5,4 +5,4 @@ export const render = (template, data = {}) => {
   const t = `return \`${template}\``;
   const f = new Function(...ks, t);
   return f(...vs);
-}
+};
