@@ -1,6 +1,4 @@
-
-const uuid = () =>
-  (Math.random() * 1e9 | 0).toString(16)
+import { uuid } from './string.js';
 
 export const css = str => {
   const className = 'stylesheet-' + uuid();

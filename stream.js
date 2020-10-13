@@ -16,14 +16,17 @@ export const createTextWriter = stream => {
 
 export const readText = stream => {
   const reader = createTextReader(stream);
+  const lines = [];
   for (const value of reader.read()) {
-
+    lines.push(value);
   }
   reader.releaseLock();
+  return lines;
 };
 
 export const writeText = (stream, lines) => {
   const writer = createTextWriter(stream);
   lines.forEach(line => writer.write(line));
-  return writer.releaseLock();
+  writer.releaseLock();
+  return writer;
 };

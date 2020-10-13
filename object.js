@@ -1,5 +1,4 @@
 
-
 export const keys = obj => {
   const keys = [];
   for (const key in obj) {
@@ -10,7 +9,7 @@ export const keys = obj => {
 
 export const values = obj => {
   const values = [];
-  for(const key in obj) {
+  for (const key in obj) {
     values.push(obj[key]);
   }
   return values;
@@ -18,3 +17,7 @@ export const values = obj => {
 
 export const get = (obj, path) =>
   path.split('.').reduce((o, k) => o[k], obj);
+
+export const clone = obj => {
+  return obj;
+};

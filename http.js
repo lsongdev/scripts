@@ -13,3 +13,9 @@ export const get = (url, headers) =>
 
 export const post = (url, payload, headers) =>
   request('post', url, payload, headers);
+
+export const getJSON = (url, headers) =>
+  Promise
+    .resolve()
+    .then(() => get(url, headers))
+    .then(res => res.json());
