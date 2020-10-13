@@ -1,5 +1,5 @@
 import { ready, querySelector as $, addEventListener } from '../../dom.js';
-import { requestCamera, requestMicrophone } from '../../media.js';
+import { requestCamera, requestMicrophone, requestDisplay } from '../../media.js';
 
 ready(() => {
 
@@ -23,6 +23,11 @@ ready(() => {
     screen.setAttribute('width', width);
     screen.setAttribute('height', height);
     context.drawImage(video, 0, 0, width, height);
+  });
+
+  addEventListener('#display', 'click', async () => {
+    const display = await requestDisplay();
+    console.log(display);
   });
 
 });

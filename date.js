@@ -30,3 +30,8 @@ export const format = (pattern, date = new Date()) => {
     ss: leftpad(_seconds, 2),
   })[name] || `{${name}}`);
 };
+
+export const parse = () => {
+  const date = new Date;
+  return date;
+};
