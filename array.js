@@ -1,3 +1,4 @@
+import { random } from './math.js';
 
 export const isArray = arr => Array.isArray(arr);
 
@@ -33,4 +34,11 @@ export const filter = (arr, fn) => {
     if (fn(arr[index], index, arr)) out.push(arr[index]);
   }
   return out;
+};
+
+export const shuffle = arr =>
+  arr.sort(() => random() > .5);
+
+export const sample = (arr, k) => {
+  return shuffle(arr).slice(0, k);
 };
