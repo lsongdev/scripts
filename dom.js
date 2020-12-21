@@ -50,3 +50,10 @@ export const removeClass = () => {
 export const toggleClass = () => {
 
 };
+
+export const createLink = (text, to) => {
+  const link = document.createElement('a');
+  link.href = to;
+  link.textContent = text;
+  return link;
+};
