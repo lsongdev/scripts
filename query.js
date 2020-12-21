@@ -40,3 +40,6 @@ export function decode(str) {
 
 export const query =
   decode(location.search.slice(1));
+
+export const parse = decode;
+export const stringify = encode;

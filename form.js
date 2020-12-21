@@ -1,4 +1,7 @@
-// source code from: https://github.com/lukeed/formee
+import { querySelector } from './dom.js';
+import { stringify } from './query.js'
+
+// part of source code from: https://github.com/lukeed/formee
 
 export function serialize(form) {
   var i = 0, j, key, tmp, out = {};
@@ -61,8 +64,9 @@ export function validate(form, rules, toCheck) {
   return out;
 }
 
-export function bind(form, opts) {
-  opts = opts || {};
+export function bind(form, opts = {}) {
+  if (typeof form === 'string')
+    form = querySelector(form);
 
   form.serialize = serialize.bind(null, form);
   form.validate = validate.bind(null, form, opts.rules);
@@ -75,3 +79,36 @@ export function bind(form, opts) {
 
   return form;
 }
+
+export const requestForm = (form, options) => {
+  if (typeof form === 'string')
+    form = querySelector(form);
+  if (typeof options === 'function') {
+    options = {
+      onError: options,
+      onSuccess: options.bind(null, null)
+    };
+  }
+  const type = form.getAttribute('type');
+  const enctype = form.getAttribute('enctype') || 'application/x-www-form-urlencoded';
+  const onFormat = options.onFormat || (({ method, url, data }) => {
+    switch (enctype) {
+      case 'application/x-www-form-urlencoded':
+        const qs = stringify(data);
+        return { url: `${url}?${qs}`, method };
+    }
+  });
+  const onRequest = options.onRequest || (({ url, ...opts }) => fetch(url, opts));
+  const onResponse = options.onResponse || (res => {
+    if (type === 'json') return res.json();
+    return res;
+  });
+  const onSubmit = options.onSubmit || (() => {
+    const { method, action: url } = form;
+    const data = form.serialize();
+    const request = onFormat({ method, url, data });
+    return onRequest(request).then(onResponse).then(onSuccess, onError);
+  });
+  const { onSuccess, onError } = options;
+  return bind(form, { onSubmit })
+};
