@@ -18,11 +18,7 @@ export const addEventListener = (el, expr, fn, options) => {
   if (typeof el === 'string') el = querySelector(el);
   const [type, filter] = expr.split(',');
   const cb = e => {
-    if (typeof filter === 'string') {
-      fn && e.target.matches(filter) && fn.call(el, e);
-    } else {
-      fn && fn.call(el, e);
-    }
+    (filter ? e.target.matches(filter) : true) && fn && fn.call(el, e);
   };
   el.addEventListener(type, cb, options);
   return removeEventListener.bind(null, el, type, cb);

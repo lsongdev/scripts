@@ -37,8 +37,7 @@ export const filter = (arr, fn) => {
 };
 
 export const shuffle = arr =>
-  arr.sort(() => random() > .5);
+  arr.sort(() => random() - .5);
 
-export const sample = (arr, k) => {
-  return shuffle(arr).slice(0, k);
-};
+export const sample = (arr, k) =>
+  shuffle(arr).slice(0, k);
