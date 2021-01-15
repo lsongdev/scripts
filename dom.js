@@ -57,3 +57,18 @@ export const createLink = (text, to) => {
   link.textContent = text;
   return link;
 };
+
+export const xpath = (xpath, node = document) => {
+  const ret = [];
+  const nodesSnapshot = document.evaluate(
+    xpath,
+    node,
+    null,
+    XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
+    null
+  );
+  for (let i = 0; i < nodesSnapshot.snapshotLength; i++) {
+    ret.push(nodesSnapshot.snapshotItem(i));
+  }
+  return ret;
+};
