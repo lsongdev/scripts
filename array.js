@@ -1,6 +1,38 @@
 import { random } from './math.js';
 
-export const isArray = arr => Array.isArray(arr);
+export const isArray = obj => {
+  return !!obj.length;
+};
+
+export const toArray = obj => {
+  return [].slice.call(obj);
+};
+
+export const keys = arr => {
+  return Object.keys(toArray(arr));
+};
+
+export const each = (arr, cb) => {
+  for (const i of keys(arr)) {
+    typeof cb === 'function' && cb(arr[i], i, arr);
+  }
+};
+
+export const map = (arr, cb) => {
+  const results = [];
+  each(arr, (item, i, arr) => {
+    results.push(typeof cb === 'function' ? cb(item, i, arr) : item);
+  });
+  return results;
+};
+
+export const filter = (arr, fn) => {
+  const results = [];
+  each(arr, (item, i, arr) => {
+    if (fn ? fn(item, i, arr) : true) results.push(item);
+  });
+  return results;
+};
 
 export const reduce = (arr, fn, initial = 0) => {
   let accumulator = initial;
@@ -26,14 +58,6 @@ export const findIndex = (arr, fn) => {
 export const find = (arr, fn) => {
   const index = findIndex(arr, fn);
   return arr[index];
-};
-
-export const filter = (arr, fn) => {
-  const out = [];
-  for (const index in arr) {
-    if (fn(arr[index], index, arr)) out.push(arr[index]);
-  }
-  return out;
 };
 
 export const shuffle = arr =>
