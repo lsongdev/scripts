@@ -19,7 +19,7 @@ export default class EventEmitter {
   }
   addListener(eventName, listener) {
     (this.events[eventName] = this.events[eventName] || []).push(listener);
-    return this;
+    return () => this.removeListener(eventName, listener);
   }
   removeListener(eventName, listener) {
     const listeners = this.events[eventName];

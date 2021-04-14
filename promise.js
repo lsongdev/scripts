@@ -1,4 +1,8 @@
 
+export const any = () => {};
+export const some = () => {};
+export const race = () => {};
+
 export const call = p =>
   p.then(r => [null, r], e => [e]);
 
@@ -13,8 +17,7 @@ export const timeout = (p, t, errorMessage) =>
     })
   ]);
 
-
 export const serialize = arr =>
   arr.reduce((m, p) =>
-    m.then(v => Promise.all([...v, p]))
+    m.then(v => Promise.all([...v, p()]))
     , Promise.resolve([]));

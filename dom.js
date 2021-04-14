@@ -51,6 +51,10 @@ export const toggleClass = () => {
 
 };
 
+export const createText = text => {
+  return document.createTextNode(text);
+};
+
 export const createLink = (text, to) => {
   const link = document.createElement('a');
   link.href = to;

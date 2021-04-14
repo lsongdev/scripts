@@ -1,5 +1,5 @@
 import { get, clone } from './obj.js';
-import { render } from './template.js';
+import { format } from './string.js';
 
 export const i18n = (obj) => {
   let locale, tree = obj || {};
@@ -16,7 +16,7 @@ export const i18n = (obj) => {
     t(key, params, lang) {
       const val = get(tree[lang || locale], key);
       if (typeof val === 'function') return val(params);
-      if (typeof val === 'string') return render(val, params);
+      if (typeof val === 'string') return format(val, params);
       return val;
     }
   };

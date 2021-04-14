@@ -1,4 +1,4 @@
-import { uuid } from './string.js';
+import { uuid } from './math.js';
 
 export const css = str => {
   const className = 'stylesheet-' + uuid();
