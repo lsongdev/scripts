@@ -1,4 +1,3 @@
-import { addEventListener } from './dom.js';
 
 const parsePath = path => {
   const partialPath = {};
@@ -53,7 +52,7 @@ export const push = (to, state) => {
 export const back = () =>
   history.back();
 
-addEventListener(window, 'popstate', e => {
+window.addEventListener('popstate', e => {
   location = getLocation();
   location.state = e.state;
   listeners.forEach(fn => fn(location));

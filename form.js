@@ -7,13 +7,10 @@ export function serialize(form) {
   var i = 0, j, key, tmp, out = {};
   var rgx1 = /(radio|checkbox)/i;
   var rgx2 = /(file|reset|submit|button)/i;
-
   while (tmp = form.elements[i++]) {
     // Ignore unnamed, disabled, or (...rgx2) inputs
     if (!tmp.name || tmp.disabled || rgx2.test(tmp.type)) continue;
-
     key = tmp.name;
-
     // Grab all values from multi-select
     if (tmp.type === 'select-multiple') {
       out[key] = [];
@@ -60,7 +57,6 @@ export function validate(form, rules, toCheck) {
   }
 
   form.isValid = isOkay;
-
   return out;
 }
 
@@ -76,7 +72,6 @@ export function bind(form, opts = {}) {
     ev.errors = form.errors = form.validate();
     return form.isValid ? opts.onSubmit(ev) : opts.onError(ev);
   };
-
   return form;
 }
 

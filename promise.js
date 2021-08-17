@@ -1,7 +1,13 @@
 
-export const any = () => {};
-export const some = () => {};
-export const race = () => {};
+export const any = () => { };
+export const some = () => { };
+export const race = () => { };
+
+export const allSettled = promises =>
+  Promise.all(promises.map(p => p
+    .then(value => ({ state: 'fulfilled', value }))
+    .catch(reason => ({ state: 'rejected', reason }))
+  ));
 
 export const call = p =>
   p.then(r => [null, r], e => [e]);

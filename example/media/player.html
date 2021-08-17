@@ -1,0 +1,30 @@
+<script type="module">
+  import { define } from '../../webcomponent.js';
+  import { render, h } from '../../react/index.js';
+
+  const react = App => {
+    return class extends HTMLElement {
+      connectedCallback() {
+        const props = [...this.attributes].reduce((props, attr, i) => {
+          props[attr.name] = attr.value;
+          return props;
+        }, {});
+        render(h(App, props), this);
+      }
+    }
+  };
+
+  define('music-player', react(props => {
+    const { playlist } = props;
+    return h('div', { className: 'music-player' }, [
+      h('div', { className: 'music-player-container' }, [
+        h('img', { className: 'music-player-cover' }),
+        h('div', { className: 'music-player-info' }, [
+          h('h4', null, "Test"),
+          h('span', null, "Test"),
+        ]),
+      ]),
+    ]);
+  }));
+</script>
+<music-player playlist=""></music-player>

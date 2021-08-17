@@ -1,0 +1,17 @@
+<table is="x-table" class="table table-bordered table-hover table-striped"></table>
+<link rel="stylesheet" href="https://lsong.org/stylesheets/table.css">
+<script type="module" src="../../components/table.js"></script>
+<script type="module">
+  const table = document.querySelector('table');
+  table.columns = [
+    { name: 'username', label: 'Name', render: 'text', default: '<no name>' },
+    { name: 'age', label: 'Age', render: 'input', default: '<unknow>' },
+    { label: 'Edit', render: 'button', default: 'Edit' }
+  ];
+  table.items = [
+    { username: 'aa', age: 11 },
+    { username: 'bb', age: 12 },
+    { /*username: 'cc',*/ age: 13 },
+    { username: 'dd' /*, age: 14*/ }
+  ];
+</script>

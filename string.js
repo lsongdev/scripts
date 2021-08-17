@@ -4,7 +4,7 @@ export const append = (s0, s1) => {
 };
 
 export const leftpad = (str, width, char = '0') => {
-  str = str.toString();
+  str = '' + str;
   while (str.length < width)
     str = char + str;
   return str;

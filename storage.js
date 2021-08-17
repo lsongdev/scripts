@@ -1,21 +1,12 @@
 
 const storage = ({ name, store = localStorage, cache = new Map } = {}) => {
-  const prefix = name ? + `${name}:` : '';
+  const prefix = name ? `${name}:` : '';
   const ctx = {
     setSync(key, value) {
       key = prefix + key;
       store.setItem(key, value);
       cache && cache.set(key, value);
       return { key, value };
-    },
-    set(key, value) {
-      return new Promise((resolve, reject) => {
-        try {
-          resolve(ctx.setSync(key, value));
-        } catch (e) {
-          reject(e);
-        }
-      })
     },
     getSync(key) {
       key = prefix + key;
@@ -25,15 +16,20 @@ const storage = ({ name, store = localStorage, cache = new Map } = {}) => {
       cache && cache.set(key, value);
       return value;
     },
-    get(key) {
-      return new Promise((resolve, reject) => {
-        try {
-          resolve(ctx.getSync(key));
-        } catch (e) {
-          reject(e);
-        }
-      });
-    },
+    get: key => new Promise((resolve, reject) => {
+      try {
+        resolve(ctx.getSync(key));
+      } catch (e) {
+        reject(e);
+      }
+    }),
+    set: (key, value) => new Promise((resolve, reject) => {
+      try {
+        resolve(ctx.setSync(key, value));
+      } catch (e) {
+        reject(e);
+      }
+    }),
     clear: () => new Promise((resolve, reject) => {
       try {
         store.clear();

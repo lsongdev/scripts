@@ -1,11 +1,10 @@
 
-
 export function fetch(url, { method = 'get', headers = {}, body, credentials } = {}) {
   const response = () => {
     const headers = {};
     xhr
       .getAllResponseHeaders()
-      .replace(/^(.*?):[^\S\n]*([\s\S]*?)$/gm, (m, key, value) => {
+      .replace(/^(.*?):[^\S\n]*([\s\S]*?)$/gm, (_, key, value) => {
         headers[key] = value;
       });
     return {
@@ -35,4 +34,10 @@ export function fetch(url, { method = 'get', headers = {}, body, credentials } =
     xhr.onload = () => resolve(response());
     xhr.send(body);
   });
+};
+
+export const getJSON = async url => {
+  const response = await fetch(url);
+  const data = await response.json();
+  return data;
 };

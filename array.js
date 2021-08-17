@@ -65,3 +65,17 @@ export const shuffle = arr =>
 
 export const sample = (arr, k) =>
   shuffle(arr).slice(0, k);
+
+export const bubblesort = (arr, comparator = (a, b) => a - b) => {
+  var temp;
+  for (var i = 0, l = arr.length; i < l; i++) {
+    for (var j = i; j > 0; j--) {
+      if (comparator(arr[j], arr[j - 1]) < 0) {
+        temp = arr[j];
+        arr[j] = arr[j - 1];
+        arr[j - 1] = temp;
+      }
+    }
+  }
+  return arr;
+};

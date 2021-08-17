@@ -1,0 +1,38 @@
+<link rel="stylesheet" href="https://lsong.org/stylesheets/dialog.css">
+
+<dialog id="favDialog" class="dialog-top-right" >
+  <form method="dialog">
+    <b>Dialog</b>
+    <p>
+      <label>Favorite animal:
+        <select id="selectEl">
+          <option value="default">Choose</option>
+          <option>Brine shrimp</option>
+          <option>Red panda</option>
+          <option>Spider monkey</option>
+        </select>
+      </label>
+    </p>
+    <div>
+      <button id="confirmBtn" value="default">OK</button>
+      <button value="cancel">Cancel</button>
+    </div>
+  </form>
+</dialog>
+<p>
+  <button id="showButton">Show the dialog</button>
+</p>
+<output id="outputBox"></output>
+<script>
+  showButton.addEventListener('click', () => {
+    favDialog.showModal();
+  });
+  // "Favorite animal" input sets the value of the submit button
+  selectEl.addEventListener('change', (e) => {
+    confirmBtn.value = selectEl.value;
+  });
+  // "Confirm" button of form triggers "close" on dialog because of [method="dialog"]
+  favDialog.addEventListener('close', () => {
+    outputBox.value = `ReturnValue: ${favDialog.returnValue}.`;
+  });
+</script>

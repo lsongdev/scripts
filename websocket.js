@@ -1,16 +1,20 @@
-import EventEmitter from './events.js';
 
 /**
  * https://developer.mozilla.org/en-US/docs/Web/API/WebSocket
  */
-class Socket extends EventEmitter {
-  constructor(url, options) {
+export class SuperWebSocket extends EventEmitter {
+  constructor(url, options = {}) {
+    super();
     const { protocols = [] } = options;
     this.ws = new WebSocket(url, protocols);
     this.ws.onerror = e => this.emit('error', e);
     this.ws.onopen = e => this.emit('open', e);
-    this.ws.onmessage = e => this.emit('message', e);
+    this.ws.onmessage = e => this.emit('message', e.data, e);
     this.ws.onclose = e => this.emit('close', e);
+    this.ready = new Promise((resolve, reject) => {
+      this.once("open", resolve);
+      this.once("error", reject);
+    });
     return this;
   }
   send(data) {
@@ -24,4 +28,4 @@ class Socket extends EventEmitter {
   }
 }
 
-export default Socket;
+export const connect = (url, opts) => new SuperWebSocket(url, opts);

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>JavaScript Audio Recorder</title>
+  </head>
+  <body>
+    <h1>JavaScript Audio Recorder</h1>
+    <button id="startButton">Start Recording</button>
+    <button id="stopButton">Stop Recording</button>
+    <script>
+      let audioChunks = [];
+      navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+        const mediaRecorder = new MediaRecorder(stream);
+        document.querySelector("#startButton").addEventListener("click", () => {
+          audioChunks = [];
+          mediaRecorder.start();
+          console.log("Recording started.");
+        });
+        document.querySelector("#stopButton").addEventListener("click", () => {
+          mediaRecorder.stop();
+          console.log("Recording stopped.");
+        });
+        mediaRecorder.addEventListener("dataavailable", (event) => {
+          audioChunks.push(event.data);
+        });
+        mediaRecorder.addEventListener("stop", () => {
+          const audioBlob = new Blob(audioChunks);
+          const audioUrl = URL.createObjectURL(audioBlob);
+          const audio = new Audio(audioUrl);
+          audio.play();
+        });
+      });
+    </script>
+  </body>
+</html>

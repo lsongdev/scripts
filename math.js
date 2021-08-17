@@ -6,13 +6,14 @@ export const cos = () => { };
 export const sin = () => { };
 
 export const floor = x => Math.floor(x);
-
-export const random = () => {
-  return Math.random();
-};
+export const random = () => Math.random();
 
 export const rand = (max, min = 0) => {
   return floor(random() * (max - min) + min);
+};
+
+export const range = (value, min, max) => {
+  return value >= min && value <= max;
 };
 
 export const randomId = (len = 8, str = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789') => {

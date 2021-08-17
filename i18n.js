@@ -1,4 +1,4 @@
-import { get, clone } from './obj.js';
+import { get } from './object.js';
 import { format } from './string.js';
 
 export const i18n = (obj) => {
@@ -10,7 +10,7 @@ export const i18n = (obj) => {
     locale(lang) {
       return (locale = lang || locale);
     },
-    table(){
+    table() {
       return tree[lang];
     },
     t(key, params, lang) {

@@ -1,13 +1,27 @@
-import { uuid } from './math.js';
+import { randomId } from './math.js';
 
-export const css = str => {
-  const className = 'stylesheet-' + uuid();
+/**
+ * @param {*} content 
+ * @param {*} className 
+ * @returns 
+ */
+export const style = (content, className = 'stylesheet-' + randomId(6)) => {
+  if (typeof content !== 'string') {
+    content = Object.entries(content).map(([key, value]) => `${key}: ${value}`).join('; ');
+  }
   const style = document.createElement('style');
-  style.textContent = str.replace(/:host/, `.${className}`);
+  style.textContent = `.${className} {${content}}`;
   document.head.appendChild(style);
   return className;
 };
 
-export const cls = () => {
-  
+export const cls = (...args) => {
+  return args.reduce((className, item) => {
+    switch (typeof item) {
+      case 'string':
+        return className + ' ' + item;
+      case 'object':
+        return;
+    }
+  }, '');
 };
