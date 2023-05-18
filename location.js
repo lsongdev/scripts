@@ -1,3 +1,4 @@
+import { EventEmitter } from './events.js';
 
 const { geolocation } = navigator;
 

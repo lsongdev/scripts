@@ -1,7 +1,7 @@
 import { define, wrap } from '../webcomponent.js';
-import { format, parse } from '../time.js';
+import { format } from '../time.js';
 
-const defaultFormat = `yyyy-MM-dd HH:mm:ss`;
+const defaultFormat = `{yyyy}-{MM}-{dd} {HH}:{mm}:{ss}`;
 
 define('x-time', class extends wrap('time') {
   mount() {

@@ -30,3 +30,29 @@ export const writeText = (stream, lines) => {
   writer.releaseLock();
   return writer;
 };
+
+
+export async function* readLines(reader) {
+  const decoder = new TextDecoder();
+  let buffer = '', done = false, value;
+  do {
+    ({ value, done } = await reader.read());
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\n');
+    buffer = lines.pop();
+    for (const line of lines) {
+      if (line.trim()) {
+        yield line;
+      }
+    }
+  } while (!done);
+  if (buffer.trim()) {
+    yield buffer;
+  }
+}
+
+export async function* parseJSONLines(reader) {
+  for await (const line of readLines(reader)) {
+    yield JSON.parse(line);
+  }
+}

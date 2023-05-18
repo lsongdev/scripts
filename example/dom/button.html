@@ -1,0 +1,28 @@
+<style>
+  @import 'https://lsong.org/stylesheets/theme/default.css';
+  @import 'https://lsong.org/stylesheets/button.css';
+
+  button {
+    display: flex;
+    align-items: center;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  .loading-icon {
+    animation: spin 1s linear infinite;
+  }
+</style>
+<script type="module" src="../../components/button.js"></script>
+
+<h1>Button Example</h1>
+<button is="x-button" icon="mdi:home" loading class="button" >Home</button>
+<button is="x-button" icon="mdi:home" loading class="button" >Home</button>

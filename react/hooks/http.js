@@ -1,4 +1,4 @@
-import { useState, useEffect } from '../components/react.js';
+import { useState, useEffect } from '../react.js';
 
 export const useRequest = (fn, options = {}) => {
   const { initialState } = options;

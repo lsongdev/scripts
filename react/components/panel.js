@@ -1,4 +1,4 @@
-import { h } from './react.js';
+import { h } from '../react.js';
 
 export const Panel = ({ className = '', title, footer, children }) => {
   return h('div', { className: `panel ${className}` },

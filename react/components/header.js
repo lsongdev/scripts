@@ -1,4 +1,4 @@
-import { h } from './react.js';
+import { h } from '../react.js';
 
 export const Header = ({ title }) => {
   return h('header', { className: 'header' },
