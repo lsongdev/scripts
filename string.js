@@ -21,3 +21,7 @@ export const format = (template, data = {}) => {
 export const trim = str => {
   return (str || '').toString().trim();
 };
+
+export const sprintf = (str, ...args) => {
+  return format(str, ...args);
+};
