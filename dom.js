@@ -9,6 +9,23 @@ export const getElementFromPoint = (x, y) => {
   return document.elementsFromPoint(x, y);
 };
 
+export const removeEventListener = (dom, type, handler) => {
+  if (typeof dom === 'string')
+    dom = querySelector(dom);
+  return dom.removeEventListener(type, handler);
+};
+
+export const addEventListener = (dom, type, handler) => {
+  if (typeof dom === 'string')
+    dom = querySelector(dom);
+  dom.addEventListener(type, handler);
+  return () => removeEventListener(dom, type, handler);
+}
+
+export const filterEvent = (selector, handler) => {
+  return e => e.target.matches(selector) && handler(e);
+};
+
 export const xpath = (path, node = document) => {
   const result = [];
   const nodesSnapshot = document.evaluate(
