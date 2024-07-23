@@ -1,4 +1,5 @@
-class Icon extends HTMLElement {
+
+export class Icon extends HTMLElement {
   static get observedAttributes() {
     return ['icon']; // Observe the 'icon' attribute for changes
   }
