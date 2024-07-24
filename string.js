@@ -22,6 +22,15 @@ export const trim = str => {
   return (str || '').toString().trim();
 };
 
-export const sprintf = (str, ...args) => {
-  return format(str, ...args);
-};
+export function sprintf(format, ...args) {
+  let i = 0;
+  return format.replace(/%[sd]/g, match => {
+    let arg = args[i++];
+    if (match === '%d') {
+      return parseInt(arg, 10);
+    } else if (match === '%s') {
+      return String(arg);
+    }
+    return match;
+  });
+}

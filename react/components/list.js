@@ -1,11 +1,9 @@
 import { h } from '../react.js';
 
 export const List = ({ items, children, className = '' }) => {
-  return h('ul', { className: `list ${className}` },
-    (items || children).map(child => h(ListItem, null, child))
-  );
+  return h('ul', { className: cls('list', className) }, children || items.map(item => h(ListItem, null, item)));
 };
 
 export const ListItem = ({ children, className = '' }) => {
-  return h('li', { className: `list-item ${className}` }, children);
+  return h('li', { className: cls('list-item', className) }, children);
 };

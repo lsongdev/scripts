@@ -82,3 +82,6 @@ export const bubblesort = (arr, comparator = (a, b) => a - b) => {
   }
   return arr;
 };
+
+
+export const last = arr => arr[arr.length - 1];
