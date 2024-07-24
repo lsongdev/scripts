@@ -31,13 +31,18 @@ export const writeText = (stream, lines) => {
   return writer;
 };
 
-
-export async function* readLines(reader) {
-  const decoder = new TextDecoder();
-  let buffer = '', done = false, value;
+export async function* readStream(reader) {
+  let value, done = false;
   do {
     ({ value, done } = await reader.read());
-    buffer += decoder.decode(value, { stream: true });
+    yield value;
+  } while (!done);
+}
+
+export async function* readLines(reader) {
+  let buffer = '';
+  for await (const value of readStream(reader)) {
+    buffer += value;
     const lines = buffer.split('\n');
     buffer = lines.pop();
     for (const line of lines) {
@@ -45,7 +50,7 @@ export async function* readLines(reader) {
         yield line;
       }
     }
-  } while (!done);
+  }
   if (buffer.trim()) {
     yield buffer;
   }
