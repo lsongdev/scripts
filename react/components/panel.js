@@ -1,4 +1,5 @@
 import { h } from '../react.js';
+import { cls } from '../../dom.js';
 
 export const Panel = ({ className = '', title, header, footer, children }) => {
   return h('div', { className: cls('panel', className) },

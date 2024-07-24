@@ -1,4 +1,5 @@
 import { h } from '../react.js';
+import { cls } from '../../dom.js';
 
 export const List = ({ items, children, className = '' }) => {
   return h('ul', { className: cls('list', className) }, children || items.map(item => h(ListItem, null, item)));
