@@ -60,6 +60,9 @@ export const find = (arr, fn) => {
   return arr[index];
 };
 
+export const uniq = arr =>
+  arr.filter((x, i, arr) => arr.indexOf(x) === i);
+
 export const shuffle = arr =>
   arr.sort(() => random() - .5);
 
