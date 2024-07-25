@@ -41,7 +41,10 @@ export async function* readStream(reader) {
 
 export async function* readLines(reader) {
   let buffer = '';
-  for await (const value of readStream(reader)) {
+  const decoder = new TextDecoder('utf-8');
+  for await (let value of readStream(reader)) {
+    if (typeof value !== 'string')
+      value = decoder.decode(value, { stream: true });
     buffer += value;
     const lines = buffer.split('\n');
     buffer = lines.pop();
