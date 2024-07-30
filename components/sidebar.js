@@ -23,6 +23,7 @@ class XSidebar extends HTMLElement {
       <style>
         :host {
           top: 0;
+          left: 0;
           bottom: 0;
           display: block;
           position: fixed;
