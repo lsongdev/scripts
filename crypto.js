@@ -1,4 +1,4 @@
-export * as md5 from './md5.js';
+export * as md5 from './crypto/md5.js';
 
 export async function generateKey(algorithm, options = {}) {
   const {
