@@ -1,3 +1,4 @@
+import { base64ToArrayBuffer, arrayBufferToBase64 } from './crypto/base64.js';
 
 // Key generation and management
 export const generateKey = (algorithm, options = {}) => {
@@ -14,14 +15,9 @@ export const exportKey = async (key, format = 'raw') => {
   return crypto.subtle.exportKey(format, key);
 };
 
-export const exportKeyToUint8Array = async (key, format = 'raw') => {
-  const exportedKey = await exportKey(key, format);
-  return new Uint8Array(exportedKey);
-};
-
 export const exportKeyToBase64 = async (key, format = 'raw') => {
-  const exportedKey = await exportKeyToUint8Array(key, format);
-  return btoa(String.fromCharCode.apply(null, exportedKey));
+  const exportedKey = await exportKey(key, format);
+  return arrayBufferToBase64(exportedKey);
 };
 
 export const exportKeyToPem = async (key, format = 'pkcs8') => {
@@ -70,33 +66,6 @@ export const sha1hmac = (key, data) => createHmac('SHA-1', key, data);
 export const sha256hmac = (key, data) => createHmac('SHA-256', key, data);
 export const sha512hmac = (key, data) => createHmac('SHA-512', key, data);
 
-// Utility functions
-export const arrayBufferToBase64 = buffer =>
-  btoa(String.fromCharCode.apply(null, new Uint8Array(buffer)));
-
-export const base64ToArrayBuffer = base64 => {
-  const binaryString = atob(base64);
-  const bytes = new Uint8Array(binaryString.length);
-  for (let i = 0; i < binaryString.length; i++) {
-    bytes[i] = binaryString.charCodeAt(i);
-  }
-  return bytes.buffer;
-};
-
-// Compose function for function composition
-export const compose = (...fns) => x => fns.reduceRight((v, f) => f(v), x);
-
-// Curry function for partial application
-export const curry = (fn) => {
-  const arity = fn.length;
-  return function $curry(...args) {
-    if (args.length < arity) {
-      return $curry.bind(null, ...args);
-    }
-    return fn.call(null, ...args);
-  };
-};
-
 // New function: deriveSharedKey
 export const deriveSharedKey = async (privateKey, publicKey, derivedKeyAlgorithm = { name: 'AES-GCM', length: 256 }) => {
   // Perform the key derivation
@@ -110,8 +79,6 @@ export const deriveSharedKey = async (privateKey, publicKey, derivedKeyAlgorithm
   );
   return sharedSecret;
 };
-
-// ... (previous code remains largely the same, with some modifications and additions)
 
 // Additional importKey functions
 export const importKeyFromBase64 = async (base64Key, algorithm, options = {}) => {
