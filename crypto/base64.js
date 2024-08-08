@@ -14,3 +14,10 @@ export const base64ToArrayBuffer = base64 => {
   }
   return bytes.buffer;
 };
+
+export function base64UrlEncode(str) {
+  return encode(str)
+    .replace(/=/g, '')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_');
+}
