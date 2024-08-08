@@ -70,25 +70,19 @@ export const importKeyFromPem = async (pemKey, algorithm, options = {}) => {
   const keyData = base64ToArrayBuffer(base64Key);
   return importKey(keyData, algorithm, {
     format,
-    keyUsages: format === 'spki' ? ['verify'] : ['sign', 'verify'],
+    keyUsages: isPublic ? ['verify'] : ['sign'],
     ...options,
   });
 };
 
 export const importKeyPairFromPem = async (pemKeyPair, algorithm, options) => {
-  const publicKey = await importKeyFromPem(pemKeyPair.publicKey, algorithm, {
-    format: 'spki',
-    ...options,
-  });
-  const privateKey = await importKeyFromPem(pemKeyPair.privateKey, algorithm, {
-    format: 'pkcs8',
-    ...options,
-  });
+  const publicKey = await importKeyFromPem(pemKeyPair.publicKey, algorithm, options);
+  const privateKey = await importKeyFromPem(pemKeyPair.privateKey, algorithm, options);
   return {
     publicKey,
     privateKey,
   };
-}
+};
 
 export const exportKey = async (key, format = 'raw') =>
   crypto.subtle.exportKey(format, key);
