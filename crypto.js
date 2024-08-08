@@ -6,19 +6,6 @@ export const generateKey = (algorithm, options = {}) => {
   return crypto.subtle.generateKey(algorithm, extractable, keyUsages);
 };
 
-export const generateRSAKeyPair = async (modulusLength = 2048, options = {}) => {
-  const { extractable = true, keyUsages = ['encrypt', 'decrypt', 'sign', 'verify'] } = options;
-  return generateKey(
-    {
-      name: 'RSA-OAEP',
-      modulusLength,
-      publicExponent: new Uint8Array([1, 0, 1]),
-      hash: 'SHA-256',
-    },
-    { extractable, keyUsages }
-  );
-};
-
 export const generateAESKey = async (length = 256, options = {}) => {
   const { extractable = true, keyUsages = ['encrypt', 'decrypt'] } = options;
   return generateKey(
@@ -30,7 +17,7 @@ export const generateAESKey = async (length = 256, options = {}) => {
   );
 };
 
-export const generateECDHKeyPair = async (namedCurve = 'P-256', options = {}) => {
+export const generateECDHKey = async (namedCurve = 'P-256', options = {}) => {
   const { extractable = true, keyUsages = ['deriveKey', 'deriveBits'] } = options;
   return generateKey(
     {
@@ -41,6 +28,17 @@ export const generateECDHKeyPair = async (namedCurve = 'P-256', options = {}) =>
   );
 };
 
+// New function: deriveSharedKey
+export const deriveSharedKey = async (privateKey, publicKey, algorithm = { name: 'AES-GCM', length: 256 }) => {
+  return crypto.subtle.deriveKey(
+    {
+      name: 'ECDH',
+      public: publicKey,
+    },
+    privateKey,
+    algorithm.length,
+  );
+};
 
 export const importKey = (key, algorithm, {
   format = 'raw',
@@ -67,7 +65,6 @@ export const importKeyFromPem = async (pemKey, algorithm, options = {}) => {
     ...options,
   });
 };
-
 
 export const exportKey = async (key, format = 'raw') => {
   return crypto.subtle.exportKey(format, key);
@@ -96,46 +93,10 @@ export const encrypt = (key, data, algorithm = { name: 'RSA-OAEP', hash: 'SHA-25
 export const decrypt = (key, data, algorithm = { name: 'RSA-OAEP', hash: 'SHA-256' }) =>
   crypto.subtle.decrypt(algorithm, key, data).then(buffer => new Uint8Array(buffer));
 
-export const encryptString = async (key, str, algorithm = { name: 'RSA-OAEP', hash: 'SHA-256' }) => {
-  const enc = new TextEncoder();
-  const data = enc.encode(str);
-  return encrypt(key, data, algorithm);
-};
-
-export const decryptString = async (key, data, algorithm = { name: 'RSA-OAEP', hash: 'SHA-256' }) => {
-  const dec = new TextDecoder();
-  const bytes = await decrypt(key, data, algorithm);
-  return dec.decode(bytes);
-};
-
 // Hash functions
-export const createHash = (algorithm, data) =>
+export const digest = (algorithm, data) => {
   crypto.subtle.digest(algorithm, data).then(buffer => new Uint8Array(buffer));
-
-export const createHmac = async (algorithm, key, data) => {
-  const cryptoKey = await importKey(key, { name: 'HMAC', hash: algorithm });
-  return crypto.subtle.sign('HMAC', cryptoKey, data).then(buffer => new Uint8Array(buffer));
-};
-
-// Specific hash functions
-export const sha1 = data => createHash('SHA-1', data);
-export const sha256 = data => createHash('SHA-256', data);
-export const sha512 = data => createHash('SHA-512', data);
-export const sha1hmac = (key, data) => createHmac('SHA-1', key, data);
-export const sha256hmac = (key, data) => createHmac('SHA-256', key, data);
-export const sha512hmac = (key, data) => createHmac('SHA-512', key, data);
-
-// New function: deriveSharedKey
-export const deriveSharedKey = async (privateKey, publicKey, algorithm = { name: 'AES-GCM', length: 256 }) => {
-  return crypto.subtle.deriveKey(
-    {
-      name: 'ECDH',
-      public: publicKey,
-    },
-    privateKey,
-    algorithm.length,
-  );
-};
+}
 
 // Signature functions
 export const sign = async (key, data, algorithm = { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }) => {
@@ -146,14 +107,22 @@ export const verify = async (key, signature, data, algorithm = { name: 'RSASSA-P
   return crypto.subtle.verify(algorithm, key, signature, data);
 };
 
-export const signString = async (key, str, algorithm = { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }) => {
-  const enc = new TextEncoder();
-  const data = enc.encode(str);
-  return sign(key, data, algorithm);
+export const createHmac = async (hash, key, data) => {
+  if (typeof data === 'string')
+    data = new TextEncoder().encode(data);
+  return sign(key, data, { name: 'HMAC', hash });
+}
+
+export const createHash = async (algorithm, data) => {
+  if (typeof data === 'string')
+    data = new TextEncoder().encode(data);
+  return digest(algorithm, data);
 };
 
-export const verifyString = async (key, signature, str, algorithm = { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }) => {
-  const enc = new TextEncoder();
-  const data = enc.encode(str);
-  return verify(key, signature, data, algorithm);
-};
+// Specific hash functions
+export const sha1 = data => createHash('SHA-1', data);
+export const sha256 = data => createHash('SHA-256', data);
+export const sha512 = data => createHash('SHA-512', data);
+export const sha1hmac = (key, data) => createHmac('SHA-1', key, data);
+export const sha256hmac = (key, data) => createHmac('SHA-256', key, data);
+export const sha512hmac = (key, data) => createHmac('SHA-512', key, data);
