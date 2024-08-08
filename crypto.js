@@ -70,10 +70,18 @@ export const importKeyFromPem = async (pemKey, algorithm, options = {}) => {
   });
 };
 
-export const importKeyPairFromPem = async (pemKeyPair, options) => {
+export const importKeyPairFromPem = async (pemKeyPair, algorithm, options) => {
+  const publicKey = await importKeyFromPem(pemKeyPair.publicKey, algorithm, {
+    format: 'spki',
+    ...options,
+  });
+  const privateKey = await importKeyFromPem(pemKeyPair.privateKey, algorithm, {
+    format: 'pkcs8',
+    ...options,
+  });
   return {
-    publicKey: await importKeyFromPem(pemKeyPair.publicKey, 'spki', options),
-    privateKey: await importKeyFromPem(pemKeyPair.privateKey, 'pkcs8', options),
+    publicKey,
+    privateKey,
   };
 }
 
