@@ -107,3 +107,42 @@ export const requestForm = (form, options) => {
   const { onSuccess, onError } = options;
   return bind(form, { onSubmit })
 };
+
+
+const PERSISTENCE_ATTR = 'data-persist';
+
+export function saveElementValue(element) {
+  if (typeof element === 'string') {
+    element = document.querySelector(element);
+  }
+  const key = element.getAttribute(PERSISTENCE_ATTR) || element.id || element.name;
+  if (key) {
+    const value = element.type === 'checkbox' ? element.checked : element.value;
+    localStorage.setItem(key, JSON.stringify(value));
+  }
+}
+
+export function restoreElementValue(element) {
+  const key = element.getAttribute(PERSISTENCE_ATTR) || element.id || element.name;
+  if (key) {
+    const value = JSON.parse(localStorage.getItem(key));
+    if (value !== null) {
+      if (element.type === 'checkbox') {
+        element.checked = value;
+      } else {
+        element.value = value;
+      }
+    }
+  }
+}
+
+export function initFormPersistence() {
+  const elements = document.querySelectorAll(`[${PERSISTENCE_ATTR}]`);
+  elements.forEach(element => {
+    restoreElementValue(element);
+    element.addEventListener('change', () => saveElementValue(element));
+    if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+      element.addEventListener('input', () => saveElementValue(element));
+    }
+  });
+}
