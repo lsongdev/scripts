@@ -1,31 +1,27 @@
 import { base64ToArrayBuffer, arrayBufferToBase64 } from './crypto/base64.js';
 
 // Key generation and management
-export const generateKey = (algorithm, options = {}) => {
-  const { extractable = true, keyUsages = ['sign', 'verify'] } = options;
-  return crypto.subtle.generateKey(algorithm, extractable, keyUsages);
-};
+export const generateKey = (algorithm, {
+  extractable = true,
+  keyUsages = ['sign', 'verify'],
+} = {}) => crypto.subtle.generateKey(algorithm, extractable, keyUsages);
 
-export const generateAESKey = async (length = 256, options = {}) => {
-  const { extractable = true, keyUsages = ['encrypt', 'decrypt'] } = options;
-  return generateKey(
-    {
-      name: 'AES-GCM',
-      length,
-    },
-    { extractable, keyUsages }
-  );
-};
+export const generateAESKey = async (length = 256, {
+  extractable = true,
+  keyUsages = ['encrypt', 'decrypt'],
+} = {}) => generateKey({
+  name: 'AES-GCM',
+  length,
+}, { extractable, keyUsages });
 
-export const generateECDHKey = async (namedCurve = 'P-256', options = {}) => {
-  const { extractable = true, keyUsages = ['deriveKey', 'deriveBits'] } = options;
-  return generateKey(
-    {
-      name: 'ECDH',
-      namedCurve,
-    },
-    { extractable, keyUsages }
-  );
+export const generateECDHKey = async (namedCurve = 'P-256', {
+  extractable = true,
+  keyUsages = ['deriveKey', 'deriveBits'],
+} = {}) => {
+  return generateKey({
+    name: 'ECDH',
+    namedCurve,
+  }, { extractable, keyUsages });
 };
 
 // New function: deriveSharedKey
@@ -66,9 +62,8 @@ export const importKeyFromPem = async (pemKey, algorithm, options = {}) => {
   });
 };
 
-export const exportKey = async (key, format = 'raw') => {
-  return crypto.subtle.exportKey(format, key);
-};
+export const exportKey = async (key, format = 'raw') =>
+  crypto.subtle.exportKey(format, key);
 
 export const exportKeyToBase64 = async (key, format = 'raw') => {
   const exportedKey = await exportKey(key, format);
@@ -94,9 +89,8 @@ export const decrypt = (key, data, algorithm = { name: 'RSA-OAEP', hash: 'SHA-25
   crypto.subtle.decrypt(algorithm, key, data).then(buffer => new Uint8Array(buffer));
 
 // Hash functions
-export const digest = (algorithm, data) => {
-  return crypto.subtle.digest(algorithm, data).then(buffer => new Uint8Array(buffer));
-}
+export const digest = async (data, algorithm = 'SHA-256') =>
+  crypto.subtle.digest(algorithm, data).then(buffer => new Uint8Array(buffer));
 
 // Signature functions
 export const sign = async (key, data, algorithm = { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }) => {
@@ -108,15 +102,18 @@ export const verify = async (key, signature, data, algorithm = { name: 'RSASSA-P
 };
 
 export const createHmac = async (hash, key, data) => {
+  const algorithm = { name: 'HMAC', hash };
+  if (!(key instanceof CryptoKey))
+    key = await importKey(key, algorithm);
   if (typeof data === 'string')
     data = new TextEncoder().encode(data);
-  return sign(key, data, { name: 'HMAC', hash });
+  return sign(key, data, algorithm);
 }
 
 export const createHash = async (algorithm, data) => {
   if (typeof data === 'string')
     data = new TextEncoder().encode(data);
-  return digest(algorithm, data);
+  return digest(data, algorithm);
 };
 
 // Specific hash functions
