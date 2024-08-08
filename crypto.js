@@ -59,13 +59,15 @@ export const importKeyFromJwkString = (jwkString, algorithm, options) => {
 };
 
 export const importKeyFromPem = async (pemKey, algorithm, options = {}) => {
+  const { format } = options;
   const base64Key = pemKey
     .replace(/-----BEGIN (.*) KEY-----/, '')
     .replace(/-----END (.*) KEY-----/, '')
     .replace(/\s/g, '');
   const keyData = base64ToArrayBuffer(base64Key);
   return importKey(keyData, algorithm, {
-    format: 'pkcs8',
+    format,
+    keyUsages: format === 'spki' ? ['verify'] : ['sign', 'verify'],
     ...options,
   });
 };
