@@ -59,7 +59,10 @@ export const importKeyFromJwkString = (jwkString, algorithm, options) => {
 };
 
 export const importKeyFromPem = async (pemKey, algorithm, options = {}) => {
-  const { format } = options;
+  const isPublic = pemKey.includes('PUBLIC KEY');
+  const {
+    format = isPublic ? 'spki' : 'pkcs8',
+  } = options;
   const base64Key = pemKey
     .replace(/-----BEGIN (.*) KEY-----/, '')
     .replace(/-----END (.*) KEY-----/, '')
