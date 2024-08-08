@@ -17,11 +17,22 @@ export const generateAESKey = async (length = 256, {
 export const generateECDHKey = async (namedCurve = 'P-256', {
   extractable = true,
   keyUsages = ['deriveKey', 'deriveBits'],
+} = {}) => generateKey({
+  name: 'ECDH',
+  namedCurve,
+}, { extractable, keyUsages });
+
+export const generateRSAKey = async ({
+  name = 'RSASSA-PKCS1-v1_5',
+  modulusLength = 2048,
+  publicExponent = new Uint8Array([1, 0, 1]),
+  hash = 'SHA-256',
+  extractable = true,
+  keyUsages = ['sign', 'verify'],
 } = {}) => {
-  return generateKey({
-    name: 'ECDH',
-    namedCurve,
-  }, { extractable, keyUsages });
+  if (name === 'RSA-OAEP') keyUsages = keyUsages || ['encrypt', 'decrypt'];
+  const algorithm = { name, modulusLength, publicExponent, hash };
+  return generateKey(algorithm, { keyUsages, extractable });
 };
 
 // New function: deriveSharedKey
@@ -122,10 +133,10 @@ export async function exportPublicKeyToJwk(publicKey) {
 
 
 // Encryption and decryption
-export const encrypt = (key, data, algorithm = { name: 'RSA-OAEP', hash: 'SHA-256' }) =>
+export const encrypt = (key, data, algorithm = key.algorithm) =>
   crypto.subtle.encrypt(algorithm, key, data).then(buffer => new Uint8Array(buffer));
 
-export const decrypt = (key, data, algorithm = { name: 'RSA-OAEP', hash: 'SHA-256' }) =>
+export const decrypt = (key, data, algorithm = key.algorithm) =>
   crypto.subtle.decrypt(algorithm, key, data).then(buffer => new Uint8Array(buffer));
 
 // Hash functions
@@ -133,11 +144,11 @@ export const digest = async (data, algorithm = 'SHA-256') =>
   crypto.subtle.digest(algorithm, data).then(buffer => new Uint8Array(buffer));
 
 // Signature functions
-export const sign = async (key, data, algorithm = { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }) => {
+export const sign = async (key, data, algorithm = key.algorithm) => {
   return crypto.subtle.sign(algorithm, key, data).then(buffer => new Uint8Array(buffer));
 };
 
-export const verify = async (key, signature, data, algorithm = { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }) => {
+export const verify = async (key, signature, data, algorithm = key.algorithm) => {
   return crypto.subtle.verify(algorithm, key, signature, data);
 };
 
