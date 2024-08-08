@@ -6,7 +6,7 @@ export const arrayBufferToString = buffer =>
   String.fromCharCode.apply(null, new Uint8Array(buffer));
 
 export const encode = data => {
-  if (data instanceof ArrayBuffer)
+  if (data instanceof ArrayBuffer || data instanceof Uint8Array)
     data = arrayBufferToString(data);
   return encodeString(data);
 };
