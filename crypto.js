@@ -50,6 +50,14 @@ export const importKeyFromBase64 = async (base64Key, algorithm, options) => {
   return importKey(keyData, algorithm, options);
 };
 
+export const importKeyFromJwkString = (jwkString, algorithm, options) => {
+  const jwk = JSON.parse(jwkString);
+  return importKey(jwk, algorithm, {
+    format: 'jwk',
+    ...options,
+  });
+};
+
 export const importKeyFromPem = async (pemKey, algorithm, options = {}) => {
   const base64Key = pemKey
     .replace(/-----BEGIN (.*) KEY-----/, '')
@@ -61,6 +69,13 @@ export const importKeyFromPem = async (pemKey, algorithm, options = {}) => {
     ...options,
   });
 };
+
+export const importKeyPairFromPem = async (pemKeyPair, options) => {
+  return {
+    publicKey: await importKeyFromPem(pemKeyPair.publicKey, 'spki', options),
+    privateKey: await importKeyFromPem(pemKeyPair.privateKey, 'pkcs8', options),
+  };
+}
 
 export const exportKey = async (key, format = 'raw') =>
   crypto.subtle.exportKey(format, key);
@@ -80,6 +95,24 @@ export const exportKeyToPem = async (key, format = 'pkcs8') => {
     h('END'),
   ].join('\n');
 };
+
+export const exportKeyPairToPem = async keyPair => {
+  return {
+    publicKey: await exportKeyToPem(keyPair.publicKey, 'spki'),
+    privateKey: await exportKeyToPem(keyPair.privateKey, 'pkcs8'),
+  };
+}
+
+export async function exportPublicKeyToJwk(publicKey) {
+  const jwk = await exportKey(publicKey, "jwk");
+  // fields in lexicographic order
+  return {
+    e: jwk.e,
+    kty: jwk.kty,
+    n: jwk.n,
+  };
+};
+
 
 // Encryption and decryption
 export const encrypt = (key, data, algorithm = { name: 'RSA-OAEP', hash: 'SHA-256' }) =>
