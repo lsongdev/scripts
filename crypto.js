@@ -95,7 +95,7 @@ export const decrypt = (key, data, algorithm = { name: 'RSA-OAEP', hash: 'SHA-25
 
 // Hash functions
 export const digest = (algorithm, data) => {
-  crypto.subtle.digest(algorithm, data).then(buffer => new Uint8Array(buffer));
+  return crypto.subtle.digest(algorithm, data).then(buffer => new Uint8Array(buffer));
 }
 
 // Signature functions
