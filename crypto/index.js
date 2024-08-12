@@ -104,7 +104,7 @@ export const toPem = (type, data) => {
 };
 
 export const parsePem = pem => {
-  const lines = pem.split('\n');
+  const lines = pem.trim().split('\n').filter(Boolean);
   const header = lines[0];
   const type = header.match(/-----BEGIN (.*)-----/)[1];
   const base64 = lines.slice(1, -1).join('');
