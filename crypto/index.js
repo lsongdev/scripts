@@ -100,7 +100,7 @@ export const toPem = (type, data) => {
     `-----BEGIN ${type}-----`,
     arrayBufferToBase64(data).replace(/(.{64})/g, '$1\n'),
     `-----END ${type}-----`,
-  ];
+  ].join('\n');
 };
 
 export const parsePem = pem => {
