@@ -41,9 +41,9 @@ export const generateRSAKey = async ({
   return generateKey(algorithm, { keyUsages, extractable });
 };
 
-export async function generateRsaKeyPairAsPem() {
-  const keyPair = await generateRSAKey();
-  return exportKeyPairToPem(keyPair, algorithm);
+export async function generateRsaKeyPairAsPem(...opts) {
+  const keyPair = await generateRSAKey(...opts);
+  return exportKeyPairToPem(keyPair);
 };
 
 // New function: deriveSharedKey
