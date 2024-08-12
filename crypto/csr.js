@@ -28,7 +28,7 @@ function createSubject(csrInfo) {
   })
 }
 
-export async function generateCSR(keyPair, info) {
+export async function createCSR(keyPair, info) {
   const subject = createSubject(info);
   const spki = await window.crypto.subtle.exportKey("spki", keyPair.publicKey);
   const publicKeyInfo = asn1js.fromBER(spki).result;
@@ -65,13 +65,4 @@ export async function generateCSR(keyPair, info) {
     ]
   });
   return csr.toBER(false);
-}
-
-export const generateCSRPem = async (keyPair, info) => {
-  const csr = await generateCSR(keyPair, info);
-  return [
-    "-----BEGIN CERTIFICATE REQUEST-----",
-    encode(csr).replace(/(.{64})/g, "$1\n"),
-    "-----END CERTIFICATE REQUEST-----"
-  ].join("\n");
 }

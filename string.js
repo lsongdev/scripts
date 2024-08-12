@@ -34,3 +34,6 @@ export function sprintf(format, ...args) {
     return match;
   });
 }
+
+export const hex = uint8array =>
+  uint8array.reduce((a, b) => a + b.toString(16).padStart(2, '0'), '');
