@@ -1,39 +1,66 @@
-<link rel="stylesheet" href="https://lsong.org/stylesheets/dialog.css">
+<!DOCTYPE html>
+<html lang="en">
 
-<h1>Dialog Example</h1>
-<dialog id="favDialog" class="dialog-top-right" >
-  <form method="dialog">
-    <b>Dialog</b>
-    <p>
-      <label>Favorite animal:
-        <select id="selectEl">
-          <option value="default">Choose</option>
-          <option>Brine shrimp</option>
-          <option>Red panda</option>
-          <option>Spider monkey</option>
-        </select>
-      </label>
-    </p>
-    <div>
-      <button id="confirmBtn" value="default">OK</button>
-      <button value="cancel">Cancel</button>
-    </div>
-  </form>
-</dialog>
-<p>
-  <button id="showButton">Show the dialog</button>
-</p>
-<output id="outputBox"></output>
-<script>
-  showButton.addEventListener('click', () => {
-    favDialog.showModal();
-  });
-  // "Favorite animal" input sets the value of the submit button
-  selectEl.addEventListener('change', (e) => {
-    confirmBtn.value = selectEl.value;
-  });
-  // "Confirm" button of form triggers "close" on dialog because of [method="dialog"]
-  favDialog.addEventListener('close', () => {
-    outputBox.value = `ReturnValue: ${favDialog.returnValue}.`;
-  });
-</script>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dialog Component</title>
+  <link rel="stylesheet" href="https://lsong.org/stylesheets/dialog.css?x">
+</head>
+
+<body>
+  <h1>Dialog Component</h1>
+
+  <dialog id="notificationDialog" class="dialog dialog-notification">
+    <form method="dialog">
+      <h3>Notification</h3>
+      <p>This is a notification message in the top right corner.</p>
+      <button class="dialog-close" value="close">&times;</button>
+    </form>
+  </dialog>
+
+  <dialog id="drawerDialog" class="dialog dialog-drawer-right">
+    <form method="dialog">
+      <h3>Drawer</h3>
+      <p>This is a side drawer content on the right side.</p>
+      <button class="dialog-close" value="close">&times;</button>
+    </form>
+  </dialog>
+
+  <dialog id="bottomDialog" class="dialog dialog-drawer-bottom">
+    <form method="dialog">
+      <h3>Bottom Drawer</h3>
+      <p>This is a bottom drawer content at the bottom of the page.</p>
+      <button class="dialog-close" value="close">&times;</button>
+    </form>
+  </dialog>
+
+  <dialog id="toastDialog" class="dialog dialog-toast">
+    This is a toast message at the top center.
+  </dialog>
+
+  <button id="showNotification">Show Notification</button>
+  <button id="showDrawer">Show Drawer</button>
+  <button id="showBottomDrawer">Show Bottom Drawer</button>
+  <button id="showToast">Show Toast</button>
+
+  <script>
+    function showDialog(dialogId) {
+      const dialog = document.getElementById(dialogId);
+      dialog.showModal();
+    }
+
+    function showToast() {
+      const toast = document.getElementById('toastDialog');
+      toast.show();
+      setTimeout(() => toast.close(), 3000);
+    }
+
+    document.getElementById('showNotification').addEventListener('click', () => showDialog('notificationDialog'));
+    document.getElementById('showDrawer').addEventListener('click', () => showDialog('drawerDialog'));
+    document.getElementById('showBottomDrawer').addEventListener('click', () => showDialog('bottomDialog'));
+    document.getElementById('showToast').addEventListener('click', showToast);
+  </script>
+</body>
+
+</html>

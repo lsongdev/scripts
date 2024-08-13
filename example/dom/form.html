@@ -1,6 +1,33 @@
+<meta charset="utf-8">
 <script type="module" src="../../components/form.js"></script>
 <h1>Form Example</h1>
-<form is="x-form" method="post" action="https://httpbin.org/post" enctype="application/json" >
-  <input type="text" name="test" value="aaa" >
-  <button type="submit">submit</button>
+
+<form is="x-form" method="POST" action="https://httpbin.org/post" content-type="application/json"
+  custom-headers='{"Authorization": "Bearer token123"}'>
+  <input type="text" name="foo" value="bar">
+  <!-- 表单字段 -->
+  <button type="submit">提交</button>
+  <button type="button" id="cancelBtn">取消</button>
 </form>
+
+<script>
+  const form = document.querySelector('form[is="x-form"]');
+
+  form.addEventListener('submitstart', () => console.log('提交开始'));
+  form.addEventListener('submitend', () => console.log('提交结束'));
+  form.addEventListener('response', (e) => console.log('收到响应:', e.detail));
+  form.addEventListener('error', (e) => console.error('发生错误:', e.detail.error));
+  form.addEventListener('abort', () => console.log('请求已中止'));
+
+  document.getElementById('cancelBtn').addEventListener('click', () => form.abort());
+
+  // 监听属性变化
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.type === 'attributes') {
+        console.log(`${mutation.attributeName} 属性已更改`);
+      }
+    });
+  });
+  observer.observe(form, { attributes: true });
+</script>

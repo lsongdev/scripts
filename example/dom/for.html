@@ -1,10 +1,27 @@
 <h1>X-For Example</h1>
-<script type="module" src="../../components/xfor.js"></script>
+<script type="module" src="../../components/for.js"></script>
+<style>
+  li {
+    background-color: red;
+  }
+</style>
 
-<x-for items='[{"name":"Item 1"},{"name":"Item 2"},{"name":"Item 3"}]'>
+<x-for id="myList" items='[{"name": "Alice", "age": 30}, {"name": "Bob", "age": 25}]'>
   <template>
     <li>
-      Name: <span data-template="name"></span>
+      <span data-template="name"></span> is <span data-template="age"></span> years old.
     </li>
   </template>
 </x-for>
+<script>
+  customElements.whenDefined('x-for').then(() => {
+    console.log('XFor element is now defined');
+    const myList = document.getElementById('myList');
+    console.log('myList element:', myList);
+    myList.items = [
+      { name: "Alice", age: 30 },
+      { name: "Bob", age: 28 }
+    ];
+  });
+
+</script>
