@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>x-select Web Component</title>
+  <style>
+  </style>
+</head>
+
+<body>
+  <x-select placeholder="Select an option">
+    <x-select-option value="1">
+      <img src="https://lsong.org/icon.png" alt="Option 1"> Option 1
+    </x-select-option>
+    <x-select-option value="2">
+      <input type="checkbox"> <span class="red">Option 2</span>
+    </x-select-option>
+    <x-select-option value="3">Option 3</x-select-option>
+  </x-select>
+
+  <script>
+    class XSelect extends HTMLElement {
+      constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+      }
+
+      connectedCallback() {
+        this.render();
+        this.addEventListeners();
+      }
+
+      render() {
+        const style = document.createElement('style');
+        style.textContent = `
+          :host {
+              display: inline-block;
+              position: relative;
+          }
+          .select-input {
+              width: 100%;
+              padding: 5px;
+          }
+          .options {
+              display: none;
+              position: absolute;
+              top: 100%;
+              left: 0;
+              width: 100%;
+              max-height: 200px;
+              overflow-y: auto;
+              border: 1px solid #ccc;
+              background-color: white;
+          }
+          ::slotted(x-select-option) {
+              display: block;
+              padding: 5px;
+              cursor: pointer;
+          }
+          ::slotted(x-select-option:hover) {
+              background-color: #f0f0f0;
+          }
+        `;
+        this.shadowRoot.innerHTML = `
+          ${style.outerHTML}
+          <input type="text" class="select-input" placeholder="${this.getAttribute('placeholder') || ''}">
+          <div class="options">
+              <slot></slot>
+          </div>
+        `;
+        this.input = this.shadowRoot.querySelector('.select-input');
+        this.optionsContainer = this.shadowRoot.querySelector('.options');
+      }
+
+      addEventListeners() {
+        this.input.addEventListener('focus', () => this.showOptions());
+        this.input.addEventListener('blur', () => setTimeout(() => this.hideOptions(), 100));
+        this.input.addEventListener('input', () => this.filterOptions());
+        this.shadowRoot.addEventListener('slotchange', () => {
+          this.options = Array.from(this.children);
+          this.options.forEach(option => {
+            option.addEventListener('click', (e) => this.selectOption(e.target));
+          });
+        });
+      }
+
+      showOptions() {
+        this.optionsContainer.style.display = 'block';
+      }
+
+      hideOptions() {
+        this.optionsContainer.style.display = 'none';
+      }
+
+      filterOptions() {
+        const filter = this.input.value.toLowerCase();
+        this.options.forEach(option => {
+          const text = option.textContent.toLowerCase();
+          option.style.display = text.includes(filter) ? '' : 'none';
+        });
+      }
+
+      selectOption(option) {
+        this.input.value = option.textContent.trim();
+        this.hideOptions();
+        this.dispatchEvent(new CustomEvent('change', {
+          detail: { value: option.getAttribute('value') },
+          bubbles: true,
+          composed: true
+        }));
+      }
+    }
+
+    class XSelectOption extends HTMLElement {
+      constructor() {
+        super();
+      }
+    }
+
+    customElements.define('x-select', XSelect);
+    customElements.define('x-select-option', XSelectOption);
+  </script>
+</body>
+
+</html>
