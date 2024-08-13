@@ -37,3 +37,9 @@ export function sprintf(format, ...args) {
 
 export const hex = uint8array =>
   uint8array.reduce((a, b) => a + b.toString(16).padStart(2, '0'), '');
+
+// export function toHexString(byteArray) {
+//   return Array.from(byteArray, function(byte) {
+//     return ('0' + (byte & 0xFF).toString(16)).slice(-2);
+//   }).join('')
+// }

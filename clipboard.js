@@ -43,6 +43,7 @@ export const copyExecCommand = content => {
 };
 
 export const copy = async content => {
+  // console.log('copy', content);
   try {
     await writeText(content);
   } catch(err) {

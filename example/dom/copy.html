@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Copy Button Example</title>
+  <script type="module" src="../../components/copy-button.js"></script>
+</head>
+
+<body>
+  <h1>Copy Button Examples</h1>
+
+  <div class="example">
+    <h2>1. Copy from input</h2>
+    <input type="text" id="inputText" value="Hello, World!">
+    <button is="x-copy" for="inputText">Copy Input</button>
+  </div>
+
+  <div class="example">
+    <h2>2. Copy link href</h2>
+    <a href="https://www.example.com" id="linkExample">Example Link</a>
+    <button is="x-copy" for="linkExample">Copy Link</button>
+  </div>
+
+  <div class="example">
+    <h2>3. Copy text content</h2>
+    <p id="paragraphExample">This is some example text that can be copied.</p>
+    <button is="x-copy" for="paragraphExample">Copy Paragraph</button>
+  </div>
+
+  <div class="example">
+    <h2>4. Copy predefined value</h2>
+    <button is="x-copy" value="This is a predefined value">Copy Predefined Text</button>
+  </div>
+</body>
+
+</html>

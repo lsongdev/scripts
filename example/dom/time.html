@@ -1,3 +1,30 @@
+<meta charset="UTF-8">
 <h1>XTime Example</h1>
 <script type="module" src="../../components/time.js"></script>
-<time is="x-time" format="{yyyy}/{MM}" >April 1, 2038</time>
+<div>
+  <time is="x-time" format="{yyyy}/{MM}">April 1, 2038</time>
+</div>
+<!-- 基本使用 -->
+<div>
+  <time is="x-time">Wednesday, August 14, 2024 12:11:20 AM</time>
+</div>
+
+<!-- 自定义格式 -->
+<div>
+  <time is="x-time"  ></time>
+</div>
+
+<!-- 指定时区 -->
+<div>
+  <time is="x-time" timezone="America/New_York"></time>
+</div>
+
+<!-- 自定义更新间隔（毫秒） -->
+<div>
+  <time is="x-time" update-interval="5000"></time>
+</div>
+
+<!-- 显示特定的日期时间 -->
+<div>
+  <time is="x-time" datetime="2023-08-15T12:00:00Z"></time>
+</div>
