@@ -1,5 +1,5 @@
-import { pathToRegexp } from '../router.js';
-import { useState, useEffect } from './react.js';
+import { pathToRegexp } from '../../router.js';
+import { useState, useEffect } from '../react.js';
 
 let _routes, _render, isHash = true;
 
