@@ -81,3 +81,24 @@ export const createSpaceAmbience = context => {
   connectNodes(osc, gain, context.destination);
   return { oscillators: [osc, lfo], gains: [lfoGain, gain] };
 };
+
+const noteToFreq = (note) => {
+  const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+  const octave = parseInt(note.slice(-1));
+  const semitone = notes.indexOf(note.slice(0, -1));
+  return 440 * Math.pow(2, (octave - 4) + (semitone - 9) / 12);
+};
+
+export const playNote = (context, analyser, note) => {
+  const frequency = noteToFreq(note);
+  const oscillator = createOscillator(context, { frequency });
+  oscillator.connect(analyser);
+  oscillator.start();
+  return oscillator;
+};
+
+export const stopNote = (oscillator) => {
+  if (!oscillator) console.error('No oscillator to stop');
+  oscillator.stop();
+  oscillator.disconnect();
+};
