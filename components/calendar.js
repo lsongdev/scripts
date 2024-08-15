@@ -59,57 +59,57 @@ class CalendarComponent extends HTMLElement {
     );
 
     let calendarHTML = `
-      <style>
-      :host {
-        display: flex;
-        flex-direction: column;
-        font-family: Arial, sans-serif;
-      }
-      table {
-        width: 100%;
-        height: 100%;
-        border-collapse: collapse;
-      }
-      th, td {
-        cursor: pointer;
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: center;
-      }
-      th {
-        background-color: #f2f2f2;
-      }
-      .today {
-        background-color: #e6f3ff;
-      }
-      .selected {
-        background-color: #ffeb3b;
-      }
-      .controls {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 10px;
-      }
-      .year-month-select {
-        gap: 5px;
-        display: flex;
-        align-items: center;
-      }
-      </style>
-      <div class="controls">
-        <button id="prevMonth">&lt;</button>
-        <div class="year-month-select">
-          <input type="number" id="yearInput" min="1900" max="2100" value="${year}">
-          <select id="monthSelect">
-              ${[...Array(12)].map((_, i) => `<option value="${i}" ${i === month ? 'selected' : ''}>${new Intl.DateTimeFormat(this._locale, { month: 'long' }).format(new Date(2021, i, 1))}</option>`).join('')}
-          </select>
+        <style>
+        :host {
+          display: flex;
+          flex-direction: column;
+          font-family: Arial, sans-serif;
+        }
+        table {
+          width: 100%;
+          height: 100%;
+          border-collapse: collapse;
+        }
+        th, td {
+          cursor: pointer;
+          border: 1px solid #ddd;
+          padding: 8px;
+          text-align: center;
+        }
+        th {
+          background-color: #f2f2f2;
+        }
+        .today {
+          background-color: #e6f3ff;
+        }
+        .selected {
+          background-color: #ffeb3b;
+        }
+        .controls {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 10px;
+        }
+        .year-month-select {
+          gap: 5px;
+          display: flex;
+          align-items: center;
+        }
+        </style>
+        <div class="controls">
+          <button id="prevMonth">&lt;</button>
+          <div class="year-month-select">
+            <input type="number" id="yearInput" min="1900" max="2100" value="${year}">
+            <select id="monthSelect">
+                ${[...Array(12)].map((_, i) => `<option value="${i}" ${i === month ? 'selected' : ''}>${new Intl.DateTimeFormat(this._locale, { month: 'long' }).format(new Date(2021, i, 1))}</option>`).join('')}
+            </select>
+          </div>
+          <button id="today">Today</button>
+          <button id="nextMonth">&gt;</button>
         </div>
-        <button id="today">Today</button>
-        <button id="nextMonth">&gt;</button>
-      </div>
-      <table>
-      <tr>${dayNames.map(day => `<th>${day}</th>`).join('')}</tr>`;
+        <table>
+        <tr>${dayNames.map(day => `<th>${day}</th>`).join('')}</tr>`;
 
     let day = 1;
     const today = new Date();
@@ -180,9 +180,15 @@ class CalendarComponent extends HTMLElement {
   }
 
   onDateClick(date) {
-    this._selectedDate = date;
+    if (this._selectedDate === date) {
+      this._selectedDate = '';
+    } else {
+      this._selectedDate = date;
+    }
     this.render();
-    const event = new CustomEvent('dateSelected', { detail: date });
+    const event = new CustomEvent('dateSelected', {
+      detail: this._selectedDate
+    });
     this.dispatchEvent(event);
   }
 }
