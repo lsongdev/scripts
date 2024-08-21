@@ -47,7 +47,7 @@ define('x-form', class extends wrap(HTMLFormElement) {
     }
 
     // 添加自定义请求头
-    const customHeaders = this.getAttribute('custom-headers');
+    const customHeaders = this.getAttribute('headers');
     if (customHeaders) {
       try {
         const headers = JSON.parse(customHeaders);

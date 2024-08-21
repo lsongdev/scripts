@@ -1,9 +1,10 @@
 <meta charset="utf-8">
 <script type="module" src="../../components/form.js"></script>
+
 <h1>Form Example</h1>
 
 <form is="x-form" method="POST" action="https://httpbin.org/post" content-type="application/json"
-  custom-headers='{"Authorization": "Bearer token123"}'>
+  headers='{"Authorization": "Bearer token123"}'>
   <input type="text" name="foo" value="bar">
   <!-- 表单字段 -->
   <button type="submit">提交</button>
@@ -30,4 +31,29 @@
     });
   });
   observer.observe(form, { attributes: true });
+</script>
+
+
+<style>
+@import url(https://lsong.org/stylesheets/form.css);
+</style>
+
+<script type="module">
+  import {generateForm} from '../../form.js';
+
+// 使用示例
+const formStructure = [
+  { name: 'username', label: '用户名', type: 'text', required: true },
+  { name: 'email', label: '邮箱', type: 'email', required: true },
+  { name: 'password', label: '密码', type: 'password', required: true },
+  { name: 'description', label: '描述', type: 'textarea' },
+  { name: 'country', label: '国家', type: 'select', options: [
+    { value: 'cn', label: '中国' },
+    { value: 'us', label: '美国' },
+    { value: 'jp', label: '日本' }
+  ]},
+];
+
+const f = generateForm(formStructure);
+document.body.appendChild(f);
 </script>

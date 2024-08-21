@@ -146,3 +146,56 @@ export function initFormPersistence() {
     }
   });
 }
+
+export const createFormField = () => {
+  const field = document.createElement('div');
+  field.className = 'form-field';
+  return field;
+}
+
+export function generateForm(formStructure) {
+  const form = document.createElement('form');
+  form.className = 'form';
+
+  formStructure.forEach(field => {
+    const container = createFormField();
+    const label = document.createElement('label');
+    label.textContent = field.label;
+    container.appendChild(label);
+    let input;
+    switch (field.type) {
+      case 'text':
+      case 'email':
+      case 'password':
+        input = document.createElement('input');
+        input.type = field.type;
+        input.className = 'input input-block';
+        break;
+      case 'textarea':
+        input = document.createElement('textarea');
+        input.className = 'input input-block';
+        break;
+      case 'select':
+        input = document.createElement('select');
+        input.className = 'select';
+        field.options.forEach(option => {
+          const optionElement = document.createElement('option');
+          optionElement.value = option.value;
+          optionElement.textContent = option.label;
+          input.appendChild(optionElement);
+        });
+    }
+    input.id = field.name;
+    input.name = field.name;
+    if (field.required) input.required = true;
+    container.appendChild(input);
+    form.appendChild(container);
+  });
+
+  const f = createFormField();
+  const button = document.createElement('button');
+  button.textContent = 'Submit';
+  f.appendChild(button)
+  form.appendChild(f);
+  return form;
+}

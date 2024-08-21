@@ -1,22 +1,52 @@
-
 export const GITHUB_API = 'https://api.github.com';
 
-export const request = (path, options) => {
-  return Promise
-    .resolve()
-    .then(() => fetch(GITHUB_API + path, options))
-    .then(async res => {
-      const data = await res.json()
-      if (res.status === 200) 
-        return data;
-      throw new Error(data.message)
-    })
-};
+export class GitHubClient {
+  constructor({ token, api = GITHUB_API } = {}) {
+    this.api = api;
+    this.token = token;
+  }
+  async request(endpoint, method, data) {
+    const url = `${this.api}${endpoint}`;
+    const headers = {
+      'Accept': 'application/vnd.github.v3+json',
+      'Content-Type': 'application/json',
+    };
+    if (this.token) {
+      headers['Authorization'] = `token ${this.token}`;
+    }
+    const response = await fetch(url, {
+      method,
+      headers,
+      body: data ? JSON.stringify(data) : null,
+    });
+    if (!response.ok) {
+      throw new Error(`GitHub API error: ${response.statusText}`);
+    }
+    return response.json();
+  };
 
-export const repos = user => {
-  return request(`/users/${user}/repos`);
-};
+  async getRepos(user) {
+    const endpoint = user ? `/users/${user}/repos` : '/user/repos';
+    return this.request(endpoint);
+  }
+  async getCommits(repo) {
+    const [owner, repoName] = repo.split('/');
+    const endpoint = `/repos/${owner}/${repoName}/commits`;
+    return this.request(endpoint);
+  }
+  async getIssues(repo) {
+    const [owner, repoName] = repo.split('/');
+    const endpoint = `/repos/${owner}/${repoName}/issues`;
+    return this.request(endpoint);
+  }
+  async createIssue(repo, issue) {
+    const [owner, repoName] = repo.split('/');
+    const endpoint = `/repos/${owner}/${repoName}/issues`;
+    return this.request(endpoint, 'POST', issue);
+  }
+}
 
-export const commits = (user, repo) => {
-  return request(`/repos/${user}/${repo}/commits`);
-};
+export const gh = new GitHubClient();
+export const repos = async (user) => gh.getRepos(user);
+export const issues = async (repo) => gh.getIssues(repo);
+export const commits = async (repo) => gh.getCommits(repo);
