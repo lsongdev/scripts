@@ -1,27 +1,27 @@
-<h1>X-For Example</h1>
-<script type="module" src="../../components/for.js"></script>
-<style>
-  li {
-    background-color: red;
-  }
-</style>
+<body>
+  <div id="app" x-data='{"user": {"name": "Bob", "age": 30}, "items": ["apple", "banana", "cherry"]}'>
+    <p x-text="user.name"></p>
+    <p x-text="'Age: ' + user.age"></p>
+    <ul>
+      <template x-for="items">
+        <li x-text></li>
+      </template>
+    </ul>
+  </div>
+</body>
 
-<x-for id="myList" items='[{"name": "Alice", "age": 30}, {"name": "Bob", "age": 25}]'>
-  <template>
-    <li>
-      <span data-template="name"></span> is <span data-template="age"></span> years old.
-    </li>
-  </template>
-</x-for>
-<script>
-  customElements.whenDefined('x-for').then(() => {
-    console.log('XFor element is now defined');
-    const myList = document.getElementById('myList');
-    console.log('myList element:', myList);
-    myList.items = [
-      { name: "Alice", age: 30 },
-      { name: "Bob", age: 28 }
-    ];
+<script type="module">
+  import initCustomAttributes from '../../dom/x-directives.js';
+
+  // 确保在DOM加载完成后初始化
+  document.addEventListener('DOMContentLoaded', () => {
+    initCustomAttributes();
+
+    const app = document.getElementById('app');
+    // 模拟数据变化
+    setInterval(() => {
+      app.$data.user.age++;
+      app.$data.items.push('new item ' + app.$data.user.age);
+    }, 2000);
   });
-
 </script>

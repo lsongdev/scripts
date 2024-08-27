@@ -1,0 +1,239 @@
+<meta charset="utf-8" />
+
+<button id="whiteNoiseBtn">白噪音</button>
+<button id="pinkNoiseBtn">粉噪音</button>
+<button id="waterfallBtn">流水声</button>
+<button id="rainSoundBtn">下雨声</button>
+<button id="oceanBtn">oceanBtn</button>
+<button id="stopBtn">停止</button>
+<input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="0.5">
+
+<script>
+
+
+// 基础音频功能
+const createAudioContext = () => new (window.AudioContext || window.webkitAudioContext)();
+const createBuffer = (audioContext, bufferSize) => audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+const createGain = (audioContext, gain = 1) => {
+  const gainNode = audioContext.createGain();
+  gainNode.gain.setValueAtTime(gain, audioContext.currentTime);
+  return gainNode;
+};
+const connectNodes = (...nodes) => {
+  for (let i = 0; i < nodes.length - 1; i++) {
+    nodes[i].connect(nodes[i + 1]);
+  }
+};
+
+// 创建不同类型的噪音
+const createNoiseBuffer = (audioContext, type, bufferSize = 5 * audioContext.sampleRate) => {
+  const buffer = createBuffer(audioContext, bufferSize);
+  const data = buffer.getChannelData(0);
+  let b0, b1, b2, b3, b4, b5, b6;
+  for (let i = 0; i < bufferSize; i++) {
+    switch (type) {
+      case 'white':
+        data[i] = Math.random() * 2 - 1;
+        break;
+      case 'pink':
+        b0 = b1 = b2 = b3 = b4 = b5 = b6 = 0.0;
+        b0 = 0.99886 * b0 + 0.0555179 * (Math.random() * 2 - 1);
+        b1 = 0.99332 * b1 + 0.0750759 * (Math.random() * 2 - 1);
+        b2 = 0.96900 * b2 + 0.1538520 * (Math.random() * 2 - 1);
+        b3 = 0.86650 * b3 + 0.3104856 * (Math.random() * 2 - 1);
+        b4 = 0.55000 * b4 + 0.5329522 * (Math.random() * 2 - 1);
+        b5 = -0.7616 * b5 - 0.0168980 * (Math.random() * 2 - 1);
+        data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + (Math.random() * 2 - 1) * 0.11) / 7;
+        break;
+      case 'brown':
+        const lastValue = i > 0 ? data[i - 1] : 0;
+        data[i] = (lastValue + (Math.random() * 2 - 1) * 0.02) / 1.02;
+        break;
+    }
+  }
+  return buffer;
+};
+
+// 创建滤波器
+const createFilter = (audioContext, type, frequency, Q = 1) => {
+  const filter = audioContext.createBiquadFilter();
+  filter.type = type;
+  filter.frequency.value = frequency;
+  filter.Q.value = Q;
+  return filter;
+};
+
+// 创建振荡器
+const createOscillator = (audioContext, type, frequency) => {
+  const oscillator = audioContext.createOscillator();
+  oscillator.type = type;
+  oscillator.frequency.value = frequency;
+  return oscillator;
+};
+
+// 创建包络
+const createEnvelope = (audioContext, attackTime, decayTime, sustainLevel, releaseTime) => {
+  const envelope = audioContext.createGain();
+  const now = audioContext.currentTime;
+  envelope.gain.setValueAtTime(0, now);
+  envelope.gain.linearRampToValueAtTime(1, now + attackTime);
+  envelope.gain.linearRampToValueAtTime(sustainLevel, now + attackTime + decayTime);
+  envelope.gain.setValueAtTime(sustainLevel, now + attackTime + decayTime + releaseTime);
+  envelope.gain.linearRampToValueAtTime(0, now + attackTime + decayTime + releaseTime + 0.1);
+  return envelope;
+};
+
+// 效果生成器
+const effectGenerators = {
+  waterfall: (audioContext, destination) => {
+    const noise = audioContext.createBufferSource();
+    noise.buffer = createNoiseBuffer(audioContext, 'white');
+    noise.loop = true;
+
+    const filter1 = createFilter(audioContext, 'bandpass', 400, 0.9);
+    const filter2 = createFilter(audioContext, 'bandpass', 1200, 3);
+    const gain = createGain(audioContext, 0.3);
+
+    connectNodes(noise, filter1, filter2, gain, destination);
+    
+    setInterval(() => {
+      filter1.frequency.value = 300 + Math.random() * 200;
+      filter2.frequency.value = 1000 + Math.random() * 400;
+    }, 200);
+
+    return noise;
+  },
+  
+  ocean: (audioContext, destination) => {
+    const noise = audioContext.createBufferSource();
+    noise.buffer = createNoiseBuffer(audioContext, 'pink');
+    noise.loop = true;
+
+    const filter = createFilter(audioContext, 'lowpass', 500);
+    const gain = createGain(audioContext, 0.5);
+
+    connectNodes(noise, filter, gain, destination);
+    
+    const lfo = createOscillator(audioContext, 'sine', 0.1);
+    const lfoGain = createGain(audioContext, 100);
+    connectNodes(lfo, lfoGain, filter.frequency);
+    lfo.start();
+
+    return noise;
+  },
+  
+  wind: (audioContext, destination) => {
+    const noise = audioContext.createBufferSource();
+    noise.buffer = createNoiseBuffer(audioContext, 'pink');
+    noise.loop = true;
+
+    const filter = createFilter(audioContext, 'bandpass', 800, 0.3);
+    const gain = createGain(audioContext, 0.3);
+
+    connectNodes(noise, filter, gain, destination);
+    
+    const lfo = createOscillator(audioContext, 'sine', 0.2);
+    const lfoGain = createGain(audioContext, 600);
+    connectNodes(lfo, lfoGain, filter.frequency);
+    lfo.start();
+
+    return noise;
+  },
+  
+  rain: (audioContext, destination) => {
+    const noise = audioContext.createBufferSource();
+    noise.buffer = createNoiseBuffer(audioContext, 'pink');
+    noise.loop = true;
+
+    const filter = createFilter(audioContext, 'highpass', 3000);
+    const gain = createGain(audioContext, 0.4);
+
+    connectNodes(noise, filter, gain, destination);
+
+    setInterval(() => {
+      const raindrop = createOscillator(audioContext, 'sine', 1000 + Math.random() * 2000);
+      const raindropEnvelope = createEnvelope(audioContext, 0.002, 0.1, 0.1, 0.1);
+      connectNodes(raindrop, raindropEnvelope, gain);
+      raindrop.start();
+      raindrop.stop(audioContext.currentTime + 0.3);
+    }, 50);
+
+    return noise;
+  },
+
+  crickets: (audioContext, destination) => {
+    const noise = audioContext.createBufferSource();
+    noise.buffer = createNoiseBuffer(audioContext, 'brown');
+    noise.loop = true;
+
+    const filter = createFilter(audioContext, 'bandpass', 4500, 10);
+    const gain = createGain(audioContext, 0.2);
+
+    connectNodes(noise, filter, gain, destination);
+
+    setInterval(() => {
+      const cricket = createOscillator(audioContext, 'sine', 4500);
+      const cricketEnvelope = createEnvelope(audioContext, 0.005, 0.05, 0.1, 0.05);
+      connectNodes(cricket, cricketEnvelope, gain);
+      cricket.start();
+      cricket.stop(audioContext.currentTime + 0.1);
+    }, 300 + Math.random() * 1000);
+
+    return noise;
+  }
+};
+
+// 主声音生成器
+const createNatureSoundGenerator = () => {
+  const audioContext = createAudioContext();
+  const masterGain = createGain(audioContext, 0.5);
+  connectNodes(masterGain, audioContext.destination);
+
+  const activeSources = new Map();
+
+  const playSound = (type) => {
+    if (activeSources.has(type)) {
+      stopSound(type);
+    }
+
+    const source = effectGenerators[type](audioContext, masterGain);
+    source.start();
+    activeSources.set(type, source);
+  };
+
+  const stopSound = (type) => {
+    if (activeSources.has(type)) {
+      activeSources.get(type).stop();
+      activeSources.delete(type);
+    }
+  };
+
+  const stopAllSounds = () => {
+    activeSources.forEach((source) => source.stop());
+    activeSources.clear();
+  };
+
+  const setVolume = (volume) => {
+    masterGain.gain.setValueAtTime(volume, audioContext.currentTime);
+  };
+
+  return {
+    playSound,
+    stopSound,
+    stopAllSounds,
+    setVolume
+  };
+};
+
+// 使用示例
+const natureSoundGenerator = createNatureSoundGenerator();
+
+document.getElementById('waterfallBtn').addEventListener('click', () => natureSoundGenerator.playSound('waterfall'));
+document.getElementById('oceanBtn').addEventListener('click', () => natureSoundGenerator.playSound('ocean'));
+document.getElementById('windBtn').addEventListener('click', () => natureSoundGenerator.playSound('wind'));
+document.getElementById('rainBtn').addEventListener('click', () => natureSoundGenerator.playSound('rain'));
+document.getElementById('cricketsBtn').addEventListener('click', () => natureSoundGenerator.playSound('crickets'));
+document.getElementById('stopAllBtn').addEventListener('click', () => natureSoundGenerator.stopAllSounds());
+document.getElementById('volumeSlider').addEventListener('input', (event) => natureSoundGenerator.setVolume(parseFloat(event.target.value)));
+
+</script>

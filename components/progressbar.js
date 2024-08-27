@@ -1,20 +1,4 @@
 
-const stylesheet = `
-<style>
-  #myProgress {
-    width: 300px;
-    background-color: #ddd;
-  }
-  #myBar {
-    width: 0%;
-    height: 20px;
-    color: white;
-    text-align: center;
-    background-color: #04AA6D;
-  }
-</style>
-`;
-
 class ProgressBar extends HTMLElement {
   constructor() {
     super();
@@ -24,13 +8,15 @@ class ProgressBar extends HTMLElement {
 
   connectedCallback() {
     this.shadow.innerHTML = `
-      ${stylesheet}
-      <div id="myProgress">
-        <div id="myBar">0%</div>
+      <style>
+      @import url("https://lsong.org/stylesheets/progressbar.css");
+      </style>
+      <div class="progress-bar" >
+        <div class="progress-bar-inner" ></div>
       </div>
     `;
-    this.myBar = this.shadow.querySelector('#myBar');
-    this.updateBar(); // Set initial value
+    this.myBar = this.shadow.querySelector('.progress-bar');
+    this.updateBar();
   }
 
   static get observedAttributes() {
