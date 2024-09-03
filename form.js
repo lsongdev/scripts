@@ -174,8 +174,8 @@ export const createFormField = ({ type, id = '', name, label: title, options, ..
       options.map(option => {
         const id = `${name}_${option.value}`;
         fieldDiv.appendChild(type === 'radio' ?
-          createRadio({ id, ...option }) :
-          createCheckbox({ id, ...option }));
+          createRadio({ id, name, ...option }) :
+          createCheckbox({ id, name, ...option }));
         fieldDiv.appendChild(createLabel(option.label, id));
       });
       break;
