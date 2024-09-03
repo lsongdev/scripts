@@ -1,3 +1,4 @@
+// dom.js
 
 export const querySelector = (selector, el = document) =>
   el.querySelector(selector);
@@ -70,6 +71,7 @@ export const createTextNode = text => {
 };
 
 export const appendChildren = (element, children) => {
+  if (!children) return element;
   switch (true) {
     case typeof children === 'string':
       element.appendChild(createTextNode(children));
@@ -165,3 +167,77 @@ export function cls() {
       return p;
     }, []).join(' ');
 }
+
+/**
+ * Creates an input element with the given attributes.
+ * @param {Object} attrs - An object of attribute key-value pairs.
+ * @returns {HTMLInputElement} The created input element.
+ */
+export const createInput = (attrs) => {
+  return createElement('input', attrs);
+};
+
+/**
+ * Creates a range input element with the given attributes.
+ * @param {Object} attrs - An object of attribute key-value pairs.
+ * @returns {HTMLInputElement} The created range input element.
+ */
+export const createRangeInput = (attrs) => {
+  return createInput({ ...attrs, type: 'range' });
+};
+
+/**
+ * Creates a textarea element with the given attributes.
+ * @param {Object} attrs - An object of attribute key-value pairs.
+ * @returns {HTMLTextAreaElement} The created textarea element.
+ */
+export const createTextarea = (attrs) => {
+  return createElement('textarea', attrs);
+};
+
+/**
+ * Creates a select element with the given attributes and options.
+ * @param {Object} attrs - An object of attribute key-value pairs.
+ * @param {Array} options - An array of option objects or strings.
+ * @returns {HTMLSelectElement} The created select element.
+ */
+export const createSelect = (attrs, options) => {
+  const select = createElement('select', attrs);
+  const optionElements = createSelectOptions(options);
+  optionElements.forEach(option => select.appendChild(option));
+  return select;
+};
+
+/**
+ * Creates an array of option elements from the given options.
+ * @param {Array} options - An array of option objects or strings.
+ * @returns {Array<HTMLOptionElement>} An array of created option elements.
+ */
+export const createSelectOptions = (options) => {
+  return options.map(option => createElement('option', {
+    value: option.value ?? option,
+    textContent: option.label ?? option
+  }));
+};
+
+/**
+ * Creates a radio input element with the given field configuration.
+ * @param {Object} field - The field configuration object.
+ * @returns {HTMLInputElement} The created radio input element.
+ */
+export const createRadio = (attrs) => {
+  return createInput({ ...attrs, type: 'radio' });
+};
+
+/**
+ * Creates a checkbox input element with the given field configuration.
+ * @param {Object} field - The field configuration object.
+ * @returns {HTMLInputElement} The created checkbox input element.
+ */
+export const createCheckbox = (attrs) => {
+  return createInput({ ...attrs, type: 'checkbox' });
+};
+
+export const createLabel = (text, forId) => {
+  return createElement('label', { htmlFor: forId, textContent: text });
+};
