@@ -241,3 +241,37 @@ export const createCheckbox = (attrs) => {
 export const createLabel = (text, forId) => {
   return createElement('label', { htmlFor: forId, textContent: text });
 };
+
+export function createListItem({ leadingContent, headlineContent, supportingContent, trailingContent }) {
+  const li = document.createElement('li');
+  li.className = 'list-item';
+
+  const leadingDiv = document.createElement('div');
+  leadingDiv.className = 'list-item-leading';
+  leadingDiv.textContent = leadingContent;
+  li.appendChild(leadingDiv);
+
+  const contentDiv = document.createElement('div');
+  contentDiv.className = 'list-item-content';
+
+  const headlineDiv = document.createElement('div');
+  headlineDiv.className = 'list-item-headline';
+  headlineDiv.textContent = headlineContent;
+  contentDiv.appendChild(headlineDiv);
+
+  if (supportingContent) {
+    const supportingDiv = document.createElement('div');
+    supportingDiv.className = 'list-item-supporting';
+    supportingDiv.textContent = supportingContent;
+    contentDiv.appendChild(supportingDiv);
+  }
+
+  li.appendChild(contentDiv);
+
+  const trailingDiv = document.createElement('div');
+  trailingDiv.className = 'list-item-trailing';
+  trailingDiv.textContent = trailingContent;
+  li.appendChild(trailingDiv);
+
+  return li;
+}

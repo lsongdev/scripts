@@ -1,5 +1,5 @@
-import { h } from '../react.js';
-import { cls } from '../../dom.js';
+import { h, useRef, useEffect } from '../react.js';
+import { cls, createListItem } from '../../dom.js';
 
 export const List = ({ items, children, className = '', ...opts }) => {
   return h('ul', { className: cls('list', className), ...opts },
@@ -7,6 +7,31 @@ export const List = ({ items, children, className = '', ...opts }) => {
   );
 };
 
-export const ListItem = ({ children, className = '' }) => {
-  return h('li', { className: cls('list-item', className) }, children);
+export const ListItem = ({
+  children,
+  className = '',
+  leadingContent,
+  headlineContent,
+  supportingContent,
+  trailingContent,
+}) => {
+  const ref = useRef();
+  useEffect(() => {
+    if (children) return;
+    const listItemElement = createListItem({
+      leadingContent,
+      headlineContent,
+      supportingContent,
+      trailingContent
+    });
+    if (ref.current) {
+      ref.current.parentNode.replaceChild(listItemElement, ref.current);
+    }
+    return () => {
+      if (listItemElement.parentNode) {
+        listItemElement.parentNode.replaceChild(ref.current, listItemElement);
+      }
+    };
+  }, [leadingContent, headlineContent, supportingContent, trailingContent]);
+  return h('li', { ref, className: cls('list-item', className) }, children);
 };

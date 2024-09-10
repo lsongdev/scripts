@@ -1,0 +1,26 @@
+<meta charset="utf-8" />
+<link rel="stylesheet" href="https://lsong.org/stylesheets/list.css">
+
+<ul class="list"></ul>
+
+<script type="module">
+
+  import { createListItem } from '../../dom.js';
+
+  const listItem1 = createListItem({
+    leadingContent: '🔔',
+    headlineContent: '主要内容',
+    supportingContent: '支持性内容',
+    trailingContent: '>'
+  });
+
+  const listItem2 = createListItem({
+    leadingContent: '🔔',
+    headlineContent: '主要内容',
+    supportingContent: '支持性内容',
+    trailingContent: '>'
+  });
+
+  document.querySelector('ul').appendChild(listItem1);
+  document.querySelector('ul').appendChild(listItem2);
+</script>
