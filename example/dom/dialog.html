@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dialog Component</title>
-  <link rel="stylesheet" href="https://lsong.org/stylesheets/dialog.css?x">
+  <link rel="stylesheet" href="https://lsong.org/stylesheets/dialog.css">
 </head>
 
 <body>
@@ -44,7 +44,22 @@
   <button id="showBottomDrawer">Show Bottom Drawer</button>
   <button id="showToast">Show Toast</button>
 
-  <script>
+  <script type="module">
+
+    import { createDialog, showConfirmDialog } from '../../dom/dialog.js';
+
+    // 使用示例
+    async function askUser() {
+      const userConfirmed = await showConfirmDialog('您确定要继续吗?', { title: '操作确认' });
+      if (userConfirmed) {
+        console.log('用户选择了是');
+      } else {
+        console.log('用户选择了否或关闭了对话框');
+      }
+    }
+
+    askUser();
+
     function showDialog(dialogId) {
       const dialog = document.getElementById(dialogId);
       dialog.showModal();
