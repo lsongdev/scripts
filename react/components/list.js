@@ -1,5 +1,5 @@
-import { h, useRef, useEffect } from '../react.js';
-import { cls, createListItem } from '../../dom.js';
+import { h } from '../react.js';
+import { cls } from '../../dom.js';
 
 export const List = ({ items, children, className = '', ...opts }) => {
   return h('ul', { className: cls('list', className), ...opts },
@@ -14,24 +14,14 @@ export const ListItem = ({
   headlineContent,
   supportingContent,
   trailingContent,
+  ...props
 }) => {
-  const ref = useRef();
-  useEffect(() => {
-    if (children) return;
-    const listItemElement = createListItem({
-      leadingContent,
-      headlineContent,
-      supportingContent,
-      trailingContent
-    });
-    if (ref.current) {
-      ref.current.parentNode.replaceChild(listItemElement, ref.current);
-    }
-    return () => {
-      if (listItemElement.parentNode) {
-        listItemElement.parentNode.replaceChild(ref.current, listItemElement);
-      }
-    };
-  }, [leadingContent, headlineContent, supportingContent, trailingContent]);
-  return h('li', { ref, className: cls('list-item', className) }, children);
+  return h('li', { className: cls('list-item', className), ...props }, children || [
+    leadingContent && h('span', { className: 'list-item-leading' }, leadingContent),
+    h('div', { className: 'list-item-content' }, [
+      headlineContent && h('div', { className: 'list-item-headline' }, headlineContent),
+      supportingContent && h('span', { className: 'list-item-supporting' }, supportingContent),
+    ]),
+    trailingContent && h('span', { className: 'list-item-trailing' }, trailingContent),
+  ]);
 };
