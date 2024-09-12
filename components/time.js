@@ -1,5 +1,5 @@
-import { define, wrap } from '../webcomponent.js';
 import { format, parse } from '../time.js';
+import { define, wrap } from '../dom/webcomponent.js';
 
 const DEFAULT_FORMAT = '{yyyy}-{MM}-{dd} {HH}:{mm}:{ss}';
 const DEFAULT_UPDATE_INTERVAL = 1000; // 1 second

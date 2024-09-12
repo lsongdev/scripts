@@ -1,68 +1,36 @@
-const createDialog = content => {
-  const dialog = document.createElement('dialog');
-  dialog.innerHTML = content;
-  return dialog;
-};
+import { createDialog, createButton } from './dom.js';
 
-const createButton = ({ text, action, className = '' }) => {
-  const button = document.createElement('button');
-  button.textContent = text;
-  button.className = className;
-  button.dataset.action = action;
-  return button;
-};
+export { createDialog } from './dom.js';
 
-const createSimpleDialog = (title, content, buttons) => {
-  const dialogContent = `
-    <h2>${title}</h2>
-    <div>${content}</div>
-    <div class="dialog-buttons"></div>
-  `;
-  const dialog = createDialog(dialogContent);
+export const createSimpleDialog = (title, content, buttons) => {
+  const dialog = createDialog(`
+    <form method="dialog" >
+      <h3>${title}</h3>
+      <p>${content}</p>
+      <div class="dialog-buttons"></div>
+    </form>
+  `);
   const buttonsContainer = dialog.querySelector('.dialog-buttons');
-  buttons.forEach(button => buttonsContainer.appendChild(createButton(button)));
+  buttons.forEach(({ text, action }) => {
+    const button = createButton(text);
+    button.dataset.action = action;
+    buttonsContainer.appendChild(button);
+  });
   return dialog;
 };
 
-const createConfirmDialog = (message, options = {}) => {
-  const { title = '确认', yesText = '是', noText = '否' } = options;
+export const createConfirmDialog = (message, options = {}) => {
+  const { title = '确认?', yesText = '是', noText = '否' } = options;
   return createSimpleDialog(title, message, [
-    { text: yesText, action: 'yes', className: 'confirm-yes' },
-    { text: noText, action: 'no', className: 'confirm-no' }
+    { text: yesText, action: 'yes' },
+    { text: noText, action: 'no' },
   ]);
 };
 
-const showDialog = dialog => {
-  document.body.appendChild(dialog);
-  dialog.showModal();
-  return new Promise((resolve) => {
-    const handleClick = (event) => {
-      const action = event.target.dataset.action;
-      if (action) {
-        dialog.close();
-        resolve(action);
-      }
-    };
-    dialog.addEventListener('click', handleClick);
-    dialog.addEventListener('close', () => {
-      dialog.removeEventListener('click', handleClick);
-      dialog.remove();
-      resolve(null);
-    });
-  });
+export const showDialog = () => {
+
 };
 
-const showConfirmDialog = async (message, options) => {
-  const dialog = createConfirmDialog(message, options);
-  dialog.className = 'dialog';
-  const result = await showDialog(dialog);
-  return result === 'yes';
-};
-
-export {
-  createDialog,
-  createSimpleDialog,
-  createConfirmDialog,
-  showDialog,
-  showConfirmDialog
+export const showConfirmDialog = () => {
+  
 };

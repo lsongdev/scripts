@@ -1,4 +1,4 @@
-import { ready, visibilityChange } from './dom.js';
+import { ready, visibilityChange } from '../dom.js';
 
 export const page = (app) => {
   const {
@@ -6,10 +6,7 @@ export const page = (app) => {
     onShow, onHide,
   } = app;
   // init
-  ready(
-    () => typeof onLoad === 'function' && onLoad.apply(app),
-    () => typeof unLoad === 'function' && unLoad.apply(app),
-  );
+  ready(onLoad);
   // page events
   visibilityChange((hidden, e) => {
     const fn = (hidden ? onHide : onShow);

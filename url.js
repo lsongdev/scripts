@@ -1,4 +1,4 @@
-import {} from './query.js';
+export * from './query.js';
 
 export function parse(url) {
   const pattern = /^((\w+):\/\/)?((.+)?@)?([^\/\?:]+):?(\d+)?(\/?[^\?#]+)?\??([^#]+)?#?(.*)/;
