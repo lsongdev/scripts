@@ -10,6 +10,10 @@ export const leftpad = (str, width, char = '0') => {
   return str;
 };
 
+export const addZero = (s, n) => {
+  return leftpad(s, n, '0');
+};
+
 export const format = (template, data = {}) => {
   const ks = Object.keys(data);
   const vs = ks.map((k) => data[k]);
@@ -43,3 +47,16 @@ export const hex = uint8array =>
 //     return ('0' + (byte & 0xFF).toString(16)).slice(-2);
 //   }).join('')
 // }
+
+
+/**
+ * Gives the length of a string in Unicode code points
+ *
+ * ```
+ * codePointLength("🐱"); // 1
+ * "🐱".length; // 2
+ * ```
+ */
+export function codePointLength(s) {
+  return Array.from(s).length;
+}

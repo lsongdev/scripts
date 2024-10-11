@@ -85,3 +85,12 @@ export const bubblesort = (arr, comparator = (a, b) => a - b) => {
 
 
 export const last = arr => arr[arr.length - 1];
+
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/fromAsync
+export const fromAsync = async (arr, mapFn) => {
+  const results = [];
+  for await (const item of arr) {
+    results.push(await item);
+  }
+  return results;
+};

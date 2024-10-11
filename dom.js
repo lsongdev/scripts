@@ -1,3 +1,3 @@
-export * from './dom/index.js';
+export * from './dom/dom.js';
 
-console.warn('dom.js is deprecated. Use dom/index.js instead.');
+console.warn('dom.js is deprecated. Use dom/dom.js instead.');

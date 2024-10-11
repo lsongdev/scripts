@@ -55,7 +55,7 @@ define('x-time', class extends wrap('time') {
   }
 
   updateDisplay() {
-    this.textContent = format(this.#format, this.#datetime, this.#timezone);
+    this.textContent = format(this.#datetime, this.#format, this.#timezone);
   }
 
   startUpdating() {
