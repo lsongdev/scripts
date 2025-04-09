@@ -1,12 +1,12 @@
 import { pathToRegexp } from '../../router.js';
-import { useState, useEffect } from '../react.js';
+import { h, useState, useEffect } from '../react.js';
 
 let _routes, _render, isHash = true;
 
 export function useRouter(routes) {
-  const [component, render] = useState(null);
+  const [component, setComponent] = useState(null);
 
-  _render = render;
+  _render = setComponent;
   _routes = Object.entries(routes).map(([path, component]) => {
     const regexp = pathToRegexp(path);
     return {
@@ -29,7 +29,7 @@ const find = pathname => {
     const { regexp, component } = route;
     if (regexp.test(pathname)) {
       const props = regexp.parse(pathname);
-      return component(props);
+      return h(component, props);
     }
   }
 };
@@ -39,7 +39,7 @@ const process = () => {
   const { hash, pathname } = location;
   path = isHash ? (hash.slice(1) || '/') : pathname;
   const component = find(path);
-  return _render(component);
+  _render(component);
 };
 
 export function push(url) {
