@@ -49,6 +49,13 @@ export class GitHubClient {
 }
 
 export const gh = new GitHubClient();
-export const repos = async (user) => gh.getRepos(user);
 export const issues = async (repo) => gh.getIssues(repo);
 export const commits = async (repo) => gh.getCommits(repo);
+export const repos = async user => {
+  var repos = [], i = 1;
+  do {
+    var results = await gh.getRepos(user, { per_page: 100, page: i++ });
+    repos = repos.concat(results);
+  } while(results.length);
+  return repos;
+};
