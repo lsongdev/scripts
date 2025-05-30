@@ -1,3 +1,5 @@
+import { stringify } from '../query.js';
+
 export const GITHUB_API = 'https://api.github.com';
 
 export class GitHubClient {
@@ -25,9 +27,9 @@ export class GitHubClient {
     return response.json();
   };
 
-  async getRepos(user) {
+  async getRepos(user, options) {
     const endpoint = user ? `/users/${user}/repos` : '/user/repos';
-    return this.request(endpoint);
+    return this.request(endpoint + '?' + stringify(options));
   }
   async getCommits(repo) {
     const [owner, repoName] = repo.split('/');
