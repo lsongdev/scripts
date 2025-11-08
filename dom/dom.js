@@ -57,7 +57,7 @@ export const ready = fn => {
     document.addEventListener('DOMContentLoaded', readyHandler, { once: true });
   }
 
-  return promise;
+  // return promise;
 };
 
 export const createTreeWalker = (root, ...options) => {
