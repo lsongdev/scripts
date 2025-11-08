@@ -43,11 +43,11 @@ export const xpath = (path, node = document) => {
 export const closest = (selector, el = document) =>
   el.closest(selector);
 
-export const ready = (fn) => {
-  const { promise, resolve } = Promise.withResolvers();
+export const ready = fn => {
+  // const { promise, resolve } = Promise.withResolvers();
 
   const readyHandler = () => {
-    resolve();
+    // resolve();
     if (typeof fn === 'function') fn();
   };
 
