@@ -43,11 +43,9 @@ export const xpath = (path, node = document) => {
 export const closest = (selector, el = document) =>
   el.closest(selector);
 
-export const ready = fn => {
-  // const { promise, resolve } = Promise.withResolvers();
-
-  const readyHandler = () => {
-    // resolve();
+export const ready = fn => new Promise(resolve => {
+    const readyHandler = () => {
+    resolve();
     if (typeof fn === 'function') fn();
   };
 
@@ -56,9 +54,7 @@ export const ready = fn => {
   } else {
     document.addEventListener('DOMContentLoaded', readyHandler, { once: true });
   }
-
-  // return promise;
-};
+});
 
 export const createTreeWalker = (root, ...options) => {
   return document.createTreeWalker(root, ...options)
