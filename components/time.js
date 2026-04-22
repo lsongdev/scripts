@@ -1,82 +1,77 @@
-import { format, parse } from '../time.js';
+import { format, parse, diff, formatDiff } from '../time.js';
 import { define, wrap } from '../dom/webcomponent.js';
 
 const DEFAULT_FORMAT = '{yyyy}-{MM}-{dd} {HH}:{mm}:{ss}';
-const DEFAULT_UPDATE_INTERVAL = 1000; // 1 second
 
 define('x-time', class extends wrap('time') {
-  static get observedAttributes() {
-    return ['format', 'datetime', 'timezone', 'update-interval'];
-  }
+  static get observedAttributes() { return ['format', 'datetime', 'timezone', 'update-interval', 'diff']; }
 
-  #updateTimer = null;
+  #timer = null;
   #format = DEFAULT_FORMAT;
-  #datetime = new Date();
-  #timezone = 'UTC';
-  #updateInterval = DEFAULT_UPDATE_INTERVAL;
+  #datetime = null;
+  #timezone = null;
+  #interval = 0;
+  #diff = false;
+  #mounted = false;
 
-  constructor() {
-    super();
-    this.updateDisplay = this.updateDisplay.bind(this);
-  }
+  connectedCallback() { this.mount(); }
+  disconnectedCallback() { this.stop(); }
 
-  connectedCallback() {
-    this.mount();
-    this.startUpdating();
-  }
-
-  disconnectedCallback() {
-    this.stopUpdating();
-  }
-
-  attributeChangedCallback(name, oldValue, newValue) {
-    if (oldValue === newValue) return;
-
-    const handlers = {
-      format: () => this.#format = newValue || DEFAULT_FORMAT,
-      datetime: () => this.#datetime = newValue ? parse(newValue) : new Date(),
-      timezone: () => this.#timezone = newValue || 'UTC',
-      'update-interval': () => {
-        this.#updateInterval = parseInt(newValue, 10) || DEFAULT_UPDATE_INTERVAL;
-        this.restartUpdating();
-      }
+  attributeChangedCallback(name, old, val) {
+    if (old === val) return;
+    const h = {
+      format: () => this.#format = val || DEFAULT_FORMAT,
+      datetime: () => this.#datetime = val ? parse(val) : null,
+      timezone: () => this.#timezone = val || null,
+      'update-interval': () => { this.#interval = parseInt(val, 10) || 0; this.restart(); },
+      diff: () => this.#diff = val !== null,
     };
-
-    handlers[name]?.();
-    this.updateDisplay();
+    h[name]?.();
+    if (this.#mounted) this.render();
   }
 
   mount() {
-    this.#format = this.getAttribute('format') || DEFAULT_FORMAT;
-    this.#datetime = this.getAttribute('datetime') ? parse(this.getAttribute('datetime')) : new Date();
-    this.#timezone = this.getAttribute('timezone') || 'UTC';
-    this.#updateInterval = parseInt(this.getAttribute('update-interval'), 10) || DEFAULT_UPDATE_INTERVAL;
-    this.updateDisplay();
+    const a = this.attributes;
+    this.#format = a.format?.value || DEFAULT_FORMAT;
+    this.#timezone = a.timezone?.value || null;
+    this.#interval = parseInt(a.getNamedItem('update-interval')?.value, 10) || 0;
+    this.#diff = a.diff?.name === 'diff';
+
+    if (a.datetime?.value) {
+      this.#datetime = parse(a.datetime.value);
+    } else if (this.textContent?.trim()) {
+      this.#datetime = parse(this.textContent);
+    } else {
+      this.#datetime = new Date();
+    }
+
+    this.#mounted = true;
+    this.render();
+    this.restart();
   }
 
-  updateDisplay() {
-    this.textContent = format(this.#datetime, this.#format, this.#timezone);
-  }
+  render() {
+    const now = new Date();
+    const target = this.#datetime || now;
+    const tz = this.#timezone;
 
-  startUpdating() {
-    this.stopUpdating();
-    this.#updateTimer = setInterval(() => {
-      if (!this.hasAttribute('datetime')) {
-        this.#datetime = new Date();
-      }
-      this.updateDisplay();
-    }, this.#updateInterval);
-  }
-
-  stopUpdating() {
-    if (this.#updateTimer) {
-      clearInterval(this.#updateTimer);
-      this.#updateTimer = null;
+    if (this.#diff) {
+      const d = diff(target, now, tz);
+      this.textContent = formatDiff(d);
+    } else {
+      this.textContent = format(target, this.#format, tz);
     }
   }
 
-  restartUpdating() {
-    this.stopUpdating();
-    this.startUpdating();
+  start() {
+    if (this.#interval > 0) {
+      this.#timer = setInterval(() => this.render(), this.#interval);
+    }
   }
+
+  stop() {
+    if (this.#timer) { clearInterval(this.#timer); this.#timer = null; }
+  }
+
+  restart() { this.stop(); this.start(); }
 }, { extends: 'time' });
