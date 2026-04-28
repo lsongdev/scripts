@@ -34,21 +34,30 @@ export function toDateObject(date, timeZone) {
   };
 }
 
+const pad2 = n => String(n).padStart(2, '0');
+
 const formatters = {
-  y: o => o.years, yy: o => String(o.years % 100).padStart(2, '0'), yyyy: o => String(o.years).padStart(4, '0'),
-  M: o => o.months, MM: o => String(o.months).padStart(2, '0'),
-  d: o => o.days, dd: o => String(o.days).padStart(2, '0'),
-  h: o => o.hours, HH: o => String(o.hours).padStart(2, '0'), hh: o => String(o.hours % 12 || 12).padStart(2, '0'),
-  m: o => o.minutes, mm: o => String(o.minutes).padStart(2, '0'),
-  s: o => o.seconds, ss: o => String(o.seconds).padStart(2, '0'),
+  y: o => o.years, yy: o => pad2(o.years % 100), yyyy: o => String(o.years).padStart(4, '0'),
+  M: o => o.months, MM: o => pad2(o.months),
+  d: o => o.days, dd: o => pad2(o.days),
+  h: o => o.hours, HH: o => pad2(o.hours), hh: o => pad2(o.hours % 12 || 12),
+  m: o => o.minutes, mm: o => pad2(o.minutes),
+  s: o => o.seconds, ss: o => pad2(o.seconds),
   ms: o => o.milliseconds,
-  date: o => o.toDateString(),
-  time: o => o.toLocaleTimeString(),
-  datetime: o => o.toLocaleString(),
+  date: o => formatters.yyyy(o) + '-' + formatters.MM(o) + '-' + formatters.dd(o),
+  time: o => formatters.HH(o) + ':' + formatters.mm(o) + ':' + formatters.ss(o),
+  datetime: o => formatters.date(o) + ' ' + formatters.time(o),
 };
 
-export function format(date, pattern = '{yyyy}-{MM}-{dd} {HH}:{mm}:{ss}', timeZone) {
+const patterns = {
+  date: '{yyyy}-{MM}-{dd}',
+  time: '{HH}:{mm}:{ss}',
+  datetime: '{yyyy}-{MM}-{dd} {HH}:{mm}:{ss}',
+};
+
+export function format(date, pattern = '{datetime}', timeZone) {
   const o = date instanceof Date ? toDateObject(date, timeZone) : date;
+  pattern = patterns[pattern.slice(1, -1)] || pattern;
   return pattern.replace(/\{([^}]+)\}/g, (_, k) => formatters[k]?.(o) ?? _);
 }
 
