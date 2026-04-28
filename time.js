@@ -41,7 +41,10 @@ const formatters = {
   h: o => o.hours, HH: o => String(o.hours).padStart(2, '0'), hh: o => String(o.hours % 12 || 12).padStart(2, '0'),
   m: o => o.minutes, mm: o => String(o.minutes).padStart(2, '0'),
   s: o => o.seconds, ss: o => String(o.seconds).padStart(2, '0'),
-  ms: o => o.milliseconds
+  ms: o => o.milliseconds,
+  date: o => o.toDateString(),
+  time: o => o.toLocaleTimeString(),
+  datetime: o => o.toLocaleString(),
 };
 
 export function format(date, pattern = '{yyyy}-{MM}-{dd} {HH}:{mm}:{ss}', timeZone) {
