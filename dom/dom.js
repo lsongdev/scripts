@@ -57,7 +57,7 @@ export const ready = fn => new Promise(resolve => {
 });
 
 export const createTreeWalker = (root, ...options) => {
-  return document.createTreeWalker(root, ...options)
+  return document.createTreeWalker(root, ...options);
 };
 
 export const createTemplate = html => {

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>html.js Test</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    .test { margin: 10px 0; padding: 10px; border: 1px solid #ddd; }
+    .active { color: green; }
+    .inactive { color: red; }
+  </style>
+</head>
+<body>
+  <h1>html.js 测试</h1>
+  
+  <div id="test1"></div>
+  <div id="test2"></div>
+  <div id="test3"></div>
+  <div id="test4"></div>
+  <div id="test5"></div>
+  <div id="test6"></div>
+  <div id="test7"></div>
+  <div id="test8"></div>
+
+  <script type="module">
+    import { html, render, nothing, noChange } from './html.js';
+
+    // Test 1: 基本文本插值
+    const name = 'World';
+    render(html`<p>Hello, ${name}!</p>`, document.getElementById('test1'));
+
+    // Test 2: 属性绑定
+    const cls = 'test active';
+    render(html`<div class=${cls}>Class binding works!</div>`, document.getElementById('test2'));
+
+    // Test 3: 事件绑定
+    let count = 0;
+    const updateCounter = () => {
+      count++;
+      render(html`
+        <button @click=${updateCounter}>Clicked ${count} times</button>
+      `, document.getElementById('test3'));
+    };
+    updateCounter();
+
+    // Test 4: 嵌套模板
+    const inner = html`<span style="color: blue;">nested template</span>`;
+    render(html`<div>This is ${inner} inside.</div>`, document.getElementById('test4'));
+
+    // Test 5: 数组渲染
+    const items = ['Apple', 'Banana', 'Cherry'];
+    render(html`<ul>${items.map(item => html`<li>${item}</li>`)}</ul>`, document.getElementById('test5'));
+
+    // Test 6: 布尔属性 + DOM 节点
+    const img = document.createElement('img');
+    img.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50"><circle cx="25" cy="25" r="20" fill="red"/></svg>';
+    img.width = 50;
+    render(html`<div><input ?disabled=${true} placeholder="disabled"> ${img}</div>`, document.getElementById('test6'));
+
+    // Test 7: 属性更新（同一模板不同值）
+    let toggle = true;
+    const container7 = document.getElementById('test7');
+    const updateToggle = () => {
+      render(html`<div class=${toggle ? 'active' : 'inactive'} @click=${() => { toggle = !toggle; updateToggle(); }}>Click to toggle (${toggle ? 'active' : 'inactive'})</div>`, container7);
+    };
+    updateToggle();
+
+    // Test 8: style 对象 + .value 属性
+    render(html`<input .value=${"hello"} style=${{ background: '#eee', padding: '5px' }}>`, document.getElementById('test8'));
+
+    console.log('All tests rendered!');
+  </script>
+</body>
+</html>
