@@ -43,27 +43,13 @@
   <button id="showDrawer">Show Drawer</button>
   <button id="showBottomDrawer">Show Bottom Drawer</button>
   <button id="showToast">Show Toast</button>
+  <button id="showConfirm">Show Confirm</button>
 
   <script type="module">
 
-    import { createDialog, showConfirmDialog } from '../../dom/dialog.js';
+    import { bindDialog, showConfirmDialog, showDialog } from '../../dom/dialog.js';
 
-    // 使用示例
-    async function askUser() {
-      const userConfirmed = await showConfirmDialog('您确定要继续吗?', { title: '操作确认' });
-      if (userConfirmed) {
-        console.log('用户选择了是');
-      } else {
-        console.log('用户选择了否或关闭了对话框');
-      }
-    }
-
-    askUser();
-
-    function showDialog(dialogId) {
-      const dialog = document.getElementById(dialogId);
-      dialog.showModal();
-    }
+    document.querySelectorAll('dialog').forEach(dialog => bindDialog(dialog));
 
     function showToast() {
       const toast = document.getElementById('toastDialog');
@@ -71,10 +57,14 @@
       setTimeout(() => toast.close(), 3000);
     }
 
-    document.getElementById('showNotification').addEventListener('click', () => showDialog('notificationDialog'));
-    document.getElementById('showDrawer').addEventListener('click', () => showDialog('drawerDialog'));
-    document.getElementById('showBottomDrawer').addEventListener('click', () => showDialog('bottomDialog'));
+    document.getElementById('showNotification').addEventListener('click', () => showDialog('#notificationDialog'));
+    document.getElementById('showDrawer').addEventListener('click', () => showDialog('#drawerDialog'));
+    document.getElementById('showBottomDrawer').addEventListener('click', () => showDialog('#bottomDialog'));
     document.getElementById('showToast').addEventListener('click', showToast);
+    document.getElementById('showConfirm').addEventListener('click', async () => {
+      const confirmed = await showConfirmDialog('您确定要继续吗?', { title: '操作确认' });
+      console.log({ confirmed });
+    });
   </script>
 </body>
 
