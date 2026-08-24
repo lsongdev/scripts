@@ -23,7 +23,12 @@ const coreAreas = new Set([
   'storage',
   'streams',
 ]);
-const ignoredDirectories = new Set(['.git', 'node_modules']);
+const ignoredDirectories = new Set([
+  '.git',
+  'node_modules',
+  'playwright-report',
+  'test-results',
+]);
 const optionalAreas = new Set(['adapters', 'elements', 'integrations']);
 const failures = [];
 

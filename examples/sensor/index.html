@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Device orientation</title></head>
+<body>
+  <h1>Explicit device orientation</h1>
+  <button id="start" type="button">Request and observe orientation</button>
+  <button id="stop" type="button" disabled>Stop</button>
+  <output id="status">Idle</output>
+  <script type="module">
+    import { observeOrientation, requestOrientationPermission } from '../../devices/orientation.js';
+    const start = document.querySelector('#start');
+    const stop = document.querySelector('#stop');
+    const status = document.querySelector('#status');
+    let controller;
+    start.addEventListener('click', async () => {
+      try {
+        await requestOrientationPermission();
+        controller = new AbortController();
+        observeOrientation(event => {
+          status.value = `alpha=${event.alpha} beta=${event.beta} gamma=${event.gamma}`;
+        }, { signal: controller.signal });
+        start.disabled = true;
+        stop.disabled = false;
+      } catch (error) { status.value = error.message; }
+    });
+    stop.addEventListener('click', () => {
+      controller.abort();
+      start.disabled = false;
+      stop.disabled = true;
+      status.value = 'Stopped';
+    });
+  </script>
+</body>
+</html>

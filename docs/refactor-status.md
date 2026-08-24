@@ -10,10 +10,11 @@
 
 | 目标 | 当前完成度 | 尚缺的决定性证据 |
 | --- | ---: | --- |
-| 最小可信 v0.x | 约 92% | 完成高复杂度恢复队列、最终 stable 裁决、不可变发布 URL |
-| 成熟 v1 stdlib | 约 45% | 多下游验证、长期版本治理、完整权限/设备/资源清理证据 |
+| 目录与能力重构 | 100% | 首轮删除账本已闭环，结构/依赖/测试门禁已建立 |
+| `v0.1.0-rc.1` 候选发布 | 100% | 语义化不可变 tag 与三引擎 CI 是最终发布动作 |
+| 成熟 v1 stdlib | 约 55% | 多下游验证、长期版本治理、完整权限/设备/资源清理证据 |
 
-这些百分比不是代码量。目录和核心实现已经越过最危险的混杂阶段，但“测试过的 candidate”仍不等于“承诺长期维护的 stable”。现在最大的距离是发布证据和真实下游使用，而不是继续扩充 helper。
+这些百分比不是代码量。目录重构与首轮能力恢复已经完成，但“进入 release candidate”仍不等于“承诺长期维护的 stable”。现在到成熟 v1 的主要距离是真实下游与长期版本证据，而不是继续扩充 helper 或兼容分支。
 
 ## 已完成
 
@@ -21,7 +22,7 @@
 - `elements/`、`adapters/preact/`、`integrations/`、`labs/` 与 `vendor/` 已和核心分层。
 - 删除根级转发文件、空模块、语言原生能力重实现、XHR Fetch 仿制、旧硬件壳和浏览器前缀 fallback；原残缺 MD5 已由完整、明确非安全用途的实现替换。
 - 核心不再依赖可选层、实验层或 vendor；仓库检查会阻止该依赖方向回退。
-- DOM 核心已拆为 query、events、nodes、form-data、dialog 叶子模块；尚未解决定位与多指针契约的 movable/resizable 已迁至 `labs/dom/`。
+- DOM 核心已拆为 query、events、nodes、form-data/request、action-link、dialog、select、sidebar、stylesheets、movable/resizable 等叶子模块；历史 attribute move/resize 仍在 `labs/dom/`，代表性示例已迁至坐标语义正确的核心 controller。
 - router、WebSocket、media capture、files、geolocation、serial、notifications、storage、streams、encoding 和 Web Crypto 已按标准对象语义重写。
 - 原 `audio.js` 已恢复并拆层：通用 Web Audio 原语进入 `media/audio.js` candidate，游戏/环境音配方进入 `labs/audio/`；零增益、pink-noise 状态和清理句柄问题已修正。
 - `time.js` 已恢复为 `datetime/format.js`：无效日期显式失败、UTC/IANA 时区统一走 Intl，duration 保留方向；UI 改为跨引擎 autonomous `x-time` 并显式注册。
@@ -34,13 +35,13 @@
 - Preact 依赖改为 bare specifier，由下游 import map 明确固定版本；核心不暗中选择 CDN。
 - 第三方 `marked` 源码已隔离并记录版本与许可证；来源不清或证据不足的实现留在 `labs/`。
 - 首轮曾以“仓内无使用方”为理由删除若干模块；维护者确认存在外部 URL 使用后，该推断已撤回，恢复原则见 [`deleted-module-audit.md`](./deleted-module-audit.md)，首轮删除路径逐组处置见 [`deleted-files-ledger.md`](./deleted-files-ledger.md)。
-- `elements/` 已收缩为经过浏览器 smoke test 的 define/icon/progressbar/tabs；`labs/elements/` 只保留依赖精确 vendor snapshot 的 QR 实验，其余无使用方 UI 草稿已删除。
+- `elements/` 包含经过真实浏览器验证且显式注册的基础组件、calendar、rich combobox、piano、spectrum、camera、copy/table 和 storage backup；`labs/elements/` 保留依赖精确 vendor snapshot 的 QR 实验。
 - 修改过且无法准确标识版本的 QR 源码副本已替换为 `vendor/qr/` 中未修改的 `qr@0.6.0` 发布快照，并记录 tarball integrity、逐文件哈希和双许可证。
-- audio、time、camera/video、YAML、MD5、Bech32/Bech32m、graphics、animation 基础、CSV/cookie、service worker、keyboard/orientation 与 Media Session 已按新边界恢复；CSR、HTML runtime、animation 视觉配方和其余 UI/应用能力仍在恢复队列，不把历史缺陷原样带回。
+- audio、time、camera/video/recording/session/spectrum、YAML、MD5、Bech32/Bech32m、CSR、graphics、animation 基础/视觉配方、CSV/cookie、service worker、keyboard/orientation、HTML renderer、form/action-link、sidebar、calendar、combobox 与 piano 已按新边界恢复，不把历史缺陷原样带回。
 - customized built-in table/copy 实验在 Chromium 成功、WebKit 不升级；能力已重建为 portable autonomous `data-table` 和 `copy-button`，不添加引擎分支、旧注册名或 forwarding 文件。
-- 已建立 84 个 Node 契约测试和 21 个页内浏览器契约测试；23 个代表性示例页进入自动 smoke test。Chromium/WebKit 本地套件共 62 项，覆盖真实 timer/AbortSignal、Web Crypto/Web Audio/Web Animations/Canvas、datetime、MediaStream/video/camera 生命周期、ShadowRoot/Document XPath、原生 Form/Request/select、History/URLPattern、File、Web Streams、本地 WebSocket server、授权 Geolocation 与 autonomous elements。
+- 已建立 89 个 Node 契约/互操作测试和 23 个页内浏览器契约测试；34 个代表性示例页进入自动 smoke test。Chromium/WebKit 本地套件共 104 项，覆盖 OpenSSL CSR、timer/AbortSignal、Web Crypto/Audio/Animations/Canvas、datetime、Media 生命周期、DOM/ShadowRoot、Form/Request/select、move/resize、WebRTC/WebSocket、授权 Geolocation 与 autonomous elements。
 - `npm run check` 统一执行语法、相对导入、HTML 本地资源、根目录结构、核心依赖方向、Node 契约测试和 Chromium/WebKit 测试。
-- 远端 Quality CI 已连续在 commit `926daed`、`867b68f`、`f25f52d` 与 `eab72c8` 的 Ubuntu 环境成功完成静态/Node 检查以及 Chromium、Firefox、WebKit 全套测试，并上传浏览器报告。
+- 远端 Quality CI 已在此前全部检查点成功完成 Ubuntu 静态/Node 以及 Chromium、Firefox、WebKit 测试并上传报告；`v0.1.0-rc.1` 标记前必须再次以最终提交验证 156 个三引擎检查。
 
 ## 当前目录契约
 
@@ -51,7 +52,7 @@ animation async browser collections crypto datetime devices dom encoding files g
     ↑
 elements adapters integrations examples
 
-labs    未获得发布承诺的实验（包括 UI movement/resize 与 QR）
+labs    未获得稳定承诺的实验与视觉配方（QR、历史 attribute move/resize、audio/animation recipes）
 vendor  隔离的第三方源码
 ```
 
@@ -59,21 +60,19 @@ vendor  隔离的第三方源码
 
 ## 下一阶段计划
 
-### P0：形成可发布的最小表面
+### P0：发布候选治理
 
-1. 复核 [`api-contracts.md`](./api-contracts.md) 中收敛出的首批叶子模块；在发布条件满足前仍保持 candidate。
-2. 把统一契约拆成每个 stable 文件的最终 API 文档和可执行示例。
-3. 持续观察三引擎 CI；首次运行已成功，后续差异仍以修正契约或明确限制处理，不增加兼容分支。
-4. 保持公开入口清单和全部可执行示例与 smoke test manifest 同步。
-5. 项目许可证已确定并写入 MIT；发布前继续核对所有 vendor/依赖的许可证边界。
-6. 确定不可变发布方案和版本号，发布首个语义化 tag。
+1. `v0.1.0-rc.1` 固定当前目录/候选契约；tag 永不移动或复用。
+2. 保持模块 registry、删除账本、可执行示例和 smoke manifest 同步。
+3. 后续差异以修正契约或明确限制处理，不增加兼容分支。
+4. 项目使用 MIT；optional dependencies/vendor 许可证由 `THIRD_PARTY_NOTICES.md` 与 vendor provenance 隔离。
 
 ### P1：补足浏览器特有证据
 
 1. 深化 Web Streams backpressure 与异常清理用例；ShadowRoot/Document XPath、History API、File 和基础 Web Streams 已有真实浏览器证据。
 2. 为 Notification、Geolocation、MediaDevices、Serial 等权限能力建立可控制的测试策略。
 3. 深化真实 WebSocket server 的连接失败、异常关闭与背压用例；连接、消息事件和 AbortSignal 正常关闭已有浏览器证据。
-4. 深化 movable/resizable 的 pointer capture、多指针、边界与清理测试；证据不足前继续标为 experimental。
+4. 核心 movable/resizable 已有 pointer capture、单活动指针、Element 边界和清理测试；历史 attribute API 继续 experimental。
 
 当前 Playwright harness 接受 Notification permission grant，但 Chromium/WebKit 页面中的 `Notification.permission` 并未变为 `granted`。这不算真实权限证据；在测试环境能提供原生状态前保持 deferred，不以 mock 冒充浏览器覆盖。
 
@@ -81,7 +80,7 @@ vendor  隔离的第三方源码
 
 1. 逐个审查剩余 `labs/elements/`；QR 在满足独立契约前保持 experimental。
 2. 评估 QR elements 是否应迁出独立版本域；第三方算法本身只以精确 vendor snapshot 存在。
-3. 继续删除已被平台或核心模块覆盖、且没有独立下游证据的实验代码。
+3. 不因仓内缺少引用删除能力；只有完成标准迁移或测试替代后才可移出候选面。
 4. 为 integrations 明确分页、限流、认证和 API 版本责任；它们不进入 stdlib core。
 
 ### P3：用下游证据决定 v1
@@ -99,8 +98,8 @@ vendor  隔离的第三方源码
 - 依赖组件自动注册的页面显式调用 `defineXxx()`。
 - 依赖字符串 `innerHTML` helper 的代码改为 Node/DocumentFragment，或显式承担 unsafe HTML 净化责任。
 - 依赖 customized built-in elements 的宿主自行评估浏览器部署条件；核心不为其制造另一套组件模型。
-- 需要 Preact、YAML、ASN.1 等外部依赖的应用通过 import map 或独立包锁定精确版本。
+- 需要 Preact、YAML、Lit 等外部依赖的应用通过 import map 或独立包锁定精确版本。
 
 ## 完成定义
 
-本次目录重构已经完成；API 重构进入“候选验证”阶段。只有 P0 全部完成，项目才可称为最小可信版本；只有 P1—P3 形成长期证据，才接近理想的成熟 stdlib。
+目录规范化、首轮删除能力恢复和 release-candidate API 重构已经完成。模块仍按证据逐个从 `candidate` 晋升为 `stable`；P1—P3 属于后续成熟度建设，而不是继续保留错误目录、空实现或未审计删除的理由。

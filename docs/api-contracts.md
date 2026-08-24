@@ -271,8 +271,17 @@ These externally used capabilities have passed their immediate recovery tests. T
 | `encoding/hex.js` | Encodes and decodes byte-oriented platform inputs with strict even-length hexadecimal syntax; Unicode text conversion remains explicit. |
 | `async/throttle.js` | Executes a leading call and retains only the latest trailing call, preserving receiver/arguments and exposing clear/flush/pending plus signal cleanup. |
 | `net/webrtc.js` | Constructs a native peer connection and performs offer/answer plus `setLocalDescription`; ICE configuration, signaling, connection closure, and remote descriptions remain caller workflows. |
+| `crypto/csr.js` | Produces DER or PEM PKCS#10 requests from a Web Crypto key pair and validated subject. Signature AlgorithmIdentifier and encoding match RSA PKCS#1, RSA-PSS, ECDSA, or Ed25519; extensions, certificate issuance, and private-key storage are outside scope. |
+| `dom/action-link.js` | Creates a native Request and intercepts only explicit ordinary primary activation. Modified clicks, targets, downloads, fetching, CSRF material, response parsing, and confirmation policy remain application-owned. |
+| `dom/movable.js` | Owns one pointer at a time, uses pointer capture and CSS translate, and constrains deltas against an Element in viewport coordinates. Disposing removes listeners but deliberately preserves the final position. |
+| `dom/resizable.js` | Owns one resize pointer, writes dimensions compatible with the target box model, and applies numeric/boundary limits. Layout redistribution and persistence remain application policy. |
+| `dom/sidebar.js` | Toggles only button-controlled ARIA disclosure panels and returns cleanup; leaf anchors retain native navigation. |
+| `dom/stylesheets.js` | Creates native constructable stylesheets and adopts them without duplication; disposal removes only sheets added by that call. |
+| `media/spectrum.js` | Draws byte frequency data while preserving Canvas state and optionally owns exactly one cancellable RAF loop; AudioContext, AnalyserNode, canvas sizing, and visual policy remain explicit. |
 
-The autonomous elements `x-time`, `camera-view`, `copy-button`, `data-table`, and `storage-backup` are optional adapters, not capability modules. Their modules are inert until the corresponding `defineXxx()` function is called. Camera permission starts only through `start()`; copy uses an explicit Clipboard operation; table cells default to text/Node rendering rather than HTML injection. Storage import validates the complete versioned snapshot and merges by default; replacement is explicit.
+`adapters/lit.js` deliberately re-exports only `html`, `render`, `nothing`, and `noChange` from exact `lit-html@3.3.3`. It replaces the historical partial renderer rather than preserving its parser. Browser consumers provide an import map; its BSD-3-Clause dependency remains outside core.
+
+The autonomous elements `x-time`, `camera-view`, `copy-button`, `data-table`, `storage-backup`, `date-calendar`, `rich-combobox`, `piano-keyboard`, and `spectrum-view` are optional adapters, not capability modules. Their modules are inert until the corresponding `defineXxx()` function is called. Permission/audio/RAF work starts explicitly; calendar/combobox keyboard and form behavior is tested cross-engine; copy/table/storage use safe text or fully validated data by default.
 
 ## Deferred from the first surface
 
@@ -284,6 +293,6 @@ The following modules remain useful candidates but are deliberately excluded fro
 - `media/capture.js`: permission, track, and device-change workflows.
 - `navigation/router.js`: History API and URLPattern now have Chromium/WebKit coverage; navigation edge cases remain deferred.
 - `net/websocket.js`: real-server connect/message/normal-close behavior now has Chromium/WebKit coverage; failure, abnormal-close, and backpressure behavior remain deferred.
-- `labs/dom/movable.js` and `labs/dom/resizable.js`: experimental UI behaviors, not first-surface DOM utilities; pointer capture, geometry bounds, multiple pointers, and cleanup contracts remain unresolved.
+- `labs/dom/movable.js` and `labs/dom/resizable.js`: historical attribute-driven behaviors remain experimental. New `dom/movable.js` and `dom/resizable.js` have separate tested pointer-capture, Element-boundary, one-active-pointer, and cleanup contracts.
 
 Deferral does not create compatibility obligations. Downstream applications may use a candidate knowingly, but its current signature may still be replaced or removed before the first stable release.

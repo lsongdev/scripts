@@ -1,41 +1,21 @@
-<meta charset="utf-8">
-<style>
-  [movable] {
-    cursor: move;
-    background-color: orange;
-  }
-
-  .box {
-    border: 1px solid #ccc;
-  }
-</style>
-<h1>DOM Move Example</h1>
-<script type="module">
-  import { initMovable } from '../../labs/dom/movable.js';
-  initMovable();
-</script>
-
-<!-- 没有边界限制，可以自由移动，包括移出屏幕 -->
-<div movable>自由移动的元素</div>
-
-<!-- 只在 X 轴上有边界限制，最大可移动到 500px -->
-<div movable movable-boundary-x="500">
-  只在 X 轴上受限的元素 (0-500px)
-</div>
-
-<!-- 只在 Y 轴上有边界限制，最大可移动到 300px -->
-<div movable movable-boundary-y="300">
-  只在 Y 轴上受限的元素 (0-300px)
-</div>
-
-<!-- 在 X 和 Y 轴上都有边界限制 -->
-<div movable movable-boundary-x="800" movable-boundary-y="600">
-  在 X 和 Y 轴上都受限的元素 (0-800px, 0-600px)
-</div>
-
-<!-- 使用选择器定义的边界仍然有效 -->
-<div id="xy-boundary" class="box" style="width: 500px; height: 500px;">
-  <div movable movable-boundary="#xy-boundary">
-    在父元素内受限的元素
-  </div>
-</div>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><title>Movable controller</title>
+  <style>#boundary{border:1px solid;width:320px;height:180px;padding:1rem}#target{background:orange;width:80px;height:60px}</style>
+</head>
+<body>
+  <h1>Movable controller</h1>
+  <div id="boundary"><button id="target" type="button">Drag me</button></div>
+  <output id="position">0,0</output>
+  <script type="module">
+    import { bindMovable } from '../../dom/movable.js';
+    const target = document.querySelector('#target');
+    const controller = bindMovable(target, { target, boundary: document.querySelector('#boundary'), grid: 5 });
+    target.addEventListener('move', event => {
+      document.querySelector('#position').value = `${event.detail.position.x},${event.detail.position.y}`;
+    });
+    addEventListener('pagehide', controller.dispose);
+  </script>
+</body>
+</html>

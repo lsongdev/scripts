@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Date calendar</title></head>
+<body>
+  <h1>Date calendar</h1>
+  <date-calendar year="2024" month="2" value="2024-02-14" locale="en" week-start="1"></date-calendar>
+  <output id="value">2024-02-14</output>
+  <script type="module">
+    import { defineDateCalendar } from '../../elements/calendar.js';
+    defineDateCalendar();
+    const calendar = document.querySelector('date-calendar');
+    calendar.addEventListener('change', () => { document.querySelector('#value').value = calendar.value; });
+  </script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Template renderer adapter</title>
+  <script type="importmap">
+    { "imports": { "lit-html": "/node_modules/lit-html/lit-html.js" } }
+  </script>
+</head>
+<body>
+  <h1>Template renderer adapter</h1>
+  <main id="app"></main>
+  <script type="module">
+    import { html, render } from '../../adapters/lit.js';
+
+    const app = document.querySelector('#app');
+    let count = 0;
+    const update = () => render(html`
+      <button @click=${() => { count += 1; update(); }}>Count: ${count}</button>
+      <ul>${Array.from({ length: count }, (_, index) => html`<li>Item ${index + 1}</li>`)}</ul>
+    `, app);
+    update();
+  </script>
+</body>
+</html>

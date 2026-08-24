@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>WebRTC offer</title></head>
+<body>
+  <h1>Explicit WebRTC offer</h1>
+  <button id="offer" type="button">Create local offer</button>
+  <button id="close" type="button" disabled>Close</button>
+  <output id="status">Idle</output>
+  <script type="module">
+    import { createOffer, createPeerConnection } from '../../net/webrtc.js';
+    const offer = document.querySelector('#offer');
+    const close = document.querySelector('#close');
+    const status = document.querySelector('#status');
+    let connection;
+    offer.addEventListener('click', async () => {
+      connection = createPeerConnection({ iceServers: [] });
+      connection.createDataChannel('example');
+      const description = await createOffer(connection);
+      status.value = `${description.type}: ${description.sdp.length} bytes`;
+      offer.disabled = true;
+      close.disabled = false;
+    });
+    close.addEventListener('click', () => {
+      connection.close();
+      status.value = 'Closed';
+      offer.disabled = false;
+      close.disabled = true;
+    });
+  </script>
+</body>
+</html>

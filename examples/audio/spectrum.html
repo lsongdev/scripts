@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Spectrum view</title></head>
+<body>
+  <h1>Spectrum view</h1>
+  <spectrum-view></spectrum-view>
+  <button id="start" type="button">Start silent analyser</button>
+  <button id="stop" type="button" disabled>Stop</button>
+  <script type="module">
+    import { defineSpectrumView } from '../../elements/spectrum.js';
+    defineSpectrumView();
+    const view = document.querySelector('spectrum-view');
+    const start = document.querySelector('#start');
+    const stop = document.querySelector('#stop');
+    let context;
+    let oscillator;
+    start.addEventListener('click', async () => {
+      context = new AudioContext();
+      oscillator = context.createOscillator();
+      const analyser = context.createAnalyser();
+      const gain = context.createGain();
+      gain.gain.value = 0;
+      oscillator.connect(analyser).connect(gain).connect(context.destination);
+      oscillator.start();
+      view.analyser = analyser;
+      view.start();
+      start.disabled = true;
+      stop.disabled = false;
+    });
+    stop.addEventListener('click', async () => {
+      view.stop();
+      oscillator.stop();
+      await context.close();
+      start.disabled = false;
+      stop.disabled = true;
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Explicit link action</title></head>
+<body>
+  <h1>Explicit link action</h1>
+  <a id="remove" href="https://example.test/profiles/42">Remove profile</a>
+  <output id="request"></output>
+  <script type="module">
+    import { bindLinkAction } from '../../dom/action-link.js';
+    bindLinkAction(document.querySelector('#remove'), request => {
+      document.querySelector('#request').value = `${request.method} ${new URL(request.url).pathname}`;
+    }, { method: 'DELETE', headers: { 'x-csrf-token': 'application-owned-token' } });
+  </script>
+</body>
+</html>

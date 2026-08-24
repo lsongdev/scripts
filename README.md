@@ -4,7 +4,7 @@ Small, composable ES modules that fill recurring gaps in the Web Platform withou
 
 > Use the Web. Fill the gaps. Own nothing.
 
-This repository is being reorganized from a long-lived scripts collection into a versioned Web standard library. There is not yet a stable release surface. See [the module registry](./docs/modules.md) before depending on a URL, [the candidate API contracts](./docs/api-contracts.md), [the deleted-module recovery audit](./docs/deleted-module-audit.md), its [historical file ledger](./docs/deleted-files-ledger.md), and [the refactor status](./docs/refactor-status.md) for the remaining distance.
+This repository is organized as a capability-based, versioned Web standard library. The first immutable checkpoint is [`v0.1.0-rc.1`](./docs/releases/v0.1.0-rc.1.md); individual leaves remain candidate or experimental until their own promotion evidence is complete. See [the module registry](./docs/modules.md), [the candidate API contracts](./docs/api-contracts.md), [the deleted-module recovery audit](./docs/deleted-module-audit.md), its [historical file ledger](./docs/deleted-files-ledger.md), and [the refactor status](./docs/refactor-status.md).
 
 ## Design rules
 
@@ -62,7 +62,7 @@ dependency-free.
 
 ## Current usage
 
-Until a versioned release exists, use relative paths while developing against this checkout and import the narrowest module that provides the capability:
+Use relative paths while developing against this checkout and import the narrowest module that provides the capability:
 
 ```js
 import { delay } from './async/delay.js';
@@ -72,7 +72,7 @@ import { $ } from './dom/query.js';
 on($('#save'), 'click', save);
 ```
 
-The public API will be published through immutable version URLs. A floating `latest` URL may be offered for experimentation, but it will not be recommended for production use.
+For an immutable release-candidate URL, replace the relative prefix with `https://cdn.jsdelivr.net/gh/lsongdev/scripts@v0.1.0-rc.1/`. A floating `latest` URL is not recommended for production use.
 
 ## Compatibility policy
 
@@ -112,3 +112,5 @@ The local gate checks JavaScript syntax, relative-import resolution, local HTML 
 ## License
 
 [MIT](./LICENSE) © Lsong
+
+Optional dependencies and isolated vendor licenses are listed in [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md).

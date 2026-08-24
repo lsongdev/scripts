@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Form request</title></head>
+<body>
+  <h1>Form request</h1>
+  <form action="/profiles" method="post" enctype="application/x-www-form-urlencoded">
+    <label>Name <input name="name" value="Ada"></label>
+    <button type="submit" name="intent" value="preview">Preview request</button>
+  </form>
+  <output id="request"></output>
+  <script type="module">
+    import { bindFormSubmission } from '../../dom/form-request.js';
+    const output = document.querySelector('#request');
+    bindFormSubmission(document.querySelector('form'), async request => {
+      output.value = `${request.method} ${new URL(request.url).pathname} ${await request.text()}`;
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Animation recipes</title></head>
+<body>
+  <h1>Explicit animation recipes</h1>
+  <canvas id="matrix" width="320" height="160"></canvas>
+  <canvas id="particles" width="320" height="160"></canvas>
+  <button id="ripple" type="button">Ripple</button>
+  <button id="start" type="button">Start canvases</button>
+  <button id="stop" type="button">Stop canvases</button>
+  <script type="module">
+    import { createMatrixRain } from '../../labs/animation/matrix.js';
+    import { createParticleNetwork } from '../../labs/animation/particles.js';
+    import { bindRipple } from '../../labs/animation/ripple.js';
+    const matrix = createMatrixRain(document.querySelector('#matrix'));
+    const particles = createParticleNetwork(document.querySelector('#particles'));
+    const disposeRipple = bindRipple(document.querySelector('#ripple'));
+    document.querySelector('#start').addEventListener('click', () => { matrix.start(); particles.start(); });
+    document.querySelector('#stop').addEventListener('click', () => { matrix.stop(); particles.stop(); disposeRipple(); });
+    addEventListener('pagehide', () => { matrix.stop(); particles.stop(); disposeRipple(); });
+  </script>
+</body>
+</html>

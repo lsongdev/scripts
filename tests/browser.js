@@ -4,10 +4,12 @@ import { delay } from '../async/delay.js';
 import { sha256 } from '../crypto/digest.js';
 import { generateAESKey } from '../crypto/keys.js';
 import { bindDialog, createDialog, createDialogFromHTMLUnsafe, showDialog } from '../dom/dialog.js';
+import { bindLinkAction, linkToRequest } from '../dom/action-link.js';
 import { delegate, on } from '../dom/events.js';
 import { formDataToObject, formToObject } from '../dom/form-data.js';
 import { bindFormSubmission, formToRequest } from '../dom/form-request.js';
 import { getSelectedItem, setSelectOptions } from '../dom/select.js';
+import { adoptStyleSheets, createStyleSheet } from '../dom/stylesheets.js';
 import { createElement, parseHTMLUnsafe } from '../dom/nodes.js';
 import { $, $$, xpath } from '../dom/query.js';
 import { defineElement } from '../elements/define.js';
@@ -172,6 +174,28 @@ test('form requests preserve native successful controls and explicit submission'
   dispose();
 });
 
+test('link actions preserve modified navigation and build explicit Requests', () => {
+  const link = document.createElement('a');
+  link.href = '/resource/1';
+  const request = linkToRequest(link, { method: 'DELETE', headers: { 'x-test': 'yes' } });
+  assert(request instanceof Request);
+  assert(request.method === 'DELETE');
+  let handled = 0;
+  const dispose = bindLinkAction(link, () => { handled += 1; }, { method: 'POST' });
+  const normal = new MouseEvent('click', { bubbles: true, cancelable: true, button: 0 });
+  link.dispatchEvent(normal);
+  assert(normal.defaultPrevented && handled === 1);
+  const modified = new MouseEvent('click', { bubbles: true, cancelable: true, button: 0, ctrlKey: true });
+  let modifiedWasPrevented;
+  link.addEventListener('click', event => {
+    modifiedWasPrevented = event.defaultPrevented;
+    event.preventDefault();
+  }, { once: true });
+  link.dispatchEvent(modified);
+  assert(modifiedWasPrevented === false && handled === 1);
+  dispose();
+});
+
 test('select mapping preserves native select semantics and source items', () => {
   const select = document.createElement('select');
   const items = [{ id: 1, name: '<Admin>' }, { id: 2, name: 'User', disabled: true }];
@@ -185,6 +209,17 @@ test('select mapping preserves native select semantics and source items', () => 
   assert(select.value === '1');
   assert(select.options[1].textContent === '<Admin>');
   assert(getSelectedItem(select) === items[0]);
+});
+
+test('constructable stylesheets are explicitly adopted and selectively removed', () => {
+  const root = document.createElement('div').attachShadow({ mode: 'open' });
+  const existing = createStyleSheet(':host { display: block }');
+  const added = createStyleSheet('span { color: red }');
+  root.adoptedStyleSheets = [existing];
+  const dispose = adoptStyleSheets(root, [existing, added]);
+  assert(root.adoptedStyleSheets.length === 2);
+  dispose();
+  assert(root.adoptedStyleSheets.length === 1 && root.adoptedStyleSheets[0] === existing);
 });
 
 test('query and node helpers preserve DOM objects', () => {

@@ -33,14 +33,14 @@ These capabilities are externally relevant. Their historical source is recoverab
 
 | Group | Historical files | Intended boundary and required redesign |
 | --- | --- | --- |
-| animation | canvas particle/matrix/ripple recipes and tween example | Core easing, numeric tween, and native Web Animations ownership are recovered in `animation/`; visual recipes remain queued for explicit labs implementations. |
+| animation | canvas particle/matrix/ripple recipes and tween example | Core easing/tween/Web Animations live in `animation/`; visual recipes are recovered in `labs/animation/` with explicit lifecycle and browser cleanup tests. |
 | graphics | `canvas.js`, `color.js` | Recovered as `graphics/canvas.js` and `graphics/color.js` with Canvas state ownership, correct CSS HSL math, validation, and tests. |
-| encodings/security | `crypto/csr.js` | CSR as an explicitly versioned ASN.1 adapter rather than a floating CDN import. Bech32/Bech32m has been recovered as `encoding/bech32.js` with official vectors. |
-| document runtime | `html/*` | Separately bounded renderer package/labs module with security, event cleanup, update, and nested-template tests. |
-| UI elements | calendar, form, link, backup, piano, select, sidebar, spectrum | Copy/table and storage backup are recovered as autonomous, explicitly registered elements. Data-backed select is recovered by populating the native control in `dom/select.js`; rich combobox, calendar, piano, sidebar, and spectrum still require their own portability contracts. |
+| encodings/security | `crypto/csr.js` | CSR and Bech32/Bech32m are recovered. CSR is dependency-free PKCS#10 with algorithm-specific OIDs/encoding and OpenSSL interoperability; Bech32 uses official vectors. |
+| document runtime | `html/*` | Recovered as a narrow adapter over exact `lit-html@3.3.3`, with explicit browser import map and Chromium/WebKit nested/event update tests. |
+| UI elements | calendar, form, link, backup, piano, select, sidebar, spectrum | All named workflows now have tested native helpers, controllers, or explicitly registered autonomous elements; rich combobox/calendar/piano/spectrum/sidebar run in Chromium/WebKit. |
 | formats/storage | empty `csv.js`, empty `cookie.js` | Recovered as implemented `encoding/csv.js` and `storage/cookies.js` contracts rather than restoring empty bodies. |
 | input/device | former keyboard/motion singleton APIs | Recovered as inert `dom/keyboard.js` and `devices/orientation.js`; no import-time singleton or listener. |
-| media | recorder example, player | Media Session and explicit MediaRecorder ownership are recovered in `media/session.js` and `media/recording.js`; player UI remains queued. |
+| media | recorder example, player | Media Session, MediaRecorder, native video attachment/playback, piano events, and analyser rendering are recovered; generic player UI remains a native HTMLMediaElement/application composition rather than a hidden wrapper. |
 | lifecycle | `dom/page.js` | Service-worker and page lifecycle observation are recovered in `browser/service-worker.js` and `browser/page-lifecycle.js`; neither starts work during import. |
 | generic workflows | non-native portions of `array.js`, `object.js`, `promise.js` | Recovered as narrow `collections/random.js`, `collections/records.js`, `async/retry.js`, `async/timeout.js`, and `async/serial.js`; native duplicates stay mapped to the language. |
 | byte/event/network workflows | `bytes.js`, hex/throttle portions of `string.js`/`events.js`, `webrtc.js` | Empty bytes surface is replaced by strict `encoding/hex.js`; throttle is lifecycle-owned in `async/throttle.js`; WebRTC returns native peer connections/descriptions without default third-party STUN or prefixes. |
@@ -59,4 +59,4 @@ Some old files consisted only of an empty body, deprecated forwarding, unsafe dy
 - string interpolation based on `new Function`;
 - prefixed browser APIs and silent unsupported fallbacks.
 
-This section is not a license to discard the external workflow. Each workflow remains in the recovery queue until it has either a documented standard migration or a tested replacement module.
+This section is not a license to discard the external workflow. Every first-pass workflow now has either a documented standard migration, a tested replacement module, or an explicitly retained experimental implementation.

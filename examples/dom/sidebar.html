@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Sidebar disclosure</title></head>
+<body>
+  <h1>Sidebar disclosure</h1>
+  <nav id="sidebar" aria-label="Example" data-state="expanded">
+    <button type="button" aria-expanded="false" aria-controls="projects">Projects</button>
+    <ul id="projects" hidden><li><a href="#alpha">Alpha</a></li></ul>
+    <a id="settings" href="#settings-target">Settings</a>
+  </nav>
+  <div id="settings-target">Settings target</div>
+  <script type="module">
+    import { bindSidebar } from '../../dom/sidebar.js';
+    bindSidebar(document.querySelector('#sidebar'));
+  </script>
+</body>
+</html>

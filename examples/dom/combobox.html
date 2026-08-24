@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Rich combobox</title></head>
+<body>
+  <h1>Rich combobox</h1>
+  <form id="example">
+    <label>Flavor</label>
+    <rich-combobox name="flavor" value="alpha" placeholder="Filter flavors" required aria-label="Flavor">
+      <rich-option value="alpha"><strong>Alpha</strong> fruit</rich-option>
+      <rich-option value="beta" disabled>Beta fruit</rich-option>
+      <rich-option value="gamma"><em>Gamma</em> fruit</rich-option>
+    </rich-combobox>
+  </form>
+  <output id="value">alpha</output>
+  <script type="module">
+    import { defineRichCombobox } from '../../elements/combobox.js';
+    defineRichCombobox();
+    const combobox = document.querySelector('rich-combobox');
+    combobox.addEventListener('change', () => { document.querySelector('#value').value = combobox.value; });
+  </script>
+</body>
+</html>

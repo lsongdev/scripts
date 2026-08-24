@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Piano keyboard events</title></head>
+<body>
+  <h1>Piano keyboard events</h1>
+  <p>The element emits notes; it does not create or own an AudioContext.</p>
+  <piano-keyboard start="60" end="71" show-notes></piano-keyboard>
+  <output id="status">Idle</output>
+  <script type="module">
+    import { definePianoKeyboard } from '../../elements/piano-keyboard.js';
+    definePianoKeyboard();
+    const status = document.querySelector('#status');
+    const keyboard = document.querySelector('piano-keyboard');
+    keyboard.addEventListener('notestart', event => { status.value = `Start ${event.detail.note}`; });
+    keyboard.addEventListener('noteend', event => { status.value = `End ${event.detail.note}`; });
+  </script>
+</body>
+</html>
