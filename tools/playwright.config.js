@@ -1,4 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
+import { fileURLToPath } from 'node:url';
+
+const reportDirectory = fileURLToPath(new URL('../playwright-report/', import.meta.url));
 
 export default defineConfig({
   testDir: '../e2e',
@@ -7,7 +10,7 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
   reporter: process.env.CI
-    ? [['github'], ['html', { outputFolder: 'playwright-report', open: 'never' }]]
+    ? [['github'], ['html', { outputFolder: reportDirectory, open: 'never' }]]
     : 'list',
   use: {
     baseURL: 'http://127.0.0.1:4173',
