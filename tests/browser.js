@@ -1,3 +1,8 @@
+import { animate } from '../animation/web.js';
+import { debounce } from '../async/debounce.js';
+import { delay } from '../async/delay.js';
+import { sha256 } from '../crypto/digest.js';
+import { generateAESKey } from '../crypto/keys.js';
 import { bindDialog, createDialog, createDialogFromHTMLUnsafe, showDialog } from '../dom/dialog.js';
 import { delegate, on } from '../dom/events.js';
 import { formDataToObject, formToObject } from '../dom/form-data.js';
@@ -5,6 +10,7 @@ import { createElement, parseHTMLUnsafe } from '../dom/nodes.js';
 import { $, $$, xpath } from '../dom/query.js';
 import { defineElement } from '../elements/define.js';
 import { readArrayBuffer, readText as readBlobText } from '../files/read.js';
+import { clear as clearCanvas, fill as fillCanvas } from '../graphics/canvas.js';
 import {
   createGain as createAudioGain,
   createNoiseBuffer,
@@ -43,6 +49,22 @@ test('timing helpers honor browser timers and AbortSignal', async () => {
   invoke.flush();
   assert(invoke.pending === false);
   assert(calls.join(',') === 'latest');
+});
+
+test('Web Animations helper returns the native Animation and honors abort', async () => {
+  const element = document.createElement('div');
+  document.body.append(element);
+  const completed = animate(element, [{ opacity: 0 }, { opacity: 1 }], { duration: 1 });
+  assert(completed instanceof Animation);
+  await completed.finished;
+
+  const controller = new AbortController();
+  const canceled = animate(element, [{ opacity: 1 }, { opacity: 0 }], {
+    duration: 10_000,
+  }, { signal: controller.signal });
+  controller.abort();
+  assert(canceled.playState === 'idle');
+  element.remove();
 });
 
 test('crypto helpers preserve browser-native results', async () => {
@@ -115,6 +137,19 @@ test('video and camera helpers keep permission and stream ownership explicit', a
   camera.stop();
   assert(camera.stream === undefined);
   camera.remove();
+});
+
+test('canvas helpers draw pixels without leaking context state', () => {
+  const canvas = document.createElement('canvas');
+  canvas.width = 2;
+  canvas.height = 1;
+  const context = canvas.getContext('2d');
+  const originalFill = context.fillStyle;
+  fillCanvas(context, { fillStyle: '#ff0000' });
+  assert(context.fillStyle === originalFill);
+  assert([...context.getImageData(0, 0, 1, 1).data].join(',') === '255,0,0,255');
+  clearCanvas(context, { width: 1, height: 1 });
+  assert([...context.getImageData(0, 0, 1, 1).data].join(',') === '0,0,0,0');
 });
 
 test('query and node helpers preserve DOM objects', () => {
@@ -382,7 +417,3 @@ for (const { name, run } of tests) {
 
 document.documentElement.dataset.status = failures ? 'failed' : 'passed';
 document.documentElement.dataset.failures = String(failures);
-import { debounce } from '../async/debounce.js';
-import { delay } from '../async/delay.js';
-import { sha256 } from '../crypto/digest.js';
-import { generateAESKey } from '../crypto/keys.js';

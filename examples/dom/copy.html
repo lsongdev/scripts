@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Copy button</title></head>
+<body>
+  <label>Text <input id="copy-source" value="Copy this text"></label>
+  <copy-button for="copy-source">Copy input</copy-button>
+  <copy-button value="Explicit value">Copy explicit value</copy-button>
+  <output id="result"></output>
+  <script type="module">
+    import { defineCopyButton } from '../../elements/copy-button.js';
+    defineCopyButton();
+    document.addEventListener('copy', event => {
+      document.querySelector('#result').value = event.detail.value;
+    });
+  </script>
+</body>
+</html>

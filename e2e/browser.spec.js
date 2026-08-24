@@ -1,9 +1,13 @@
 import { expect, test } from '@playwright/test';
 
 const coreModules = [
+  '/animation/easing.js',
+  '/animation/tween.js',
+  '/animation/web.js',
   '/async/debounce.js',
   '/async/delay.js',
   '/browser/notifications.js',
+  '/browser/service-worker.js',
   '/crypto/digest.js',
   '/crypto/keys.js',
   '/crypto/md5.js',
@@ -11,20 +15,28 @@ const coreModules = [
   '/datetime/format.js',
   '/devices/geolocation.js',
   '/devices/serial.js',
+  '/devices/orientation.js',
   '/dom/dialog.js',
   '/dom/events.js',
   '/dom/form-data.js',
+  '/dom/keyboard.js',
   '/dom/nodes.js',
   '/dom/query.js',
   '/encoding/base32.js',
   '/encoding/base64.js',
+  '/encoding/bech32.js',
+  '/encoding/csv.js',
   '/files/read.js',
+  '/graphics/canvas.js',
+  '/graphics/color.js',
   '/media/audio.js',
   '/media/capture.js',
   '/media/video.js',
+  '/media/session.js',
   '/navigation/router.js',
   '/net/websocket.js',
   '/storage/local.js',
+  '/storage/cookies.js',
   '/streams/text.js',
 ];
 
@@ -32,11 +44,13 @@ const examplePages = [
   '/examples/audio/',
   '/examples/bluetooth/',
   '/examples/dom/dialog.html',
+  '/examples/dom/copy.html',
   '/examples/dom/icon.html',
   '/examples/dom/move.html',
   '/examples/dom/progressbar.html',
   '/examples/dom/resize.html',
   '/examples/dom/tabs.html',
+  '/examples/dom/table.html',
   '/examples/file/',
   '/examples/hid/',
   '/examples/location/',
@@ -81,7 +95,7 @@ test('browser contract harness passes', async ({ page }) => {
   await page.goto('/tests/browser.html');
   await expect(page.locator('html')).toHaveAttribute('data-status', 'passed');
   await expect(page.locator('html')).toHaveAttribute('data-failures', '0');
-  await expect(page.locator('#results li')).toHaveCount(17);
+  await expect(page.locator('#results li')).toHaveCount(19);
   expect(errors).toEqual([]);
 });
 
@@ -150,6 +164,34 @@ test('geolocation helper returns the native browser position', async ({ page, co
     latitude: 31.2304,
     longitude: 121.4737,
   });
+});
+
+test('autonomous data table renders idempotently across engines', async ({ page }) => {
+  await page.goto('/examples/dom/table.html');
+  await expect(page.locator('data-table thead th')).toHaveCount(2);
+  await expect(page.locator('data-table tbody tr')).toHaveCount(2);
+  await page.locator('data-table').evaluate(table => {
+    table.data = [{ name: 'Updated', role: 'Tester' }];
+  });
+  await expect(page.locator('data-table tbody tr')).toHaveCount(1);
+  await expect(page.locator('data-table tbody')).toContainText('Updated');
+});
+
+test('autonomous copy button exposes an explicit Clipboard workflow', async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {
+        writeText(value) {
+          globalThis.__copiedText = value;
+          return Promise.resolve();
+        },
+      },
+    });
+  });
+  await page.goto('/examples/dom/copy.html');
+  await page.locator('copy-button[value]').click();
+  await expect.poll(() => page.evaluate(() => globalThis.__copiedText)).toBe('Explicit value');
 });
 
 for (const path of examplePages) {

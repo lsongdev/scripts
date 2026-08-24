@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const coreAreas = new Set([
+  'animation',
   'async',
   'browser',
   'crypto',
@@ -13,6 +14,7 @@ const coreAreas = new Set([
   'dom',
   'encoding',
   'files',
+  'graphics',
   'media',
   'navigation',
   'net',

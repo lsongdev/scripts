@@ -10,7 +10,7 @@
 
 | 目标 | 当前完成度 | 尚缺的决定性证据 |
 | --- | ---: | --- |
-| 最小可信 v0.x | 约 80% | 删除模块恢复审计、首次 CI 证据、最终 stable 裁决、不可变发布 URL |
+| 最小可信 v0.x | 约 88% | 完成删除模块恢复队列、最终 stable 裁决、不可变发布 URL |
 | 成熟 v1 stdlib | 约 45% | 多下游验证、长期版本治理、完整权限/设备/资源清理证据 |
 
 这些百分比不是代码量。目录和核心实现已经越过最危险的混杂阶段，但“测试过的 candidate”仍不等于“承诺长期维护的 stable”。现在最大的距离是发布证据和真实下游使用，而不是继续扩充 helper。
@@ -26,6 +26,8 @@
 - 原 `audio.js` 已恢复并拆层：通用 Web Audio 原语进入 `media/audio.js` candidate，游戏/环境音配方进入 `labs/audio/`；零增益、pink-noise 状态和清理句柄问题已修正。
 - `time.js` 已恢复为 `datetime/format.js`：无效日期显式失败、UTC/IANA 时区统一走 Intl，duration 保留方向；UI 改为跨引擎 autonomous `x-time` 并显式注册。
 - camera/video 已恢复为 `media/video.js` 与 autonomous `camera-view`：导入和连接 DOM 都不请求权限，只有显式 `start()` 获取标准 MediaStream，停止与断开会释放资源。
+- Bech32/Bech32m 已恢复为 `encoding/bech32.js`，使用 BIP-173/BIP-350 官方有效/无效向量验证 checksum、case、长度和 bit padding。
+- canvas/color 已恢复为 `graphics/` candidate：Canvas helper 不泄漏绘图状态，颜色使用校验后的 sRGB 与正确 CSS HSL 数学，并有真实像素测试。
 - 长生命周期 API 优先采用 `AbortSignal`，订阅型 API 同时返回 disposer。
 - 普通 DOM 构造默认接受文本或 Node；字符串 HTML 只通过名称含 `Unsafe` 的显式入口进入。
 - Web Components 改为显式 `defineXxx()`；导入不再自动注册。
@@ -34,18 +36,18 @@
 - 首轮曾以“仓内无使用方”为理由删除若干模块；维护者确认存在外部 URL 使用后，该推断已撤回，逐文件恢复状态见 [`deleted-module-audit.md`](./deleted-module-audit.md)。
 - `elements/` 已收缩为经过浏览器 smoke test 的 define/icon/progressbar/tabs；`labs/elements/` 只保留依赖精确 vendor snapshot 的 QR 实验，其余无使用方 UI 草稿已删除。
 - 修改过且无法准确标识版本的 QR 源码副本已替换为 `vendor/qr/` 中未修改的 `qr@0.6.0` 发布快照，并记录 tarball integrity、逐文件哈希和双许可证。
-- audio、time、camera/video、YAML 与 MD5 已按新边界恢复；graphics、Bech32、CSR、HTML runtime、animation 和其余 UI/应用能力进入恢复队列，不把历史缺陷原样带回。
-- customized built-in table/copy 实验在 Chromium 成功、WebKit 不升级；因此已连同示例删除，不添加引擎分支或第二套兼容组件模型。受限浏览器矩阵或 autonomous component 的选择由下游承担。
-- 已建立 57 个 Node 契约测试和 17 个浏览器契约测试；19 个代表性示例页进入自动 smoke test。新增真实 timer/AbortSignal、Web Crypto/Web Audio、datetime、MediaStream/video/camera 生命周期、ShadowRoot/Document XPath、History/URLPattern、File、Web Streams、本地 WebSocket server 与授权 Geolocation 引擎证据。
+- audio、time、camera/video、YAML、MD5、Bech32/Bech32m、graphics、animation 基础、CSV/cookie、service worker、keyboard/orientation 与 Media Session 已按新边界恢复；CSR、HTML runtime、animation 视觉配方和其余 UI/应用能力仍在恢复队列，不把历史缺陷原样带回。
+- customized built-in table/copy 实验在 Chromium 成功、WebKit 不升级；能力已重建为 portable autonomous `data-table` 和 `copy-button`，不添加引擎分支、旧注册名或 forwarding 文件。
+- 已建立 70 个 Node 契约测试和 19 个页内浏览器契约测试；21 个代表性示例页进入自动 smoke test。Chromium/WebKit 本地套件共 56 项，覆盖真实 timer/AbortSignal、Web Crypto/Web Audio/Web Animations/Canvas、datetime、MediaStream/video/camera 生命周期、ShadowRoot/Document XPath、History/URLPattern、File、Web Streams、本地 WebSocket server、授权 Geolocation 与 autonomous elements。
 - `npm run check` 统一执行语法、相对导入、HTML 本地资源、根目录结构、核心依赖方向、Node 契约测试和 Chromium/WebKit 测试。
-- CI workflow 使用锁定 commit 的 Actions，配置为在 Firefox 上补充执行同一套跨浏览器测试并保留报告；首次远端运行结果仍待观察。
+- 首次远端 Quality CI（commit `926daed`）已在 Ubuntu 成功完成静态/Node 检查以及 Chromium、Firefox、WebKit 全套测试，并上传浏览器报告。
 
 ## 当前目录契约
 
 ```text
 Web Platform
     ↑
-async browser crypto devices dom encoding files media navigation net storage streams
+animation async browser crypto datetime devices dom encoding files graphics media navigation net storage streams
     ↑
 elements adapters integrations examples
 
@@ -59,9 +61,9 @@ vendor  隔离的第三方源码
 
 ### P0：形成可发布的最小表面
 
-1. 复核 [`api-contracts.md`](./api-contracts.md) 中收敛出的首批 16 个叶子模块；在发布条件满足前仍保持 candidate。
+1. 复核 [`api-contracts.md`](./api-contracts.md) 中收敛出的首批叶子模块；在发布条件满足前仍保持 candidate。
 2. 把统一契约拆成每个 stable 文件的最终 API 文档和可执行示例。
-3. 观察首次 CI 的三引擎结果，修复运行环境或标准行为问题；不以兼容分支吞掉差异。
+3. 持续观察三引擎 CI；首次运行已成功，后续差异仍以修正契约或明确限制处理，不增加兼容分支。
 4. 保持公开入口清单和全部可执行示例与 smoke test manifest 同步。
 5. 项目许可证已确定并写入 MIT；发布前继续核对所有 vendor/依赖的许可证边界。
 6. 确定不可变发布方案和版本号，发布首个语义化 tag。

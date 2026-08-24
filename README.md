@@ -21,6 +21,7 @@ Development tools may be used to test the repository. Consumers receive ordinary
 ## Repository structure
 
 ```text
+animation/      timing and Web Animations workflows
 async/          asynchronous workflows
 browser/        browser-level capabilities
 crypto/         Web Crypto workflows
@@ -29,6 +30,7 @@ devices/        device and sensor capabilities
 dom/            DOM workflows
 encoding/       binary and textual encodings
 files/          File and Blob workflows
+graphics/       Canvas and color workflows
 media/          media capture workflows
 navigation/     URL/history navigation workflows
 net/            network protocols beyond native fetch

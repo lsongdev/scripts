@@ -236,6 +236,30 @@ playNoise(context, type, duration?, options?) -> { source, gain, stop }
 - Playback helpers return native nodes plus an idempotent `stop()` and honor `AbortSignal`; the caller owns the AudioContext lifecycle.
 - Named game/environment effects are recipes in `labs/audio/`, not core signal-processing contracts.
 
+## Recovered candidate surfaces
+
+These externally used capabilities have passed their immediate recovery tests. They remain candidates until the same publication and downstream-evidence gates as the first surface are met.
+
+| Module | Contract boundary |
+| --- | --- |
+| `datetime/format.js` | Parses valid instants explicitly, formats in a named IANA time zone, and preserves the sign of duration differences. It does not infer locale or host time-zone policy. |
+| `crypto/md5.js` | Accepts text or byte-oriented input and returns digest bytes/hex for legacy interoperability only. It must never be presented as secure hashing. |
+| `encoding/bech32.js` | Implements strict BIP-173/BIP-350 checksum variants and explicit 8-bit/5-bit conversion; mixed case, invalid padding, length, alphabet, or checksum fail. |
+| `encoding/csv.js` | Parses and serializes a strict quoted CSV record model. Schema inference, object mapping, dialect guessing, and streaming are separate policies. |
+| `graphics/color.js` | Provides immutable validated sRGB values and CSS-compatible hex/RGB/HSL conversion without DOM parsing or implicit clamping. |
+| `graphics/canvas.js` | Draw/clear helpers accept and return a native 2D context and preserve its caller-owned state. Canvas sizing, animation, and scene ownership stay downstream. |
+| `animation/easing.js` | Pure normalized easing functions preserve endpoints. |
+| `animation/tween.js` | Interpolates finite numeric records immutably, owns its frame loop, resolves the final state, and rejects with `AbortSignal.reason`. |
+| `animation/web.js` | Delegates to `Element.animate()`, returns the native `Animation`, and binds optional cancellation without inventing a timeline wrapper. |
+| `storage/cookies.js` | Parses raw Cookie request/header text and serializes browser-settable cookie attributes explicitly; it does not model `Set-Cookie`, consent, or cross-site policy. |
+| `browser/service-worker.js` | Registration is explicit and returns the native registration; observation is opt-in and returns a disposer. |
+| `dom/keyboard.js` | Observes native keyboard events on an explicit target with filtering, native listener options, disposer, and `AbortSignal` ownership. |
+| `devices/orientation.js` | Requests permission and observes native orientation events explicitly; unsupported capability fails instead of returning fabricated data. |
+| `media/video.js` | Attaches/detaches a standard `MediaStream` and starts native playback explicitly; stream tracks remain caller-owned. |
+| `media/session.js` | Writes native Media Session metadata/state/action/position fields explicitly and fails when unsupported; it does not emulate Media Session. |
+
+The autonomous elements `x-time`, `camera-view`, `copy-button`, and `data-table` are optional adapters, not capability modules. Their modules are inert until the corresponding `defineXxx()` function is called. Camera permission starts only through `start()`; copy uses an explicit Clipboard operation; table cells default to text/Node rendering rather than HTML injection.
+
 ## Deferred from the first surface
 
 The following modules remain useful candidates but are deliberately excluded from the first stable set until their browser-specific evidence is stronger:

@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Data table</title></head>
+<body>
+  <data-table></data-table>
+  <script type="module">
+    import { defineDataTable } from '../../elements/data-table.js';
+    defineDataTable();
+    const table = document.querySelector('data-table');
+    table.columns = [
+      { key: 'name', label: 'Name' },
+      { key: 'role', label: 'Role' },
+    ];
+    table.data = [
+      { name: 'Ada', role: 'Engineer' },
+      { name: 'Lin', role: 'Designer' },
+    ];
+  </script>
+</body>
+</html>

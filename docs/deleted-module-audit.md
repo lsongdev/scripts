@@ -33,15 +33,15 @@ These capabilities are externally relevant. Their historical source is recoverab
 
 | Group | Historical files | Intended boundary and required redesign |
 | --- | --- | --- |
-| animation | `animate/*`, tween example | `animation/` primitives around Web Animations plus optional recipes; explicit cancellation and native `Animation` objects. |
-| graphics | `canvas.js`, `color.js` | `graphics/` candidate modules; correct Canvas state ownership, color-space math, validation, and tests. |
-| encodings/security | `crypto/bech32.js`, `crypto/csr.js` | Bech32/Bech32m with published vectors; CSR as an explicitly versioned ASN.1 adapter rather than a floating CDN import. |
+| animation | canvas particle/matrix/ripple recipes and tween example | Core easing, numeric tween, and native Web Animations ownership are recovered in `animation/`; visual recipes remain queued for explicit labs implementations. |
+| graphics | `canvas.js`, `color.js` | Recovered as `graphics/canvas.js` and `graphics/color.js` with Canvas state ownership, correct CSS HSL math, validation, and tests. |
+| encodings/security | `crypto/csr.js` | CSR as an explicitly versioned ASN.1 adapter rather than a floating CDN import. Bech32/Bech32m has been recovered as `encoding/bech32.js` with official vectors. |
 | document runtime | `html/*` | Separately bounded renderer package/labs module with security, event cleanup, update, and nested-template tests. |
-| UI elements | calendar, copy, form, link, backup, piano, select, sidebar, spectrum, table | Autonomous and explicitly registered elements where portable; otherwise host-specific adapters with the browser constraint documented. |
-| formats/storage | empty `csv.js`, empty `cookie.js` | New CSV and Cookie contracts rather than restoring empty files. |
-| input/device | `keyboard.js`, `motion.js` | Inert EventTarget/AbortSignal workflows; no import-time singleton or listener. |
-| media | Media Session helpers, recorder example, player | Separate capture, playback, recording, and Media Session contracts with explicit resource ownership. |
-| lifecycle | `sw.js`, `dom/page.js` | Explicit service-worker/page-lifecycle operations returning native objects and disposers. |
+| UI elements | calendar, form, link, backup, piano, select, sidebar, spectrum | Copy/table are recovered as autonomous, explicitly registered `copy-button` and `data-table`; the remaining elements follow the same portability review. |
+| formats/storage | empty `csv.js`, empty `cookie.js` | Recovered as implemented `encoding/csv.js` and `storage/cookies.js` contracts rather than restoring empty bodies. |
+| input/device | former keyboard/motion singleton APIs | Recovered as inert `dom/keyboard.js` and `devices/orientation.js`; no import-time singleton or listener. |
+| media | recorder example, player | Media Session is recovered in `media/session.js`; recording/player contracts remain queued. |
+| lifecycle | `dom/page.js` | Service-worker registration/state observation is recovered in `browser/service-worker.js`; page lifecycle remains queued. |
 | application helpers | i18n, regex, form persistence/request | Separate optional/application modules after safe interpolation, validation, and storage ownership are defined. |
 
 ## Behaviors not restored as implementations
