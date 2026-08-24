@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { getPageLifecycleState, observePageLifecycle } from '../page-lifecycle.js';
+import { getPageLifecycleState, observePageLifecycle } from '../dom/page.js';
 import { createMediaRecorder, startRecording } from '../media/recording.js';
 import {
   createStorageSnapshot,

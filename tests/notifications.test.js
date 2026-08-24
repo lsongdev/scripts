@@ -4,7 +4,7 @@ import test from 'node:test';
 import {
   notify,
   requestNotificationPermission,
-} from '../notifications.js';
+} from '../browser/notifications.js';
 
 class GrantedNotification {
   static permission = 'default';

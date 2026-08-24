@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { onServiceWorkerStateChange, registerServiceWorker } from '../service-worker.js';
+import { onServiceWorkerStateChange, registerServiceWorker } from '../browser/service-worker.js';
 import { requestOrientationPermission, observeOrientation } from '../devices/orientation.js';
 import { onKey } from '../dom/keyboard.js';
 import {

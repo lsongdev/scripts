@@ -1,7 +1,7 @@
 import { animate } from '../animation/web.js';
 import { debounce } from '../async/debounce.js';
 import { delay } from '../async/delay.js';
-import { sha256 } from '../crypto/digest.js';
+import { sha256 } from '../crypto/index.js';
 import { generateAESKey } from '../crypto/keys.js';
 import { bindDialog, createDialog, createDialogFromHTMLUnsafe, showDialog } from '../dom/dialog.js';
 import { bindLinkAction, linkToRequest } from '../dom/action-link.js';
