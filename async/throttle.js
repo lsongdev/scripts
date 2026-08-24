@@ -44,3 +44,24 @@ export function throttle(fn, wait, { signal } = {}) {
   signal?.addEventListener('abort', clear, { once: true });
   return throttled;
 }
+
+// export function throttle(func, throttleDelay) {
+//   let lastFunc
+//   let lastRan
+//   return function () {
+//     const context = this;
+//     const args = arguments;
+//     if (!lastRan) {
+//       func.apply(context, args)
+//       lastRan = Date.now()
+//     } else {
+//       clearTimeout(lastFunc)
+//       lastFunc = setTimeout(function () {
+//         if ((Date.now() - lastRan) >= throttleDelay) {
+//           func.apply(context, args)
+//           lastRan = Date.now()
+//         }
+//       }, throttleDelay - (Date.now() - lastRan))
+//     }
+//   }
+// };

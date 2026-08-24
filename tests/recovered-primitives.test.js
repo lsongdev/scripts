@@ -2,13 +2,13 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { throttle } from '../async/throttle.js';
-import { bytesToHex, hexToBytes } from '../encoding/hex.js';
+import { encode, decode } from '../encoding/hex.js';
 import { createAnswer, createOffer, createPeerConnection } from '../net/webrtc.js';
 
 test('hex codec round-trips bytes and rejects malformed text', () => {
-  assert.equal(bytesToHex(new Uint8Array([0, 15, 255])), '000fff');
-  assert.deepEqual(hexToBytes('000Fff'), new Uint8Array([0, 15, 255]));
-  assert.throws(() => hexToBytes('abc'), SyntaxError);
+  assert.equal(encode(new Uint8Array([0, 15, 255])), '000fff');
+  assert.deepEqual(decode('000Fff'), new Uint8Array([0, 15, 255]));
+  assert.throws(() => decode('abc'), SyntaxError);
 });
 
 test('throttle preserves the receiver and latest trailing call', async () => {

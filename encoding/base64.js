@@ -26,8 +26,8 @@ export function decode(value) {
 }
 
 /** Encode bytes as unpadded base64url. */
-export function encodeToBase64URL(value) {
-  return bytesToBase64(value)
+export function encodeBase64URL(value) {
+  return encode(value)
     .replaceAll('+', '-')
     .replaceAll('/', '_')
     .replace(/=+$/, '');
@@ -38,5 +38,5 @@ export function decodeBase64URL(value) {
   if (typeof value !== 'string') throw new TypeError('Expected a base64url string');
   const base64 = value.replaceAll('-', '+').replaceAll('_', '/');
   const padding = '='.repeat((4 - base64.length % 4) % 4);
-  return base64ToBytes(base64 + padding);
+  return decode(base64 + padding);
 }

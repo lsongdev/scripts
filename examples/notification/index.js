@@ -1,6 +1,6 @@
 import { on, ready } from '../../dom/events.js';
 import { $ } from '../../dom/query.js';
-import { notify, requestNotificationPermission } from '../../browser/notifications.js';
+import { notify, requestNotificationPermission } from '../../notifications.js';
 
 ready(() => {
   on($('#request'), 'click', () => {

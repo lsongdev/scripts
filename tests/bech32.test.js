@@ -3,8 +3,8 @@ import test from 'node:test';
 import {
   bech32WordsToBytes,
   bytesToBech32Words,
-  decodeBech32,
-  encodeBech32,
+  decode,
+  encode,
 } from '../encoding/bech32.js';
 
 const valid = new Map([
@@ -18,15 +18,15 @@ const valid = new Map([
 
 test('Bech32 and Bech32m decode official BIP-173/BIP-350 vectors', () => {
   for (const [value, encoding] of valid) {
-    const decoded = decodeBech32(value);
+    const decoded = decode(value);
     assert.equal(decoded.encoding, encoding);
-    assert.equal(encodeBech32(decoded.prefix, decoded.words, { encoding }), value.toLowerCase());
+    assert.equal(encode(decoded.prefix, decoded.words, { encoding }), value.toLowerCase());
   }
 });
 
 test('Bech32 rejects mixed case, invalid checksums, and invalid padding', () => {
-  assert.throws(() => decodeBech32('a12UEL5L'), SyntaxError);
-  assert.throws(() => decodeBech32('a12uel5p'), SyntaxError);
+  assert.throws(() => decode('a12UEL5L'), SyntaxError);
+  assert.throws(() => decode('a12uel5p'), SyntaxError);
   assert.throws(() => bech32WordsToBytes([31]), SyntaxError);
 });
 

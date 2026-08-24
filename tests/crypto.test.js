@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { digest, hmac, sha256 } from '../crypto/digest.js';
+import { digest, hmac, sha256 } from '../crypto/index.js';
 import {
   deriveECDHKey,
   generateAESKey,

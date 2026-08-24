@@ -1,8 +1,8 @@
-import { base64ToBytes, bytesToBase64 } from '../encoding/base64.js';
+import { decode, encode } from '../encoding/base64.js';
 
 /** Encode binary DER data as a PEM block. */
 export function encodePEM(label, value) {
-  const base64 = bytesToBase64(value);
+  const base64 = encode(value);
   const lines = base64.match(/.{1,64}/g) ?? [];
   return `-----BEGIN ${label}-----\n${lines.join('\n')}\n-----END ${label}-----`;
 }
@@ -15,7 +15,7 @@ export function decodePEM(value) {
   if (!match) throw new SyntaxError('Invalid PEM block');
   return {
     label: match[1],
-    bytes: base64ToBytes(match[2].replace(/\s/g, '')),
+    bytes: decode(match[2].replace(/\s/g, '')),
   };
 }
 
