@@ -1,4 +1,6 @@
+
 const scanner = document.querySelector('x-scanner');
+
 document.querySelector('#startScanner').addEventListener('click', async () => {
   try {
     await scanner.start();
@@ -6,6 +8,7 @@ document.querySelector('#startScanner').addEventListener('click', async () => {
     console.error(error);
   }
 }, { once: true });
+
 scanner.addEventListener('scan', (e) => {
   console.log('Scanned:', e.detail.value);
 });

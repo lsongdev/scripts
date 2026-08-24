@@ -1,4 +1,4 @@
-import decodeQR from '../../vendor/qr/decode.js';
+import decodeQR from '../../media/qrcode/decode.js';
 import { requestCamera } from '../../media/capture.js';
 import { defineElement } from '../../elements/define.js';
 

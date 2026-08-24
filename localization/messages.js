@@ -1,4 +1,4 @@
-import { getPath } from '../collections/records.js';
+import { getPath } from '../array/records.js';
 
 /** Interpolate plain-text `{name}` placeholders without evaluating source text. */
 export function formatMessage(template, parameters = {}, { missing = 'keep' } = {}) {

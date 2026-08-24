@@ -13,8 +13,8 @@ const coreModules = [
   '/browser/notifications.js',
   '/browser/service-worker.js',
   '/browser/page-lifecycle.js',
-  '/collections/random.js',
-  '/collections/records.js',
+  '/array/random.js',
+  '/array/records.js',
   '/crypto/digest.js',
   '/crypto/csr.js',
   '/crypto/keys.js',
@@ -81,7 +81,6 @@ const examplePages = [
   '/examples/dom/storage-backup.html',
   '/examples/dom/tabs.html',
   '/examples/dom/table.html',
-  '/examples/dom/template.html',
   '/examples/file/',
   '/examples/hid/',
   '/examples/location/',
@@ -246,16 +245,6 @@ test('storage backup validates and imports without clearing by default', async (
     return { count, entries: [...values.entries()] };
   });
   expect(result).toEqual({ count: 1, entries: [['existing', 'kept'], ['imported', 'yes']] });
-});
-
-test('pinned template adapter replaces events and updates nested iterables', async ({ page }) => {
-  await page.goto('/examples/dom/template.html');
-  const button = page.getByRole('button', { name: 'Count: 0' });
-  await button.click();
-  await expect(page.getByRole('button', { name: 'Count: 1' })).toHaveCount(1);
-  await expect(page.locator('#app li')).toHaveText(['Item 1']);
-  await page.getByRole('button', { name: 'Count: 1' }).click();
-  await expect(page.locator('#app li')).toHaveText(['Item 1', 'Item 2']);
 });
 
 test('date calendar provides roving keyboard selection and valid civil dates', async ({ page }) => {

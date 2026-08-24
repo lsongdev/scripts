@@ -1,5 +1,5 @@
 {
-  "name": "@lsong/web-stdlib",
+  "name": "@lsongdev/scripts",
   "version": "0.1.0-rc.1",
   "private": true,
   "license": "MIT",
@@ -15,9 +15,5 @@
   "devDependencies": {
     "@playwright/test": "1.62.1",
     "ws": "8.21.3"
-  },
-  "dependencies": {
-    "lit-html": "3.3.3",
-    "yaml": "2.9.0"
   }
 }

@@ -1,5 +1,5 @@
-import encodeQR from '../../vendor/qr/index.js';
-import { svgToPng } from '../../vendor/qr/dom.js';
+import encodeQR from '../../media/qrcode/index.js';
+import { svgToPng } from '../../media/qrcode/dom.js';
 import { defineElement } from '../../elements/define.js';
 
 export class XRCode extends HTMLElement {

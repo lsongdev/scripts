@@ -90,8 +90,8 @@ There are currently no `stable` modules.
 | `labs/dom/` | `experimental` | Historical attribute-driven move/resize behavior retained for migration. New representative examples use tested `dom/movable.js` and `dom/resizable.js`; labs signatures are not stable core. |
 | `labs/audio/` | `experimental` | Game/environment sound recipes built from `media/audio.js`; effect identity and mixing policy remain application-facing contracts. |
 | `labs/animation/` | `experimental` | Matrix, particle-network, and ripple recipes now have explicit start/stop/dispose, no global handler assignment, RAF/timer cleanup, and browser tests; visual identity remains application policy. |
-| `vendor/marked.js` | `vendor` | Version 4.2.12 and MIT provenance are recorded; historical snapshot remains outside the public surface. |
-| `vendor/qr/` | `vendor` | Exact unmodified `qr@0.6.0` snapshot with registry integrity, file hashes, and upstream dual-license files. |
+| `text/markedown.js` | `vendor` | Version 4.2.12 and MIT provenance are recorded; historical snapshot remains outside the public surface. |
+| `media/qr/` | `vendor` | Exact unmodified `qr@0.6.0` snapshot with registry integrity, file hashes, and upstream dual-license files. |
 
 ## Retired modules
 

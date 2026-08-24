@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { sample, shuffled } from '../collections/random.js';
-import { getPath, omit, pick } from '../collections/records.js';
+import { sample, shuffled } from '../array/random.js';
+import { getPath, omit, pick } from '../array/records.js';
 
 test('shuffled and sample preserve their input and support deterministic randomness', () => {
   const source = [1, 2, 3, 4];

@@ -24,8 +24,8 @@ import {
 import { createRouter } from '../navigation/router.js';
 import { attachMediaStream } from '../media/video.js';
 import { readText as readStreamText, writeText } from '../streams/text.js';
-import { initMovable } from '../labs/dom/movable.js';
-import { initResizable } from '../labs/dom/resizable.js';
+import { initMovable } from '../elements/movable.js';
+import { initResizable } from '../elements/resizable.js';
 
 const tests = [];
 const test = (name, run) => tests.push({ name, run });
