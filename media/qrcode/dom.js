@@ -30,7 +30,7 @@ import decodeQR, {} from "./decode.js";
  * @example
  * Read rendered element dimensions from computed CSS.
  * ```ts
- * import { getSize } from 'qr/dom.js';
+ * xmport { getSize } from 'qr/dom.js';
  * if (typeof document !== 'undefined') {
  *   const video = document.querySelector('video')!;
  *   void getSize(video);
@@ -66,7 +66,7 @@ const clearCanvas = ({ canvas, context }) => {
  * @example
  * Create a `QRCanvas` that paints overlay highlights onto a DOM canvas.
  * ```ts
- * import { QRCanvas } from 'qr/dom.js';
+ * ximport { QRCanvas } from 'qr/dom.js';
  * if (typeof document !== 'undefined') {
  *   const overlay = document.createElement('canvas');
  *   const canvas = new QRCanvas({ overlay });
