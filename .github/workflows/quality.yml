@@ -1,0 +1,43 @@
+name: Quality
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24.12.0
+          cache: npm
+
+      - name: Install development dependencies
+        run: npm ci
+
+      - name: Install browser engines
+        run: npx playwright install --with-deps
+
+      - name: Run repository and unit checks
+        run: npm run check:static && npm run test:unit
+
+      - name: Run cross-browser tests
+        run: npm run test:browser:all
+
+      - name: Upload browser report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 14

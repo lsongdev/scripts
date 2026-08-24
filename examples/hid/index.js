@@ -1,11 +1,11 @@
-import { ready, addEventListener, querySelector as $ } from '../../dom.js';
-import { listDevices, requestDevice } from '../../hid.js';
+import { on, ready } from '../../dom/events.js';
+import { $ } from '../../dom/query.js';
 
 const select = selector => {
   const dom = $(selector);
   return {
     on(type, fn) {
-      return addEventListener(dom, type, fn);
+      return on(dom, type, fn);
     },
     append(display, value) {
       const option = document.createElement('option');
@@ -19,12 +19,15 @@ const select = selector => {
 ready(async () => {
 
   const list = select('#list');
-  const devices = await listDevices();
-  devices.forEach((device, i) => {
-    list.append(device.productName, i);
-  });
+  let devices = [];
 
-  let selectedDevice = devices[0];
+  let selectedDevice = null;
+  on($('#paired'), 'click', async () => {
+    devices = await navigator.hid.getDevices();
+    $('#list').replaceChildren();
+    devices.forEach((device, index) => list.append(device.productName, index));
+    selectedDevice = devices[0] ?? null;
+  });
   list.on('change', e => {
     const { value: index } = e.target;
     const device = devices[index];
@@ -32,14 +35,15 @@ ready(async () => {
     console.log('selectedDevice:', selectedDevice);
   });
 
-  addEventListener('#request', 'click', async () => {
-    const devices = await requestDevice();
+  on($('#request'), 'click', async () => {
+    const devices = await navigator.hid.requestDevice({ filters: [] });
     devices.forEach(device => {
       console.log(`HID: ${device.productName}`);
     });
   });
 
-  addEventListener('#open', 'click', async () => {
+  on($('#open'), 'click', async () => {
+    if (!selectedDevice) return;
     if (!selectedDevice.opened)
       await selectedDevice.open();
     selectedDevice.oninputreport = e => {
@@ -48,8 +52,8 @@ ready(async () => {
     };
   });
 
-  addEventListener('#close', 'click', async () => {
-    selectedDevice.close();
+  on($('#close'), 'click', async () => {
+    await selectedDevice?.close();
   });
 
   const numberFormat = new Intl.NumberFormat(undefined, {

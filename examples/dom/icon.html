@@ -1,11 +1,13 @@
-<script type="module" src="../../components/icon.js"></script>
+<script type="module">
+  import { defineIcon } from '../../elements/icon.js';
+  defineIcon();
+</script>
 
 <h1>Icon Example</h1>
 
-<x-icon icon="mdi:home" ></x-icon>
-<x-icon icon="fluent-emoji-flat/alarm-clock" ></x-icon>
+<x-icon src="./home.svg" alt="Home"></x-icon>
 
 <button>
-  <x-icon icon="mdi:home" ></x-icon>
+  <x-icon src="./home.svg"></x-icon>
   Home
 </button>

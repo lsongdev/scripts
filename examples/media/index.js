@@ -1,11 +1,32 @@
-import { querySelector as $ } from '../../dom.js';
-import { listDevices } from '../../media.js';
+import { $ } from '../../dom/query.js';
+import { defineCamera } from '../../elements/camera.js';
+import {
+  listDevices,
+  requestCamera,
+  requestDisplay,
+  stopMediaStream,
+} from '../../media/capture.js';
+import { attachMediaStream } from '../../media/video.js';
 
-const devices = await listDevices();
+defineCamera();
 
-const videoinputs = devices.filter(x => x.kind == 'videoinput');
-const audioinputs = devices.filter(x => x.kind == 'audioinput');
-const audiooutputs = devices.filter(x => x.kind == 'audiooutput');
+const video = $('video');
+let stream = null;
+let detach = null;
+
+function stop() {
+  if (stream) stopMediaStream(stream);
+  stream = null;
+  detach?.();
+  detach = null;
+}
+
+async function show(nextStream) {
+  stop();
+  stream = nextStream;
+  detach = attachMediaStream(video, stream);
+  await video.play();
+}
 
 const $videoinputs = $('#videoinputs');
 const $audioinputs = $('#audioinputs');
@@ -19,6 +40,24 @@ const appendToSelect = (dom, device) => {
   return option;
 };
 
-audioinputs.forEach(x => appendToSelect($audioinputs, x));
-audiooutputs.forEach(x => appendToSelect($audiooutputs, x));
-videoinputs.forEach(x => appendToSelect($videoinputs, x));
+$('#refresh').addEventListener('click', async () => {
+  for (const select of [$audioinputs, $audiooutputs, $videoinputs]) {
+    select.replaceChildren();
+  }
+  for (const device of await listDevices()) {
+    const target = {
+      audioinput: $audioinputs,
+      audiooutput: $audiooutputs,
+      videoinput: $videoinputs,
+    }[device.kind];
+    if (target) appendToSelect(target, device);
+  }
+});
+
+$('#camera').addEventListener('click', async () => show(await requestCamera()));
+$('#screen').addEventListener('click', async () => show(await requestDisplay()));
+$('#stop').addEventListener('click', stop);
+
+const cameraView = $('camera-view');
+$('#camera-view-start').addEventListener('click', () => cameraView.start());
+$('#camera-view-stop').addEventListener('click', () => cameraView.stop());

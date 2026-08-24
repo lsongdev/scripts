@@ -1,54 +1,52 @@
 /**
- * Creates a debounced function that delays the given `func`
- * by a given `wait` time in milliseconds. If the method is called
- * again before the timeout expires, the previous call will be
- * aborted.
+ * Delay invocation until calls have stopped for `wait` milliseconds.
  *
- * @example Usage
- * ```js
- * import { debounce } from "debounce.js";
+ * The returned function exposes `clear()`, `flush()`, and `pending` without
+ * introducing a scheduler or lifecycle outside the platform.
  *
- * const log = debounce(event =>
- *   console.log("[%s] %s", event.kind, event.paths[0]),
- *   200,
- * );
- *
- * for await (const event of array) {
- *   log(event);
- * }
- * // wait 200ms ...
- * // output: Function debounced after 200ms with baz
- * ```
- *
- * @typeParam T The arguments of the provided function.
- * @param fn The function to debounce.
- * @param wait The time in milliseconds to delay the function.
- * @returns The debounced function.
+ * @template {(...args: any[]) => any} T
+ * @param {T} fn
+ * @param {number} wait
+ * @param {{ signal?: AbortSignal }} [options]
  */
-// deno-lint-ignore no-explicit-any
-export function debounce(fn, wait) {
-  let timeout = null;
-  let flush = null;
-  const debounced = (...args) => {
-    debounced.clear();
-    flush = () => {
-      debounced.clear();
-      fn.call(debounced, ...args);
-    };
-    timeout = Number(setTimeout(flush, wait));
-  };
-  debounced.clear = () => {
-    if (typeof timeout === "number") {
-      clearTimeout(timeout);
-      timeout = null;
-      flush = null;
-    }
-  };
-  debounced.flush = () => {
-    flush?.();
-  };
-  Object.defineProperty(debounced, "pending", {
-    get: () => typeof timeout === "number",
+export function debounce(fn, wait, { signal } = {}) {
+  if (typeof fn !== 'function') {
+    throw new TypeError('fn must be a function');
+  }
+  if (!Number.isFinite(wait) || wait < 0) {
+    throw new RangeError('wait must be a finite, non-negative number');
+  }
+
+  let timeout;
+  let pendingCall;
+
+  function clear() {
+    if (timeout !== undefined) clearTimeout(timeout);
+    timeout = undefined;
+    pendingCall = undefined;
+  }
+
+  function flush() {
+    signal?.throwIfAborted();
+    if (!pendingCall) return;
+    const call = pendingCall;
+    clear();
+    return Reflect.apply(fn, call.thisArg, call.args);
+  }
+
+  function debounced(...args) {
+    signal?.throwIfAborted();
+    if (timeout !== undefined) clearTimeout(timeout);
+    pendingCall = { thisArg: this, args };
+    timeout = setTimeout(flush, wait);
+  }
+
+  Object.defineProperties(debounced, {
+    clear: { value: clear },
+    flush: { value: flush },
+    pending: { get: () => pendingCall !== undefined },
   });
+
+  signal?.addEventListener('abort', clear, { once: true });
   return debounced;
 }

@@ -1,5 +1,4 @@
-import { ready, addEventListener } from '../../dom.js';
-import { } from '../../bluetooth.js';
+import { ready } from '../../dom/events.js';
 
 let device = null;
 let myCharacteristic;

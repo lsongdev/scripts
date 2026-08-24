@@ -5,7 +5,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dialog Component</title>
-  <link rel="stylesheet" href="https://lsong.org/stylesheets/dialog.css">
+  <style>
+    dialog { max-inline-size: 32rem; border: 1px solid ButtonBorder; border-radius: 0.5rem; }
+    dialog::backdrop { background: rgb(0 0 0 / 35%); }
+    form { display: grid; gap: 0.75rem; }
+    .dialog-close { justify-self: end; }
+  </style>
 </head>
 
 <body>
@@ -47,7 +52,7 @@
 
   <script type="module">
 
-    import { bindDialog, showConfirmDialog, showDialog } from '../../dom/dialog.js';
+    import { bindDialog, confirmDialog, showDialog } from '../../dom/dialog.js';
 
     document.querySelectorAll('dialog').forEach(dialog => bindDialog(dialog));
 
@@ -57,12 +62,12 @@
       setTimeout(() => toast.close(), 3000);
     }
 
-    document.getElementById('showNotification').addEventListener('click', () => showDialog('#notificationDialog'));
-    document.getElementById('showDrawer').addEventListener('click', () => showDialog('#drawerDialog'));
-    document.getElementById('showBottomDrawer').addEventListener('click', () => showDialog('#bottomDialog'));
+    document.getElementById('showNotification').addEventListener('click', () => showDialog(document.getElementById('notificationDialog')));
+    document.getElementById('showDrawer').addEventListener('click', () => showDialog(document.getElementById('drawerDialog')));
+    document.getElementById('showBottomDrawer').addEventListener('click', () => showDialog(document.getElementById('bottomDialog')));
     document.getElementById('showToast').addEventListener('click', showToast);
     document.getElementById('showConfirm').addEventListener('click', async () => {
-      const confirmed = await showConfirmDialog('您确定要继续吗?', { title: '操作确认' });
+      const confirmed = await confirmDialog('您确定要继续吗?', { title: '操作确认' });
       console.log({ confirmed });
     });
   </script>

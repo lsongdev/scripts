@@ -1,13 +1,15 @@
-import { ready, addEventListener } from '../../dom.js';
-import { listDevices, requestDevice } from '../../usb.js';
+import { on, ready } from '../../dom/events.js';
+import { $ } from '../../dom/query.js';
 
 ready(async () => {
-  addEventListener('#list', 'click', async () => {
-    const devices = await listDevices();
+  on($('#list'), 'click', async () => {
+    const devices = await navigator.usb.getDevices();
     console.log(devices);
   });
 
-  addEventListener('#request', 'click', async () => {
-    const device = await requestDevice({ vendorId: 0x2341 });
+  on($('#request'), 'click', async () => {
+    const device = await navigator.usb.requestDevice({
+      filters: [{ vendorId: 0x2341 }],
+    });
   });
 });

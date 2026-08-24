@@ -1,12 +1,19 @@
-import { search } from '../../services/itunes.js';
-import { today } from '../../services/bing.js';
-import { commits } from '../../services/github.js';
+import { search } from '../../integrations/itunes.js';
+import { getDailyImage } from '../../integrations/bing.js';
+import { GitHubClient } from '../../integrations/github.js';
 
-// const results = await search("坏蛋调频");
-// console.log(results);
+const github = new GitHubClient();
+const output = document.querySelector('#output');
+const show = value => {
+  output.textContent = JSON.stringify(value, null, 2);
+};
 
-const img = await today({ api: 'https://api.lsong.one:8443/bing' });
-console.log(img);
-
-const a = await commits("song940", "home");
-console.log(a);
+document.querySelector('#daily').addEventListener('click', async () => {
+  show(await getDailyImage());
+});
+document.querySelector('#itunes').addEventListener('click', async () => {
+  show(await search(document.querySelector('#term').value));
+});
+document.querySelector('#commits').addEventListener('click', async () => {
+  show(await github.getCommits(document.querySelector('#repository').value));
+});

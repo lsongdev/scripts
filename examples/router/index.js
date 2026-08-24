@@ -1,12 +1,18 @@
-import { ready, filterEvent } from '../../dom.js';
-import { push, listen, back } from '../../router.js';
+import { delegate, ready } from '../../dom/events.js';
+import { createRouter } from '../../navigation/router.js';
+
+const router = createRouter({
+  '/': 'home',
+  '/app': 'app',
+});
 
 ready(() => {
-  listen(loc => console.log('loc', loc));
-  document.addEventListener('click', filterEvent('#push', e => {
-    push('/app', { a: 1 });
-  }));
-  document.addEventListener('click', filterEvent('#back', e => {
-    back();
-  }));
+  router.subscribe(route => console.log('route', route));
+  router.start();
+  delegate(document, 'click', '#push', () => {
+    router.navigate('/app', { state: { a: 1 } });
+  });
+  delegate(document, 'click', '#back', () => {
+    router.back();
+  });
 });

@@ -1,9 +1,10 @@
-import { ready, addEventListener } from '../../dom.js';
-import { connect } from '../../serialport.js';
+import { on, ready } from '../../dom/events.js';
+import { $ } from '../../dom/query.js';
+import { openPort } from '../../devices/serial.js';
 
 ready(async () => {
-  addEventListener('#connect', 'click', async () => {
-    const port = await connect();
+  on($('#connect'), 'click', async () => {
+    const port = await openPort();
     console.log(port);
   });
 

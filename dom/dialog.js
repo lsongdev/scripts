@@ -1,147 +1,147 @@
-import { createDialog as createDialogElement, createButton } from './dom.js';
-
-const bindings = new WeakMap();
-
-const resolveDialog = dialog => {
-  const element = typeof dialog === 'string'
-    ? document.querySelector(dialog)
-    : dialog;
-  if (!(element instanceof HTMLDialogElement)) {
-    throw new TypeError('Expected a dialog element or selector');
+function assertDialog(value) {
+  if (!(value instanceof HTMLDialogElement)) {
+    throw new TypeError('Expected an HTMLDialogElement');
   }
-  return element;
-};
+  return value;
+}
 
-const resolveFocusTarget = (dialog, target) => {
-  if (typeof target === 'string') return dialog.querySelector(target);
-  return target;
-};
-
-/**
- * Create a dialog from trusted HTML or a DOM node.
- * String content is interpreted as HTML for backward compatibility.
- */
-export const createDialog = (content = '') => {
-  const dialog = createDialogElement('');
-  dialog.classList.add('dialog');
+/** Create a dialog from safe text or an existing Node. */
+export function createDialog(content = '') {
+  const dialog = document.createElement('dialog');
   if (content instanceof Node) dialog.append(content);
-  else dialog.innerHTML = content;
+  else dialog.textContent = String(content);
   return dialog;
-};
+}
 
 /**
- * Bind close buttons and optional backdrop dismissal to a static dialog.
- * Calling this repeatedly for the same dialog is safe.
+ * Create a dialog from trusted HTML without sanitization.
+ * Never pass untrusted input.
  */
-export const bindDialog = (dialog, options = {}) => {
-  const element = resolveDialog(dialog);
-  const previous = bindings.get(element);
-  if (previous) return previous;
+export function createDialogFromHTMLUnsafe(html) {
+  const dialog = document.createElement('dialog');
+  dialog.innerHTML = html;
+  return dialog;
+}
 
-  const { closeOnBackdrop = true } = options;
-  const onClick = event => {
+/** Bind explicit close controls and optional backdrop dismissal. */
+export function bindDialog(dialog, {
+  closeOnBackdrop = true,
+  signal,
+} = {}) {
+  assertDialog(dialog);
+  signal?.throwIfAborted();
+
+  const click = event => {
     const target = event.target instanceof Element ? event.target : null;
-    const closeButton = target?.closest('[data-dialog-close], [data-close-dialog]');
-    if (closeButton && element.contains(closeButton)) {
+    const button = target?.closest('[data-dialog-close]');
+    if (button && dialog.contains(button)) {
       event.preventDefault();
-      element.close(closeButton.value || closeButton.dataset.dialogValue || '');
+      dialog.close(button.value || button.dataset.dialogValue || '');
       return;
     }
 
-    if (!closeOnBackdrop || event.target !== element) return;
-    const bounds = element.getBoundingClientRect();
+    if (!closeOnBackdrop || event.target !== dialog) return;
+    const bounds = dialog.getBoundingClientRect();
     const outside = event.clientX < bounds.left || event.clientX > bounds.right
       || event.clientY < bounds.top || event.clientY > bounds.bottom;
-    if (outside) element.close('cancel');
+    if (outside) dialog.close('cancel');
   };
 
-  element.addEventListener('click', onClick);
-  const binding = {
-    dialog: element,
-    destroy() {
-      element.removeEventListener('click', onClick);
-      bindings.delete(element);
-    },
-  };
-  bindings.set(element, binding);
-  return binding;
-};
+  dialog.addEventListener('click', click, { signal });
+  return () => dialog.removeEventListener('click', click);
+}
 
-export const showDialog = (dialog, options = {}) => {
-  const element = resolveDialog(dialog);
-  const { initialFocus, modal = true } = options;
-  bindDialog(element, options);
-  if (!element.isConnected) document.body.append(element);
+/** Show a dialog and restore focus after it closes. */
+export function showDialog(dialog, {
+  initialFocus,
+  modal = true,
+  signal,
+} = {}) {
+  assertDialog(dialog);
+  signal?.throwIfAborted();
+  if (!dialog.isConnected) document.body.append(dialog);
+
   const previousFocus = document.activeElement instanceof HTMLElement
     ? document.activeElement
     : null;
-  element.addEventListener('close', () => {
+  const abort = () => {
+    if (dialog.open) dialog.close('abort');
+  };
+  dialog.addEventListener('close', () => {
+    signal?.removeEventListener('abort', abort);
     if (previousFocus?.isConnected) previousFocus.focus();
   }, { once: true });
-  if (!element.open) modal ? element.showModal() : element.show();
-  const focusTarget = resolveFocusTarget(element, initialFocus);
-  if (focusTarget instanceof HTMLElement) focusTarget.focus();
-  return element;
-};
+  signal?.addEventListener('abort', abort, { once: true });
 
-export const closeDialog = (dialog, returnValue = '') => {
-  const element = resolveDialog(dialog);
-  if (element.open) element.close(returnValue);
-  return element;
-};
+  if (!dialog.open) modal ? dialog.showModal() : dialog.show();
+  const focusTarget = typeof initialFocus === 'string'
+    ? dialog.querySelector(initialFocus)
+    : initialFocus;
+  focusTarget?.focus();
+  return dialog;
+}
 
-export const createSimpleDialog = (title, content, buttons = []) => {
+/** Create a semantic form-method=dialog with safe text/Node content. */
+export function createSimpleDialog(title, content, buttons = []) {
   const heading = document.createElement('h3');
   heading.textContent = title;
-
-  const header = document.createElement('div');
-  header.className = 'dialog-header';
+  const header = document.createElement('header');
   header.append(heading);
 
   const body = document.createElement('div');
-  body.className = 'dialog-body';
   if (content instanceof Node) body.append(content);
-  else body.textContent = content;
+  else body.textContent = String(content);
 
-  const footer = document.createElement('div');
-  footer.className = 'dialog-footer dialog-buttons';
-  buttons.forEach(({ text, action, className = 'button' }) => {
-    const button = createButton(text);
+  const footer = document.createElement('footer');
+  for (const { text, value, className = '' } of buttons) {
+    const button = document.createElement('button');
     button.type = 'submit';
-    button.value = action;
-    button.dataset.action = action;
+    button.value = value;
     button.className = className;
+    button.textContent = text;
     footer.append(button);
-  });
+  }
 
   const form = document.createElement('form');
   form.method = 'dialog';
   form.append(header, body, footer);
   return createDialog(form);
-};
+}
 
-export const createConfirmDialog = (message, options = {}) => {
-  const {
-    title = '确认?',
-    yesText = '是',
-    noText = '否',
-    yesClassName = 'button button-primary',
-    noClassName = 'button',
-  } = options;
-  return createSimpleDialog(title, message, [
-    { text: noText, action: 'no', className: noClassName },
-    { text: yesText, action: 'yes', className: yesClassName },
+/** Show a self-cleaning confirmation dialog. */
+export function confirmDialog(message, {
+  title = 'Confirm',
+  confirmText = 'Confirm',
+  cancelText = 'Cancel',
+  confirmClass = '',
+  cancelClass = '',
+  signal,
+} = {}) {
+  signal?.throwIfAborted();
+  const dialog = createSimpleDialog(title, message, [
+    { text: cancelText, value: 'cancel', className: cancelClass },
+    { text: confirmText, value: 'confirm', className: confirmClass },
   ]);
-};
+  const bindings = new AbortController();
+  bindDialog(dialog, { signal: bindings.signal });
 
-export const showConfirmDialog = (message, options = {}) => {
-  const dialog = createConfirmDialog(message, options);
-  return new Promise(resolve => {
+  return new Promise((resolve, reject) => {
+    let aborted = false;
+    const abort = () => {
+      aborted = true;
+      bindings.abort();
+      if (dialog.open) dialog.close('abort');
+      dialog.remove();
+      reject(signal.reason);
+    };
+    signal?.addEventListener('abort', abort, { once: true });
     dialog.addEventListener('close', () => {
-      resolve(dialog.returnValue === 'yes');
-      bindings.get(dialog)?.destroy();
+      signal?.removeEventListener('abort', abort);
+      bindings.abort();
+      if (aborted) return;
+      resolve(dialog.returnValue === 'confirm');
       dialog.remove();
     }, { once: true });
-    showDialog(dialog, { initialFocus: '[value="no"]' });
+    showDialog(dialog, { initialFocus: '[value="cancel"]' });
   });
-};
+}

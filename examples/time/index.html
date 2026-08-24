@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Date and time example</title>
+</head>
+<body>
+  <h1>Date and time</h1>
+  <x-time datetime="2026-08-24T12:34:56Z" timezone="UTC"></x-time>
+  <x-time datetime="2026-08-24T12:34:56Z" timezone="Asia/Shanghai" format="{yyyy}/{MM}/{dd} {HH}:{mm}"></x-time>
+  <x-time relative datetime="2038-01-19T03:14:07Z" update-interval="1000"></x-time>
+  <script type="module">
+    import { defineTime } from '../../elements/time.js';
+    defineTime();
+  </script>
+</body>
+</html>

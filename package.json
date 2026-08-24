@@ -1,0 +1,21 @@
+{
+  "name": "@lsong/web-stdlib",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "check": "npm run check:static && npm run test:unit && npm run test:browser",
+    "check:static": "node tools/validate-repository.js",
+    "test": "npm run test:unit",
+    "test:unit": "node --test",
+    "test:browser": "playwright test --config=tools/playwright.config.js --project=chromium --project=webkit",
+    "test:browser:all": "playwright test --config=tools/playwright.config.js"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.62.1",
+    "ws": "8.21.3"
+  },
+  "dependencies": {
+    "yaml": "2.9.0"
+  }
+}

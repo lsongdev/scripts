@@ -18,7 +18,10 @@
       padding: 10px;
     }
   </style>
-  <script type="module" src="../../dom/resizable.js" resizable-auto-init></script>
+  <script type="module">
+  import { initResizable } from '../../labs/dom/resizable.js';
+    initResizable();
+  </script>
 </head>
 
 <body>
@@ -49,23 +52,6 @@
     </div>
   </div>
 
-  <!-- <script type="module">
-        import { initResizable } from '../../resizable.js';
-
-        window.addEventListener('load', () => {
-            const cleanup = initResizable({
-                onResize: (element) => {
-                    console.log(`Element resized: ${element.offsetWidth}x${element.offsetHeight}`);
-                },
-                onResizeStop: (element) => {
-                    console.log(`Resize stopped: ${element.offsetWidth}x${element.offsetHeight}`);
-                }
-            });
-
-            // 如果需要在某个时候清理事件监听器，可以调用 cleanup 函数
-            // cleanup();
-        });
-    </script> -->
 </body>
 
 </html>

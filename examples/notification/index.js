@@ -1,11 +1,12 @@
-import { ready, addEventListener } from '../../dom.js';
-import { request, notify } from '../../notification.js';
+import { on, ready } from '../../dom/events.js';
+import { $ } from '../../dom/query.js';
+import { notify, requestNotificationPermission } from '../../browser/notifications.js';
 
 ready(() => {
-  addEventListener('#request', 'click', () => {
-    request();
+  on($('#request'), 'click', () => {
+    requestNotificationPermission();
   });
-  addEventListener('#notify', 'click', () => {
+  on($('#notify'), 'click', () => {
     notify('Hi');
   });
 });

@@ -1,6 +1,15 @@
+<script type="importmap">
+  {
+    "imports": {
+      "htm": "https://esm.sh/htm@3.1.1",
+      "preact": "https://esm.sh/preact@10.29.8",
+      "preact/hooks": "https://esm.sh/preact@10.29.8/hooks"
+    }
+  }
+</script>
 <script type="module">
-  import { define } from '../../webcomponent.js';
-  import { render, h } from '../../react/index.js';
+  import { defineElement } from '../../elements/define.js';
+  import { render, h } from '../../adapters/preact/index.js';
 
   const react = App => {
     return class extends HTMLElement {
@@ -14,7 +23,7 @@
     }
   };
 
-  define('music-player', react(props => {
+  defineElement('music-player', react(props => {
     const { playlist } = props;
     return h('div', { className: 'music-player' }, [
       h('div', { className: 'music-player-container' }, [

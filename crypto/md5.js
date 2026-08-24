@@ -1,86 +1,101 @@
+const shifts = [
+  7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22,
+  5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20,
+  4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23,
+  6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21,
+];
+const constants = Array.from(
+  { length: 64 },
+  (_, index) => Math.floor(Math.abs(Math.sin(index + 1)) * 2 ** 32) >>> 0,
+);
 
-// Auxiliary functions and variables
-const hex_chr = '0123456789abcdef'.split('');
-
-function add32(a, b) {
-  return (a + b) & 0xFFFFFFFF;
-}
-
-function md5cycle(x, k) {
-  let a = x[0], b = x[1], c = x[2], d = x[3];
-
-  a = ff(a, b, c, d, k[0], 7, -680876936);
-  d = ff(d, a, b, c, k[1], 12, -389564586);
-  c = ff(c, d, a, b, k[2], 17, 606105819);
-  b = ff(b, c, d, a, k[3], 22, -1044525330);
-  // ... (many lines omitted for brevity)
-  x[0] = add32(a, x[0]);
-  x[1] = add32(b, x[1]);
-  x[2] = add32(c, x[2]);
-  x[3] = add32(d, x[3]);
-}
-
-function cmn(q, a, b, x, s, t) {
-  a = add32(add32(a, q), add32(x, t));
-  return add32((a << s) | (a >>> (32 - s)), b);
-}
-
-function ff(a, b, c, d, x, s, t) {
-  return cmn((b & c) | ((~b) & d), a, b, x, s, t);
-}
-
-// ... (other auxiliary functions like gg, hh, ii omitted for brevity)
-
-function md51(s) {
-  const txt = '';
-  const n = s.length;
-  const state = [1732584193, -271733879, -1732584194, 271733878];
-  let i;
-  for (i = 64; i <= s.length; i += 64) {
-    md5cycle(state, md5blk(s.substring(i - 64, i)));
+function bytes(value) {
+  if (typeof value === 'string') return new TextEncoder().encode(value);
+  if (value instanceof ArrayBuffer) return new Uint8Array(value);
+  if (ArrayBuffer.isView(value)) {
+    return new Uint8Array(value.buffer, value.byteOffset, value.byteLength);
   }
-  s = s.substring(i - 64);
-  const tail = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-  for (i = 0; i < s.length; i++)
-    tail[i >> 2] |= s.charCodeAt(i) << ((i % 4) << 3);
-  tail[i >> 2] |= 0x80 << ((i % 4) << 3);
-  if (i > 55) {
-    md5cycle(state, tail);
-    for (i = 0; i < 16; i++) tail[i] = 0;
+  throw new TypeError('Expected a string, ArrayBuffer, or ArrayBufferView');
+}
+
+const rotateLeft = (value, shift) => (value << shift | value >>> (32 - shift)) >>> 0;
+
+/**
+ * Return the 16-byte MD5 digest used by legacy protocols and file manifests.
+ * MD5 is collision-broken and must not be used for passwords, signatures,
+ * certificates, or any security decision.
+ */
+export function md5(value) {
+  const input = bytes(value);
+  const paddedLength = Math.ceil((input.length + 9) / 64) * 64;
+  const padded = new Uint8Array(paddedLength);
+  padded.set(input);
+  padded[input.length] = 0x80;
+  new DataView(padded.buffer).setBigUint64(
+    paddedLength - 8,
+    BigInt(input.length) * 8n,
+    true,
+  );
+
+  let a0 = 0x67452301;
+  let b0 = 0xefcdab89;
+  let c0 = 0x98badcfe;
+  let d0 = 0x10325476;
+  const view = new DataView(padded.buffer);
+
+  for (let offset = 0; offset < padded.length; offset += 64) {
+    const words = Array.from(
+      { length: 16 },
+      (_, index) => view.getUint32(offset + index * 4, true),
+    );
+    let a = a0;
+    let b = b0;
+    let c = c0;
+    let d = d0;
+
+    for (let index = 0; index < 64; index += 1) {
+      let f;
+      let word;
+      if (index < 16) {
+        f = (b & c) | (~b & d);
+        word = index;
+      } else if (index < 32) {
+        f = (d & b) | (~d & c);
+        word = (5 * index + 1) % 16;
+      } else if (index < 48) {
+        f = b ^ c ^ d;
+        word = (3 * index + 5) % 16;
+      } else {
+        f = c ^ (b | ~d);
+        word = (7 * index) % 16;
+      }
+
+      const previousD = d;
+      d = c;
+      c = b;
+      const sum = (a + f + constants[index] + words[word]) >>> 0;
+      b = (b + rotateLeft(sum, shifts[index])) >>> 0;
+      a = previousD;
+    }
+
+    a0 = (a0 + a) >>> 0;
+    b0 = (b0 + b) >>> 0;
+    c0 = (c0 + c) >>> 0;
+    d0 = (d0 + d) >>> 0;
   }
-  tail[14] = n * 8;
-  md5cycle(state, tail);
-  return state;
+
+  const output = new Uint8Array(16);
+  const digest = new DataView(output.buffer);
+  digest.setUint32(0, a0, true);
+  digest.setUint32(4, b0, true);
+  digest.setUint32(8, c0, true);
+  digest.setUint32(12, d0, true);
+  return output;
 }
 
-function md5blk(s) {
-  const md5blks = [];
-  for (let i = 0; i < 64; i += 4) {
-    md5blks[i >> 2] = s.charCodeAt(i)
-      + (s.charCodeAt(i + 1) << 8)
-      + (s.charCodeAt(i + 2) << 16)
-      + (s.charCodeAt(i + 3) << 24);
-  }
-  return md5blks;
+/** Return the lowercase hexadecimal MD5 digest for legacy interchange. */
+export function md5Hex(value) {
+  return [...md5(value)]
+    .map(byte => byte.toString(16).padStart(2, '0'))
+    .join('');
 }
-
-function rhex(n) {
-  const s = '';
-  for (let j = 0; j < 4; j++)
-    s += hex_chr[(n >> (j * 8 + 4)) & 0x0F] + hex_chr[(n >> (j * 8)) & 0x0F];
-  return s;
-}
-
-function hex(x) {
-  for (let i = 0; i < x.length; i++)
-    x[i] = rhex(x[i]);
-  return x.join('');
-}
-
-export function md5(s) {
-  return hex(md51(s));
-}
-
-// Usage
-// const hash = md5('your string here');
-// console.log(hash);

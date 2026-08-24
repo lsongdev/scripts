@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Service integrations</title>
+  </head>
+  <body>
+    <h1>Service integrations</h1>
+    <p>Requests are made only after an explicit action.</p>
+    <p><button id="daily">Load Bing daily image metadata</button></p>
+    <p>
+      <input id="term" value="Web Platform" aria-label="iTunes search term">
+      <button id="itunes">Search iTunes</button>
+    </p>
+    <p>
+      <input id="repository" value="whatwg/html" aria-label="GitHub repository">
+      <button id="commits">Load GitHub commits</button>
+    </p>
+    <pre id="output"></pre>
+    <script type="module" src="./index.js"></script>
+  </body>
+</html>

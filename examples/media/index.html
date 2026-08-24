@@ -4,6 +4,7 @@
 <div class="panel">
   <h3 class="panel-header">Devices</h3>
   <form class="panel-body">
+    <button id="refresh" type="button">List devices</button>
     <div class="form-field">
       <label for="audioinputs">Audio Input:</label>
       <select id="audioinputs"></select>
@@ -22,6 +23,13 @@
 </div>
 
 <div class="panel">
+  <h3 class="panel-header">Explicit camera element</h3>
+  <camera-view></camera-view>
+  <button id="camera-view-start" type="button">Start camera view</button>
+  <button id="camera-view-stop" type="button">Stop camera view</button>
+</div>
+
+<div class="panel">
   <h3 class="panel-header">Media</h3>
   <div class="panel-body">
     <video></video>
@@ -29,5 +37,6 @@
   <div class="panel-footer">
     <button id="camera" class="button">camera</button>
     <button id="screen" class="button">screen</button>
+    <button id="stop" class="button">stop</button>
   </div>
 </div>
