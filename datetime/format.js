@@ -32,6 +32,15 @@ export function dateParts(value, { timeZone } = {}) {
 
 const pad = (value, width = 2) => String(value).padStart(width, '0');
 
+/** Format a non-negative elapsed time in whole seconds as minutes and seconds. */
+export function formatTime(totalSeconds) {
+  if (!Number.isFinite(totalSeconds)) throw new TypeError('totalSeconds must be finite');
+  const value = Math.max(0, Math.floor(totalSeconds));
+  const minutes = Math.floor(value / 60);
+  const seconds = value % 60;
+  return `${pad(minutes)}:${pad(seconds)}`;
+}
+
 /** Format a date with the small documented token set or a named alias. */
 export function formatDate(value, pattern = '{datetime}', { timeZone } = {}) {
   const parts = dateParts(value, { timeZone });

@@ -37,7 +37,7 @@ There are currently no `stable` modules.
 | `crypto/keys.js` | `candidate` | AES/ECDH/RSA helpers return CryptoKey objects with secure defaults; AES native-object behavior has Chromium/WebKit coverage. |
 | `crypto/md5.js` | `candidate` | Complete byte-oriented MD5 with published interoperability vectors. Explicitly limited to legacy protocol/file-manifest use; never a security primitive. |
 | `crypto/pem.js` | `candidate` | Strict DER/PEM and CryptoKey round trips are tested; expand supported algorithm examples. |
-| `datetime/format.js` | `candidate` | Validated instants, explicit IANA zones, stable formatting tokens, and signed duration semantics have Node tests and Chromium/WebKit element coverage. |
+| `datetime/format.js` | `candidate` | Validated instants, explicit IANA zones, stable date tokens, elapsed `MM:SS` clocks, and signed duration semantics have Node tests and Chromium/WebKit element coverage. |
 | `devices/geolocation.js` | `candidate` | Promise/disposer workflows and metre-based distance are tested; granted permission and native GeolocationPosition have Chromium/WebKit coverage, while denial/watch lifecycle still need browser cases. |
 | `devices/serial.js` | `candidate` | Returns the standard SerialPort and has workflow tests; add chooser and device browser coverage. |
 | `devices/orientation.js` | `candidate` | Permission and orientation observers are inert, standard-event based, and disposer/AbortSignal aware. |
