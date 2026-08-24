@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -12,9 +12,11 @@ function verifyWithOpenSSL(pem, expectedSubject) {
   const path = join(directory, 'request.pem');
   try {
     writeFileSync(path, pem);
-    const output = execFileSync('openssl', ['req', '-in', path, '-noout', '-verify', '-subject'], {
+    const result = spawnSync('openssl', ['req', '-in', path, '-noout', '-verify', '-subject'], {
       encoding: 'utf8',
     });
+    assert.equal(result.status, 0, result.stderr);
+    const output = `${result.stdout}${result.stderr}`;
     assert.match(output, /Certificate request self-signature verify OK/u);
     assert.match(output, expectedSubject);
   } finally {
@@ -30,7 +32,7 @@ test('RSA PKCS#1 CSR interoperates with OpenSSL', async () => {
   const pem = await createCSRPEM(keyPair, {
     country: 'CN', organization: 'Web Stdlib', commonName: 'example.test',
   });
-  verifyWithOpenSSL(pem, /CN=example\.test/u);
+  verifyWithOpenSSL(pem, /CN\s*=\s*example\.test/u);
 });
 
 test('ECDSA CSR converts Web Crypto raw signatures for OpenSSL', async () => {
@@ -39,7 +41,7 @@ test('ECDSA CSR converts Web Crypto raw signatures for OpenSSL', async () => {
     { name: 'commonName', value: 'ecdsa.example' },
     { name: 'email', value: 'admin@example.test' },
   ]);
-  verifyWithOpenSSL(pem, /CN=ecdsa\.example/u);
+  verifyWithOpenSSL(pem, /CN\s*=\s*ecdsa\.example/u);
 });
 
 test('CSR validates subjects and algorithm-specific values', async () => {
@@ -49,5 +51,5 @@ test('CSR validates subjects and algorithm-specific values', async () => {
   }, true, ['sign', 'verify']);
   await assert.rejects(createCSRPEM(keyPair, { country: 'China' }), TypeError);
   const pem = await createCSRPEM(keyPair, { commonName: 'pss.example' });
-  verifyWithOpenSSL(pem, /CN=pss\.example/u);
+  verifyWithOpenSSL(pem, /CN\s*=\s*pss\.example/u);
 });
