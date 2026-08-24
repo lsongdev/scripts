@@ -43,6 +43,7 @@ These capabilities are externally relevant. Their historical source is recoverab
 | media | recorder example, player | Media Session and explicit MediaRecorder ownership are recovered in `media/session.js` and `media/recording.js`; player UI remains queued. |
 | lifecycle | `dom/page.js` | Service-worker and page lifecycle observation are recovered in `browser/service-worker.js` and `browser/page-lifecycle.js`; neither starts work during import. |
 | generic workflows | non-native portions of `array.js`, `object.js`, `promise.js` | Recovered as narrow `collections/random.js`, `collections/records.js`, `async/retry.js`, `async/timeout.js`, and `async/serial.js`; native duplicates stay mapped to the language. |
+| byte/event/network workflows | `bytes.js`, hex/throttle portions of `string.js`/`events.js`, `webrtc.js` | Empty bytes surface is replaced by strict `encoding/hex.js`; throttle is lifecycle-owned in `async/throttle.js`; WebRTC returns native peer connections/descriptions without default third-party STUN or prefixes. |
 | form workflows | `dom/form.js`, `form.js`, form component/example | Native successful controls plus action/method/enctype are recovered as `dom/form-data.js` and `dom/form-request.js`; validation and persistence remain separate policies. |
 | application helpers | `i18n.js`, `regexp.js` | i18n is recovered as isolated `localization/messages.js` with safe plain-text interpolation. Broad regex validation remains mapped to native controls/URL parsing or application policy rather than frozen, incomplete patterns. |
 

@@ -4,7 +4,7 @@ Small, composable ES modules that fill recurring gaps in the Web Platform withou
 
 > Use the Web. Fill the gaps. Own nothing.
 
-This repository is being reorganized from a long-lived scripts collection into a versioned Web standard library. There is not yet a stable release surface. See [the module registry](./docs/modules.md) before depending on a URL, [the candidate API contracts](./docs/api-contracts.md), [the deleted-module recovery audit](./docs/deleted-module-audit.md), and [the refactor status](./docs/refactor-status.md) for the remaining distance.
+This repository is being reorganized from a long-lived scripts collection into a versioned Web standard library. There is not yet a stable release surface. See [the module registry](./docs/modules.md) before depending on a URL, [the candidate API contracts](./docs/api-contracts.md), [the deleted-module recovery audit](./docs/deleted-module-audit.md), its [historical file ledger](./docs/deleted-files-ledger.md), and [the refactor status](./docs/refactor-status.md) for the remaining distance.
 
 ## Design rules
 

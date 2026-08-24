@@ -26,6 +26,7 @@ There are currently no `stable` modules.
 | `async/retry.js` | `candidate` | Explicit attempt count, retry predicate/backoff, attempt metadata, and AbortSignal cancellation replace the former TODO body. |
 | `async/serial.js` | `candidate` | Executes task functions sequentially with ordered results and explicit signal propagation; it does not accept already-started promises. |
 | `async/timeout.js` | `candidate` | Enforces a deadline and passes a derived AbortSignal so cooperative work can stop; it does not pretend arbitrary promises are physically cancellable. |
+| `async/throttle.js` | `candidate` | Leading/latest-trailing scheduling preserves receiver and exposes clear/flush/pending plus AbortSignal cleanup. |
 | `browser/notifications.js` | `candidate` | Unsupported, denied, and granted states have unit contracts; the local Playwright grant does not produce a real granted Notification state, so native permission-browser coverage remains deferred. |
 | `browser/page-lifecycle.js` | `candidate` | Visibility/page show-hide/freeze-resume observation is explicit, reports native state/events, and returns an AbortSignal-aware disposer. |
 | `browser/service-worker.js` | `candidate` | Explicit module registration returns the native registration; state observation returns a disposer and has injected workflow tests. |
@@ -51,6 +52,7 @@ There are currently no `stable` modules.
 | `encoding/base64.js` | `candidate` | Byte-only semantics and base64/base64url round trips are documented and tested. |
 | `encoding/bech32.js` | `candidate` | Bech32/Bech32m detection, strict bit conversion, and official BIP-173/BIP-350 valid/invalid vectors are tested. |
 | `encoding/csv.js` | `candidate` | Strict RFC 4180-style quoting/newline parsing and serialization have round-trip and malformed-input tests. |
+| `encoding/hex.js` | `candidate` | Strict byte-only hexadecimal encoding/decoding replaces the former string helper and empty byte module. |
 | `files/read.js` | `candidate` | Uses Blob methods; Node Blob and real-browser File text/byte workflows are covered. |
 | `graphics/canvas.js` | `candidate` | Canvas drawing operations preserve context state and return the native context; pixel-level browser coverage is present. |
 | `graphics/color.js` | `candidate` | Validated immutable sRGB colors plus hex/RGB/HSL conversion with unit contracts. |
@@ -62,6 +64,7 @@ There are currently no `stable` modules.
 | `media/recording.js` | `candidate` | Returns the native MediaRecorder plus an explicit stop/result lifecycle, rejects with AbortSignal reason, and leaves MediaStream track ownership to the caller. |
 | `navigation/router.js` | `candidate` | Inert URLPattern router, real History state, explicit start, navigation, and prior-route abort have Chromium/WebKit coverage; deepen navigation edge cases. |
 | `net/websocket.js` | `candidate` | A real local server verifies standard WebSocket/MessageEvent, echo, stream cancellation, and AbortSignal close in Chromium/WebKit; add failure and abnormal-close cases. |
+| `net/webrtc.js` | `candidate` | Returns the native RTCPeerConnection and native local descriptions; configuration and ICE servers are caller-owned, with no prefixed constructors. |
 | `storage/local.js` | `candidate` | Namespaced string semantics and clear/cache isolation are tested; add StorageEvent policy if needed. |
 | `storage/cookies.js` | `candidate` | Raw Cookie parsing, explicit browser-settable serialization, scoped deletion, and validation are tested. |
 | `storage/snapshot.js` | `candidate` | Versioned string-pair snapshots are fully validated before optional replace/restore; file selection, download, merge, and conflict UI remain adapters. |

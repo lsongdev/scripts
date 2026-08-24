@@ -268,6 +268,9 @@ These externally used capabilities have passed their immediate recovery tests. T
 | `dom/form-request.js` | Converts an `HTMLFormElement` and optional submitter into a native `Request`, preserving successful controls, repeated fields, action, method, and enctype. Fetching and submit interception are separate explicit functions; responses are not parsed or rewrapped. |
 | `localization/messages.js` | Holds an isolated locale/fallback catalog and formats plain text with property-path placeholders. Message text is never executed or interpreted as HTML; plural/date/number policy composes with explicit `Intl` or function-valued messages. |
 | `dom/select.js` | Replaces native Option children from an iterable using explicit value/label/disabled mappings, safe text, and optional placeholder/selection. It preserves the native select rather than emulating form, keyboard, or accessibility behavior. |
+| `encoding/hex.js` | Encodes and decodes byte-oriented platform inputs with strict even-length hexadecimal syntax; Unicode text conversion remains explicit. |
+| `async/throttle.js` | Executes a leading call and retains only the latest trailing call, preserving receiver/arguments and exposing clear/flush/pending plus signal cleanup. |
+| `net/webrtc.js` | Constructs a native peer connection and performs offer/answer plus `setLocalDescription`; ICE configuration, signaling, connection closure, and remote descriptions remain caller workflows. |
 
 The autonomous elements `x-time`, `camera-view`, `copy-button`, `data-table`, and `storage-backup` are optional adapters, not capability modules. Their modules are inert until the corresponding `defineXxx()` function is called. Camera permission starts only through `start()`; copy uses an explicit Clipboard operation; table cells default to text/Node rendering rather than HTML injection. Storage import validates the complete versioned snapshot and merges by default; replacement is explicit.
 

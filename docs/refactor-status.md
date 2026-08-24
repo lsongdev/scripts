@@ -33,14 +33,14 @@
 - Web Components 改为显式 `defineXxx()`；导入不再自动注册。
 - Preact 依赖改为 bare specifier，由下游 import map 明确固定版本；核心不暗中选择 CDN。
 - 第三方 `marked` 源码已隔离并记录版本与许可证；来源不清或证据不足的实现留在 `labs/`。
-- 首轮曾以“仓内无使用方”为理由删除若干模块；维护者确认存在外部 URL 使用后，该推断已撤回，逐文件恢复状态见 [`deleted-module-audit.md`](./deleted-module-audit.md)。
+- 首轮曾以“仓内无使用方”为理由删除若干模块；维护者确认存在外部 URL 使用后，该推断已撤回，恢复原则见 [`deleted-module-audit.md`](./deleted-module-audit.md)，首轮删除路径逐组处置见 [`deleted-files-ledger.md`](./deleted-files-ledger.md)。
 - `elements/` 已收缩为经过浏览器 smoke test 的 define/icon/progressbar/tabs；`labs/elements/` 只保留依赖精确 vendor snapshot 的 QR 实验，其余无使用方 UI 草稿已删除。
 - 修改过且无法准确标识版本的 QR 源码副本已替换为 `vendor/qr/` 中未修改的 `qr@0.6.0` 发布快照，并记录 tarball integrity、逐文件哈希和双许可证。
 - audio、time、camera/video、YAML、MD5、Bech32/Bech32m、graphics、animation 基础、CSV/cookie、service worker、keyboard/orientation 与 Media Session 已按新边界恢复；CSR、HTML runtime、animation 视觉配方和其余 UI/应用能力仍在恢复队列，不把历史缺陷原样带回。
 - customized built-in table/copy 实验在 Chromium 成功、WebKit 不升级；能力已重建为 portable autonomous `data-table` 和 `copy-button`，不添加引擎分支、旧注册名或 forwarding 文件。
-- 已建立 81 个 Node 契约测试和 21 个页内浏览器契约测试；23 个代表性示例页进入自动 smoke test。Chromium/WebKit 本地套件共 62 项，覆盖真实 timer/AbortSignal、Web Crypto/Web Audio/Web Animations/Canvas、datetime、MediaStream/video/camera 生命周期、ShadowRoot/Document XPath、原生 Form/Request/select、History/URLPattern、File、Web Streams、本地 WebSocket server、授权 Geolocation 与 autonomous elements。
+- 已建立 84 个 Node 契约测试和 21 个页内浏览器契约测试；23 个代表性示例页进入自动 smoke test。Chromium/WebKit 本地套件共 62 项，覆盖真实 timer/AbortSignal、Web Crypto/Web Audio/Web Animations/Canvas、datetime、MediaStream/video/camera 生命周期、ShadowRoot/Document XPath、原生 Form/Request/select、History/URLPattern、File、Web Streams、本地 WebSocket server、授权 Geolocation 与 autonomous elements。
 - `npm run check` 统一执行语法、相对导入、HTML 本地资源、根目录结构、核心依赖方向、Node 契约测试和 Chromium/WebKit 测试。
-- 远端 Quality CI 已连续在 commit `926daed`、`867b68f` 与 `f25f52d` 的 Ubuntu 环境成功完成静态/Node 检查以及 Chromium、Firefox、WebKit 全套测试，并上传浏览器报告。
+- 远端 Quality CI 已连续在 commit `926daed`、`867b68f`、`f25f52d` 与 `eab72c8` 的 Ubuntu 环境成功完成静态/Node 检查以及 Chromium、Firefox、WebKit 全套测试，并上传浏览器报告。
 
 ## 当前目录契约
 
