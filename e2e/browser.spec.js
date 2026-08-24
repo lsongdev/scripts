@@ -25,9 +25,11 @@ const coreModules = [
   '/dom/dialog.js',
   '/dom/events.js',
   '/dom/form-data.js',
+  '/dom/form-request.js',
   '/dom/keyboard.js',
   '/dom/nodes.js',
   '/dom/query.js',
+  '/dom/select.js',
   '/encoding/base32.js',
   '/encoding/base64.js',
   '/encoding/bech32.js',
@@ -35,6 +37,7 @@ const coreModules = [
   '/files/read.js',
   '/graphics/canvas.js',
   '/graphics/color.js',
+  '/localization/messages.js',
   '/media/audio.js',
   '/media/capture.js',
   '/media/video.js',
@@ -57,6 +60,7 @@ const examplePages = [
   '/examples/dom/move.html',
   '/examples/dom/progressbar.html',
   '/examples/dom/resize.html',
+  '/examples/dom/storage-backup.html',
   '/examples/dom/tabs.html',
   '/examples/dom/table.html',
   '/examples/file/',
@@ -104,7 +108,7 @@ test('browser contract harness passes', async ({ page }) => {
   await page.goto('/tests/browser.html');
   await expect(page.locator('html')).toHaveAttribute('data-status', 'passed');
   await expect(page.locator('html')).toHaveAttribute('data-failures', '0');
-  await expect(page.locator('#results li')).toHaveCount(19);
+  await expect(page.locator('#results li')).toHaveCount(21);
   expect(errors).toEqual([]);
 });
 
@@ -201,6 +205,26 @@ test('autonomous copy button exposes an explicit Clipboard workflow', async ({ p
   await page.goto('/examples/dom/copy.html');
   await page.locator('copy-button[value]').click();
   await expect.poll(() => page.evaluate(() => globalThis.__copiedText)).toBe('Explicit value');
+});
+
+test('storage backup validates and imports without clearing by default', async ({ page }) => {
+  await page.goto('/examples/dom/storage-backup.html');
+  const result = await page.locator('storage-backup').evaluate(async element => {
+    const values = new Map([['existing', 'kept']]);
+    element.storage = {
+      get length() { return values.size; },
+      key(index) { return [...values.keys()][index] ?? null; },
+      getItem(key) { return values.get(key) ?? null; },
+      setItem(key, value) { values.set(String(key), String(value)); },
+      clear() { values.clear(); },
+    };
+    const file = new File([
+      JSON.stringify({ version: 1, entries: [['imported', 'yes']] }),
+    ], 'backup.json', { type: 'application/json' });
+    const count = await element.importFile(file);
+    return { count, entries: [...values.entries()] };
+  });
+  expect(result).toEqual({ count: 1, entries: [['existing', 'kept'], ['imported', 'yes']] });
 });
 
 for (const path of examplePages) {

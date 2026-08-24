@@ -32,6 +32,7 @@ dom/            DOM workflows
 encoding/       binary and textual encodings
 files/          File and Blob workflows
 graphics/       Canvas and color workflows
+localization/   locale and plain-text message workflows
 media/          media capture workflows
 navigation/     URL/history navigation workflows
 net/            network protocols beyond native fetch

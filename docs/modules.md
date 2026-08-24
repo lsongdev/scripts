@@ -44,7 +44,9 @@ There are currently no `stable` modules.
 | `dom/events.js` | `candidate` | EventTarget, disposer, AbortSignal, and real-browser delegation behavior are tested. |
 | `dom/nodes.js` | `candidate` | Node construction and explicit unsafe parsing have browser coverage; add Trusted Types guidance. |
 | `dom/form-data.js` | `candidate` | Repeated names, File values, and real HTMLFormElement behavior are tested. |
+| `dom/form-request.js` | `candidate` | Converts native successful controls and enctype/method/action semantics into a standard Request; binding and fetching remain explicit and abortable. |
 | `dom/keyboard.js` | `candidate` | Explicit EventTarget/key filtering returns a disposer and preserves KeyboardEvent objects/options. |
+| `dom/select.js` | `candidate` | Safely maps data into native Option nodes while preserving native form, keyboard, and accessibility semantics; rich custom combobox behavior is out of scope. |
 | `encoding/base32.js` | `candidate` | RFC 4648 vectors and strict malformed length/padding/alphabet/trailing-bit rejection are tested. |
 | `encoding/base64.js` | `candidate` | Byte-only semantics and base64/base64url round trips are documented and tested. |
 | `encoding/bech32.js` | `candidate` | Bech32/Bech32m detection, strict bit conversion, and official BIP-173/BIP-350 valid/invalid vectors are tested. |
@@ -52,6 +54,7 @@ There are currently no `stable` modules.
 | `files/read.js` | `candidate` | Uses Blob methods; Node Blob and real-browser File text/byte workflows are covered. |
 | `graphics/canvas.js` | `candidate` | Canvas drawing operations preserve context state and return the native context; pixel-level browser coverage is present. |
 | `graphics/color.js` | `candidate` | Validated immutable sRGB colors plus hex/RGB/HSL conversion with unit contracts. |
+| `localization/messages.js` | `candidate` | Isolated locale/fallback catalogs and plain-text placeholder interpolation; no global locale, HTML rendering, or dynamic evaluation. |
 | `media/capture.js` | `candidate` | Uses standard MediaDevices, returns MediaStream, and has contract tests; add permission/browser coverage. |
 | `media/audio.js` | `candidate` | Web Audio construction, note conversion, deterministic noise buffers, native node returns, and zero-gain semantics have Chromium/WebKit coverage. |
 | `media/video.js` | `candidate` | Explicit MediaStream attachment/detachment and signal-owned native playback; add real-track browser coverage. |
@@ -68,7 +71,7 @@ There are currently no `stable` modules.
 
 | Area | Status | Boundary |
 | --- | --- | --- |
-| `elements/` | `adapter` | Optional autonomous Web Components with inert imports and explicit registration; includes icon, progressbar, tabs, time, camera, copy button, and data table. |
+| `elements/` | `adapter` | Optional autonomous Web Components with inert imports and explicit registration; includes icon, progressbar, tabs, time, camera, copy button, data table, and versioned storage backup. |
 | `adapters/preact/` | `adapter` | Optional Preact/htm bindings. Must not be imported by capability modules. |
 | `adapters/yaml.js` | `adapter` | Deliberate parse/stringify surface over exact `yaml@2.9.0`; downstream browser import maps must resolve the bare package specifier. |
 | `integrations/` | `adapter` | Provider-specific clients. Must depend only on standards or capability modules. |

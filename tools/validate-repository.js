@@ -16,6 +16,7 @@ const coreAreas = new Set([
   'encoding',
   'files',
   'graphics',
+  'localization',
   'media',
   'navigation',
   'net',

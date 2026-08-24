@@ -265,8 +265,11 @@ These externally used capabilities have passed their immediate recovery tests. T
 | `async/retry.js` | Invokes a fresh operation per attempt with attempt number and signal, applying explicit retry/backoff policy; final or excluded errors pass through unchanged. |
 | `async/timeout.js` | Races a deadline and supplies a derived signal so cooperative work can release resources; no API can forcibly cancel a caller-owned arbitrary promise. |
 | `async/serial.js` | Runs lazy task functions one at a time and preserves result order; already-started promises are intentionally not a serial scheduling API. |
+| `dom/form-request.js` | Converts an `HTMLFormElement` and optional submitter into a native `Request`, preserving successful controls, repeated fields, action, method, and enctype. Fetching and submit interception are separate explicit functions; responses are not parsed or rewrapped. |
+| `localization/messages.js` | Holds an isolated locale/fallback catalog and formats plain text with property-path placeholders. Message text is never executed or interpreted as HTML; plural/date/number policy composes with explicit `Intl` or function-valued messages. |
+| `dom/select.js` | Replaces native Option children from an iterable using explicit value/label/disabled mappings, safe text, and optional placeholder/selection. It preserves the native select rather than emulating form, keyboard, or accessibility behavior. |
 
-The autonomous elements `x-time`, `camera-view`, `copy-button`, and `data-table` are optional adapters, not capability modules. Their modules are inert until the corresponding `defineXxx()` function is called. Camera permission starts only through `start()`; copy uses an explicit Clipboard operation; table cells default to text/Node rendering rather than HTML injection.
+The autonomous elements `x-time`, `camera-view`, `copy-button`, `data-table`, and `storage-backup` are optional adapters, not capability modules. Their modules are inert until the corresponding `defineXxx()` function is called. Camera permission starts only through `start()`; copy uses an explicit Clipboard operation; table cells default to text/Node rendering rather than HTML injection. Storage import validates the complete versioned snapshot and merges by default; replacement is explicit.
 
 ## Deferred from the first surface
 

@@ -6,6 +6,8 @@ import { generateAESKey } from '../crypto/keys.js';
 import { bindDialog, createDialog, createDialogFromHTMLUnsafe, showDialog } from '../dom/dialog.js';
 import { delegate, on } from '../dom/events.js';
 import { formDataToObject, formToObject } from '../dom/form-data.js';
+import { bindFormSubmission, formToRequest } from '../dom/form-request.js';
+import { getSelectedItem, setSelectOptions } from '../dom/select.js';
 import { createElement, parseHTMLUnsafe } from '../dom/nodes.js';
 import { $, $$, xpath } from '../dom/query.js';
 import { defineElement } from '../elements/define.js';
@@ -150,6 +152,39 @@ test('canvas helpers draw pixels without leaking context state', () => {
   assert([...context.getImageData(0, 0, 1, 1).data].join(',') === '255,0,0,255');
   clearCanvas(context, { width: 1, height: 1 });
   assert([...context.getImageData(0, 0, 1, 1).data].join(',') === '0,0,0,0');
+});
+
+test('form requests preserve native successful controls and explicit submission', async () => {
+  const form = document.createElement('form');
+  form.action = '/save?existing=1';
+  form.method = 'post';
+  form.enctype = 'application/x-www-form-urlencoded';
+  form.innerHTML = '<input name="name" value="Ada"><input name="tag" value="web"><input name="tag" value="standards">';
+  const request = formToRequest(form);
+  assert(request instanceof Request);
+  assert(request.method === 'POST');
+  assert(await request.text() === 'name=Ada&tag=web&tag=standards');
+
+  let submitted;
+  const dispose = bindFormSubmission(form, next => { submitted = next; });
+  form.dispatchEvent(new SubmitEvent('submit', { cancelable: true }));
+  assert(submitted instanceof Request);
+  dispose();
+});
+
+test('select mapping preserves native select semantics and source items', () => {
+  const select = document.createElement('select');
+  const items = [{ id: 1, name: '<Admin>' }, { id: 2, name: 'User', disabled: true }];
+  setSelectOptions(select, items, {
+    value: item => item.id,
+    label: item => item.name,
+    placeholder: 'Choose',
+    selectedValue: 1,
+  });
+  assert(select instanceof HTMLSelectElement);
+  assert(select.value === '1');
+  assert(select.options[1].textContent === '<Admin>');
+  assert(getSelectedItem(select) === items[0]);
 });
 
 test('query and node helpers preserve DOM objects', () => {

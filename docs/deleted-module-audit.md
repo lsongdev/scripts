@@ -37,13 +37,14 @@ These capabilities are externally relevant. Their historical source is recoverab
 | graphics | `canvas.js`, `color.js` | Recovered as `graphics/canvas.js` and `graphics/color.js` with Canvas state ownership, correct CSS HSL math, validation, and tests. |
 | encodings/security | `crypto/csr.js` | CSR as an explicitly versioned ASN.1 adapter rather than a floating CDN import. Bech32/Bech32m has been recovered as `encoding/bech32.js` with official vectors. |
 | document runtime | `html/*` | Separately bounded renderer package/labs module with security, event cleanup, update, and nested-template tests. |
-| UI elements | calendar, form, link, backup, piano, select, sidebar, spectrum | Copy/table are recovered as autonomous, explicitly registered `copy-button` and `data-table`; the remaining elements follow the same portability review. |
+| UI elements | calendar, form, link, backup, piano, select, sidebar, spectrum | Copy/table and storage backup are recovered as autonomous, explicitly registered elements. Data-backed select is recovered by populating the native control in `dom/select.js`; rich combobox, calendar, piano, sidebar, and spectrum still require their own portability contracts. |
 | formats/storage | empty `csv.js`, empty `cookie.js` | Recovered as implemented `encoding/csv.js` and `storage/cookies.js` contracts rather than restoring empty bodies. |
 | input/device | former keyboard/motion singleton APIs | Recovered as inert `dom/keyboard.js` and `devices/orientation.js`; no import-time singleton or listener. |
 | media | recorder example, player | Media Session and explicit MediaRecorder ownership are recovered in `media/session.js` and `media/recording.js`; player UI remains queued. |
 | lifecycle | `dom/page.js` | Service-worker and page lifecycle observation are recovered in `browser/service-worker.js` and `browser/page-lifecycle.js`; neither starts work during import. |
 | generic workflows | non-native portions of `array.js`, `object.js`, `promise.js` | Recovered as narrow `collections/random.js`, `collections/records.js`, `async/retry.js`, `async/timeout.js`, and `async/serial.js`; native duplicates stay mapped to the language. |
-| application helpers | i18n, regex, form persistence/request | Separate optional/application modules after safe interpolation, validation, and storage ownership are defined. |
+| form workflows | `dom/form.js`, `form.js`, form component/example | Native successful controls plus action/method/enctype are recovered as `dom/form-data.js` and `dom/form-request.js`; validation and persistence remain separate policies. |
+| application helpers | `i18n.js`, `regexp.js` | i18n is recovered as isolated `localization/messages.js` with safe plain-text interpolation. Broad regex validation remains mapped to native controls/URL parsing or application policy rather than frozen, incomplete patterns. |
 
 ## Behaviors not restored as implementations
 

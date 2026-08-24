@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Storage backup</title></head>
+<body>
+  <h1>Storage backup</h1>
+  <p>Import merges by default. Add the <code>replace</code> attribute only when replacement is intended.</p>
+  <storage-backup></storage-backup>
+  <output id="status"></output>
+  <script type="module">
+    import { defineStorageBackup } from '../../elements/storage-backup.js';
+    defineStorageBackup();
+    const backup = document.querySelector('storage-backup');
+    const status = document.querySelector('#status');
+    backup.addEventListener('storageimport', event => {
+      status.value = `Imported ${event.detail.count} entries`;
+    });
+    backup.addEventListener('storageerror', event => {
+      status.value = event.detail.error.message;
+    });
+  </script>
+</body>
+</html>
