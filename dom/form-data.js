@@ -17,3 +17,5 @@ export function formDataToObject(formData) {
 export function formToObject(form, submitter) {
   return formDataToObject(new FormData(form, submitter));
 }
+
+export const serialize = formToObject;
