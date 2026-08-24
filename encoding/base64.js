@@ -8,7 +8,7 @@ function bytes(value) {
 }
 
 /** Encode bytes as RFC 4648 base64. */
-export function bytesToBase64(value) {
+export function encode(value) {
   const input = bytes(value);
   let binary = '';
   const size = 0x8000;
@@ -19,14 +19,14 @@ export function bytesToBase64(value) {
 }
 
 /** Decode RFC 4648 base64 into bytes. */
-export function base64ToBytes(value) {
+export function decode(value) {
   if (typeof value !== 'string') throw new TypeError('Expected a base64 string');
   const binary = atob(value);
   return Uint8Array.from(binary, character => character.charCodeAt(0));
 }
 
 /** Encode bytes as unpadded base64url. */
-export function bytesToBase64URL(value) {
+export function encodeToBase64URL(value) {
   return bytesToBase64(value)
     .replaceAll('+', '-')
     .replaceAll('/', '_')
@@ -34,7 +34,7 @@ export function bytesToBase64URL(value) {
 }
 
 /** Decode padded or unpadded base64url into bytes. */
-export function base64URLToBytes(value) {
+export function decodeBase64URL(value) {
   if (typeof value !== 'string') throw new TypeError('Expected a base64url string');
   const base64 = value.replaceAll('-', '+').replaceAll('_', '/');
   const padding = '='.repeat((4 - base64.length % 4) % 4);

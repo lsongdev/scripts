@@ -41,7 +41,7 @@ function checksum(prefix, words, encoding) {
 }
 
 /** Encode 5-bit words using BIP-173 Bech32 or BIP-350 Bech32m. */
-export function encodeBech32(prefix, words, {
+export function encode(prefix, words, {
   encoding = 'bech32',
   limit = 90,
 } = {}) {
@@ -59,7 +59,7 @@ export function encodeBech32(prefix, words, {
 }
 
 /** Decode and identify a BIP-173 Bech32 or BIP-350 Bech32m string. */
-export function decodeBech32(value, { limit = 90 } = {}) {
+export function decode(value, { limit = 90 } = {}) {
   if (typeof value !== 'string') throw new TypeError('Bech32 value must be a string');
   if (value.length > limit) throw new RangeError(`Bech32 value exceeds ${limit} characters`);
   if (value !== value.toLowerCase() && value !== value.toUpperCase()) {

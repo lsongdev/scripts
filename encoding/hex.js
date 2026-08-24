@@ -4,11 +4,11 @@ function bytes(value) {
   throw new TypeError('value must be an ArrayBuffer or ArrayBufferView');
 }
 
-export function bytesToHex(value) {
+export function encode(value) {
   return [...bytes(value)].map(byte => byte.toString(16).padStart(2, '0')).join('');
 }
 
-export function hexToBytes(text) {
+export function decode(text) {
   if (typeof text !== 'string') throw new TypeError('hex must be a string');
   if (text.length % 2 !== 0 || !/^[\da-f]*$/iu.test(text)) throw new SyntaxError('Invalid hexadecimal text');
   return Uint8Array.from({ length: text.length / 2 }, (_, index) =>

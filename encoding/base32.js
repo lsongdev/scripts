@@ -1,7 +1,7 @@
 const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
 
 /** Encode bytes as padded RFC 4648 base32. */
-export function bytesToBase32(value) {
+export function encode(value) {
   const input = value instanceof Uint8Array ? value : new Uint8Array(value);
   let output = '';
   let bits = 0;
@@ -20,7 +20,7 @@ export function bytesToBase32(value) {
 }
 
 /** Decode padded or unpadded RFC 4648 base32 into bytes. */
-export function base32ToBytes(value) {
+export function decode(value) {
   if (typeof value !== 'string') throw new TypeError('Expected a base32 string');
   const match = /^([A-Z2-7]*)(=*)$/iu.exec(value);
   if (!match) throw new SyntaxError('Invalid base32 input');
