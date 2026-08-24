@@ -8,6 +8,7 @@ const coreAreas = new Set([
   'animation',
   'async',
   'browser',
+  'collections',
   'crypto',
   'datetime',
   'devices',

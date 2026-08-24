@@ -40,8 +40,9 @@ These capabilities are externally relevant. Their historical source is recoverab
 | UI elements | calendar, form, link, backup, piano, select, sidebar, spectrum | Copy/table are recovered as autonomous, explicitly registered `copy-button` and `data-table`; the remaining elements follow the same portability review. |
 | formats/storage | empty `csv.js`, empty `cookie.js` | Recovered as implemented `encoding/csv.js` and `storage/cookies.js` contracts rather than restoring empty bodies. |
 | input/device | former keyboard/motion singleton APIs | Recovered as inert `dom/keyboard.js` and `devices/orientation.js`; no import-time singleton or listener. |
-| media | recorder example, player | Media Session is recovered in `media/session.js`; recording/player contracts remain queued. |
-| lifecycle | `dom/page.js` | Service-worker registration/state observation is recovered in `browser/service-worker.js`; page lifecycle remains queued. |
+| media | recorder example, player | Media Session and explicit MediaRecorder ownership are recovered in `media/session.js` and `media/recording.js`; player UI remains queued. |
+| lifecycle | `dom/page.js` | Service-worker and page lifecycle observation are recovered in `browser/service-worker.js` and `browser/page-lifecycle.js`; neither starts work during import. |
+| generic workflows | non-native portions of `array.js`, `object.js`, `promise.js` | Recovered as narrow `collections/random.js`, `collections/records.js`, `async/retry.js`, `async/timeout.js`, and `async/serial.js`; native duplicates stay mapped to the language. |
 | application helpers | i18n, regex, form persistence/request | Separate optional/application modules after safe interpolation, validation, and storage ownership are defined. |
 
 ## Behaviors not restored as implementations
@@ -50,7 +51,7 @@ Some old files consisted only of an empty body, deprecated forwarding, unsafe dy
 
 - root forwarding/barrel files and import-time auto-registration;
 - empty `bytes.js`, `csv.js`, and `cookie.js` bodies;
-- Array/Object/Promise/Number wrappers already provided by the language;
+- Array/Object/Promise/Number wrappers already provided by the language; their non-native shuffle/sample, record selection, retry/timeout, and serial-task workflows now have narrow replacements;
 - regex URL parsing instead of `URL`/`URLSearchParams`;
 - XHR pretending to be Fetch;
 - string interpolation based on `new Function`;

@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Explicit media recording</title>
+</head>
+<body>
+  <h1>Explicit media recording</h1>
+  <p>Microphone permission is requested only after Start is pressed.</p>
+  <button id="start" type="button">Start</button>
+  <button id="stop" type="button" disabled>Stop</button>
+  <audio id="playback" controls></audio>
+  <output id="status">Idle</output>
+  <script type="module">
+    import { requestMicrophone, stopMediaStream } from '../../media/capture.js';
+    import { startRecording } from '../../media/recording.js';
+
+    const start = document.querySelector('#start');
+    const stop = document.querySelector('#stop');
+    const playback = document.querySelector('#playback');
+    const status = document.querySelector('#status');
+    let session;
+    let stream;
+    let playbackURL;
+
+    start.addEventListener('click', async () => {
+      try {
+        stream = await requestMicrophone();
+        session = startRecording(stream);
+        start.disabled = true;
+        stop.disabled = false;
+        status.value = 'Recording';
+      } catch (error) {
+        if (stream) stopMediaStream(stream);
+        stream = undefined;
+        status.value = error.message;
+      }
+    });
+
+    stop.addEventListener('click', async () => {
+      try {
+        const blob = await session.stop();
+        if (playbackURL) URL.revokeObjectURL(playbackURL);
+        playbackURL = URL.createObjectURL(blob);
+        playback.src = playbackURL;
+        status.value = `Recorded ${blob.size} bytes`;
+      } finally {
+        stopMediaStream(stream);
+        stream = undefined;
+        session = undefined;
+        start.disabled = false;
+        stop.disabled = true;
+      }
+    });
+
+    addEventListener('pagehide', () => {
+      if (stream) stopMediaStream(stream);
+      if (playbackURL) URL.revokeObjectURL(playbackURL);
+    });
+  </script>
+</body>
+</html>

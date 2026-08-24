@@ -10,7 +10,7 @@
 
 | 目标 | 当前完成度 | 尚缺的决定性证据 |
 | --- | ---: | --- |
-| 最小可信 v0.x | 约 88% | 完成删除模块恢复队列、最终 stable 裁决、不可变发布 URL |
+| 最小可信 v0.x | 约 90% | 完成删除模块恢复队列、最终 stable 裁决、不可变发布 URL |
 | 成熟 v1 stdlib | 约 45% | 多下游验证、长期版本治理、完整权限/设备/资源清理证据 |
 
 这些百分比不是代码量。目录和核心实现已经越过最危险的混杂阶段，但“测试过的 candidate”仍不等于“承诺长期维护的 stable”。现在最大的距离是发布证据和真实下游使用，而不是继续扩充 helper。
@@ -38,16 +38,16 @@
 - 修改过且无法准确标识版本的 QR 源码副本已替换为 `vendor/qr/` 中未修改的 `qr@0.6.0` 发布快照，并记录 tarball integrity、逐文件哈希和双许可证。
 - audio、time、camera/video、YAML、MD5、Bech32/Bech32m、graphics、animation 基础、CSV/cookie、service worker、keyboard/orientation 与 Media Session 已按新边界恢复；CSR、HTML runtime、animation 视觉配方和其余 UI/应用能力仍在恢复队列，不把历史缺陷原样带回。
 - customized built-in table/copy 实验在 Chromium 成功、WebKit 不升级；能力已重建为 portable autonomous `data-table` 和 `copy-button`，不添加引擎分支、旧注册名或 forwarding 文件。
-- 已建立 70 个 Node 契约测试和 19 个页内浏览器契约测试；21 个代表性示例页进入自动 smoke test。Chromium/WebKit 本地套件共 56 项，覆盖真实 timer/AbortSignal、Web Crypto/Web Audio/Web Animations/Canvas、datetime、MediaStream/video/camera 生命周期、ShadowRoot/Document XPath、History/URLPattern、File、Web Streams、本地 WebSocket server、授权 Geolocation 与 autonomous elements。
+- 已建立 79 个 Node 契约测试和 19 个页内浏览器契约测试；22 个代表性示例页进入自动 smoke test。Chromium/WebKit 本地套件共 58 项，覆盖真实 timer/AbortSignal、Web Crypto/Web Audio/Web Animations/Canvas、datetime、MediaStream/video/camera 生命周期、ShadowRoot/Document XPath、History/URLPattern、File、Web Streams、本地 WebSocket server、授权 Geolocation 与 autonomous elements。
 - `npm run check` 统一执行语法、相对导入、HTML 本地资源、根目录结构、核心依赖方向、Node 契约测试和 Chromium/WebKit 测试。
-- 首次远端 Quality CI（commit `926daed`）已在 Ubuntu 成功完成静态/Node 检查以及 Chromium、Firefox、WebKit 全套测试，并上传浏览器报告。
+- 远端 Quality CI 已连续在 commit `926daed` 与 `867b68f` 的 Ubuntu 环境成功完成静态/Node 检查以及 Chromium、Firefox、WebKit 全套测试，并上传浏览器报告。
 
 ## 当前目录契约
 
 ```text
 Web Platform
     ↑
-animation async browser crypto datetime devices dom encoding files graphics media navigation net storage streams
+animation async browser collections crypto datetime devices dom encoding files graphics media navigation net storage streams
     ↑
 elements adapters integrations examples
 

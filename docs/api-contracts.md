@@ -257,6 +257,14 @@ These externally used capabilities have passed their immediate recovery tests. T
 | `devices/orientation.js` | Requests permission and observes native orientation events explicitly; unsupported capability fails instead of returning fabricated data. |
 | `media/video.js` | Attaches/detaches a standard `MediaStream` and starts native playback explicitly; stream tracks remain caller-owned. |
 | `media/session.js` | Writes native Media Session metadata/state/action/position fields explicitly and fails when unsupported; it does not emulate Media Session. |
+| `media/recording.js` | Constructs/starts a native `MediaRecorder`, collects non-empty data chunks, and exposes `recorder`, `result`, and idempotent-style `stop()` ownership. Abort rejects with the signal reason; input stream tracks remain caller-owned. |
+| `browser/page-lifecycle.js` | Reports native visibility state alongside visibility/page show-hide/freeze-resume events and returns a disposer; application load/unload state machines are not synthesized. |
+| `storage/snapshot.js` | Captures versioned string pairs, validates an entire JSON snapshot before mutation, and makes destructive replacement explicit. File/download UI and conflict resolution stay outside core. |
+| `collections/random.js` | Returns shuffled/sampled copies using Fisher-Yates and optional injected randomness; it never mutates the input or uses a biased sort comparator. |
+| `collections/records.js` | Reads own-property paths and copies selected own enumerable keys to null-prototype records; prototype traversal keys are not followed. |
+| `async/retry.js` | Invokes a fresh operation per attempt with attempt number and signal, applying explicit retry/backoff policy; final or excluded errors pass through unchanged. |
+| `async/timeout.js` | Races a deadline and supplies a derived signal so cooperative work can release resources; no API can forcibly cancel a caller-owned arbitrary promise. |
+| `async/serial.js` | Runs lazy task functions one at a time and preserves result order; already-started promises are intentionally not a serial scheduling API. |
 
 The autonomous elements `x-time`, `camera-view`, `copy-button`, and `data-table` are optional adapters, not capability modules. Their modules are inert until the corresponding `defineXxx()` function is called. Camera permission starts only through `start()`; copy uses an explicit Clipboard operation; table cells default to text/Node rendering rather than HTML injection.
 

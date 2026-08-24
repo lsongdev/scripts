@@ -23,8 +23,14 @@ There are currently no `stable` modules.
 | `animation/web.js` | `candidate` | Returns the native Animation and binds optional signal cancellation; add deeper timeline/browser lifecycle cases. |
 | `async/delay.js` | `candidate` | Abort reason, validation, cleanup, and real-browser timer cancellation have contract tests. |
 | `async/debounce.js` | `candidate` | Signal cancellation, flush, clear, pending state, and browser timer behavior have contract tests. |
+| `async/retry.js` | `candidate` | Explicit attempt count, retry predicate/backoff, attempt metadata, and AbortSignal cancellation replace the former TODO body. |
+| `async/serial.js` | `candidate` | Executes task functions sequentially with ordered results and explicit signal propagation; it does not accept already-started promises. |
+| `async/timeout.js` | `candidate` | Enforces a deadline and passes a derived AbortSignal so cooperative work can stop; it does not pretend arbitrary promises are physically cancellable. |
 | `browser/notifications.js` | `candidate` | Unsupported, denied, and granted states have unit contracts; the local Playwright grant does not produce a real granted Notification state, so native permission-browser coverage remains deferred. |
+| `browser/page-lifecycle.js` | `candidate` | Visibility/page show-hide/freeze-resume observation is explicit, reports native state/events, and returns an AbortSignal-aware disposer. |
 | `browser/service-worker.js` | `candidate` | Explicit module registration returns the native registration; state observation returns a disposer and has injected workflow tests. |
+| `collections/random.js` | `candidate` | Fisher-Yates shuffle/sample return new arrays, validate injected randomness, and never use biased sort comparators. |
+| `collections/records.js` | `candidate` | Own-property path reads and pick/omit produce null-prototype records while blocking prototype traversal keys. |
 | `crypto/digest.js` | `candidate` | SHA/HMAC workflows return ArrayBuffer; SHA-256 known vectors run in Node and Chromium/WebKit Web Crypto. |
 | `crypto/keys.js` | `candidate` | AES/ECDH/RSA helpers return CryptoKey objects with secure defaults; AES native-object behavior has Chromium/WebKit coverage. |
 | `crypto/md5.js` | `candidate` | Complete byte-oriented MD5 with published interoperability vectors. Explicitly limited to legacy protocol/file-manifest use; never a security primitive. |
@@ -50,10 +56,12 @@ There are currently no `stable` modules.
 | `media/audio.js` | `candidate` | Web Audio construction, note conversion, deterministic noise buffers, native node returns, and zero-gain semantics have Chromium/WebKit coverage. |
 | `media/video.js` | `candidate` | Explicit MediaStream attachment/detachment and signal-owned native playback; add real-track browser coverage. |
 | `media/session.js` | `candidate` | Explicit Media Session metadata, playback, action, position, camera, and microphone workflows with no silent unsupported fallback. |
+| `media/recording.js` | `candidate` | Returns the native MediaRecorder plus an explicit stop/result lifecycle, rejects with AbortSignal reason, and leaves MediaStream track ownership to the caller. |
 | `navigation/router.js` | `candidate` | Inert URLPattern router, real History state, explicit start, navigation, and prior-route abort have Chromium/WebKit coverage; deepen navigation edge cases. |
 | `net/websocket.js` | `candidate` | A real local server verifies standard WebSocket/MessageEvent, echo, stream cancellation, and AbortSignal close in Chromium/WebKit; add failure and abnormal-close cases. |
 | `storage/local.js` | `candidate` | Namespaced string semantics and clear/cache isolation are tested; add StorageEvent policy if needed. |
 | `storage/cookies.js` | `candidate` | Raw Cookie parsing, explicit browser-settable serialization, scoped deletion, and validation are tested. |
+| `storage/snapshot.js` | `candidate` | Versioned string-pair snapshots are fully validated before optional replace/restore; file selection, download, merge, and conflict UI remain adapters. |
 | `streams/text.js` | `candidate` | Iteration, decoding, line parsing, writer cleanup, locks, and basic native-browser streams are tested; add backpressure coverage. |
 
 ## Optional layers

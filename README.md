@@ -24,6 +24,7 @@ Development tools may be used to test the repository. Consumers receive ordinary
 animation/      timing and Web Animations workflows
 async/          asynchronous workflows
 browser/        browser-level capabilities
+collections/    collection and record workflows
 crypto/         Web Crypto workflows
 datetime/       date, time-zone, and duration workflows
 devices/        device and sensor capabilities
