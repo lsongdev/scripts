@@ -114,3 +114,7 @@ export function createRouter(routes = {}, {
     subscribe,
   });
 }
+
+export const back = () =>
+  history.back();
+
