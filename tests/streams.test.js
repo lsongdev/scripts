@@ -7,7 +7,7 @@ import {
   readStream,
   readText,
   writeText,
-} from '../streams/text.js';
+} from '../streams/index.js';
 
 const streamFrom = chunks => new ReadableStream({
   start(controller) {

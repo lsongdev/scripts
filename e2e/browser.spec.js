@@ -58,7 +58,7 @@ const coreModules = [
   '/storage/local.js',
   '/storage/cookies.js',
   '/storage/snapshot.js',
-  '/streams/text.js',
+  '/streams/index.js',
 ];
 
 const examplePages = [

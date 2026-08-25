@@ -23,7 +23,7 @@ import {
 } from '../media/audio.js';
 import { createRouter } from '../navigation/router.js';
 import { attachMediaStream } from '../media/video.js';
-import { readText as readStreamText, writeText } from '../streams/text.js';
+import { readText as readStreamText, writeText } from '../streams/index.js';
 import { initMovable } from '../elements/movable.js';
 import { initResizable } from '../elements/resizable.js';
 
