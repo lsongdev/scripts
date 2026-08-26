@@ -26,3 +26,20 @@ export function adoptStyleSheets(root, sheets) {
     root.adoptedStyleSheets = root.adoptedStyleSheets.filter(sheet => !remove.has(sheet));
   };
 }
+
+/** Compose class names. */
+export function cls(...values) {
+  const names = [];
+  const append = value => {
+    if (!value) return;
+    if (typeof value === 'string') names.push(value);
+    else if (Array.isArray(value)) value.forEach(append);
+    else if (typeof value === 'object') {
+      for (const [name, enabled] of Object.entries(value)) {
+        if (enabled) names.push(name);
+      }
+    }
+  };
+  values.forEach(append);
+  return [...new Set(names)].join(' ');
+}
