@@ -1,8 +1,8 @@
 import { h } from '../react.js';
-import { classes } from '../classnames.js';
+import { cls } from '../../dom/stylesheets.js';
 
 export const Panel = ({ className = '', title, header, footer, children, ...opts }) => {
-  return h('div', { className: classes('panel', className), ...opts },
+  return h('div', { className: cls('panel', className), ...opts },
     h('div', { className: 'panel-header' }, [
       title && h('span', { className: 'panel-title' }, title), 
       header

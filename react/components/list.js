@@ -1,8 +1,8 @@
 import { h } from '../react.js';
-import { classes } from '../classnames.js';
+import { cls } from '../../dom/stylesheets.js';
 
 export const List = ({ items, children, className = '', ...opts }) => {
-  return h('ul', { className: classes('list', className), ...opts },
+  return h('ul', { className: cls('list', className), ...opts },
     children || items.map(item => h(ListItem, null, item))
   );
 };
@@ -16,7 +16,7 @@ export const ListItem = ({
   trailingContent,
   ...props
 }) => {
-  return h('li', { className: classes('list-item', className), ...props }, children || [
+  return h('li', { className: cls('list-item', className), ...props }, children || [
     leadingContent && h('span', { className: 'list-item-leading' }, leadingContent),
     h('div', { className: 'list-item-content' }, [
       headlineContent && h('div', { className: 'list-item-headline' }, headlineContent),
