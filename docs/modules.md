@@ -62,6 +62,7 @@ There are currently no `stable` modules.
 | `files/read.js` | `candidate` | Uses Blob methods; Node Blob and real-browser File text/byte workflows are covered. |
 | `graphics/canvas.js` | `candidate` | Canvas drawing operations preserve context state and return the native context; pixel-level browser coverage is present. |
 | `graphics/color.js` | `candidate` | Validated immutable sRGB colors plus hex/RGB/HSL conversion with unit contracts. |
+| `integrations/oauth.js` | `adapter` | Browser Authorization Code + PKCE lifecycle with state validation and session-scoped token storage. |
 | `localization/messages.js` | `candidate` | Isolated locale/fallback catalogs and plain-text placeholder interpolation; no global locale, HTML rendering, or dynamic evaluation. |
 | `media/capture.js` | `candidate` | Uses standard MediaDevices, returns MediaStream, and has contract tests; add permission/browser coverage. |
 | `media/audio.js` | `candidate` | Web Audio construction, note conversion, deterministic noise buffers, native node returns, and zero-gain semantics have Chromium/WebKit coverage. |

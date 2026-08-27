@@ -132,6 +132,23 @@ confirmDialog(message, options?) -> Promise<boolean>
 - `confirmDialog` owns and removes its generated dialog; it resolves only for the explicit confirm value and rejects with `signal.reason` on abort.
 - Styling, animation, focus-trap replacement, and legacy modal emulation are out of scope.
 
+### `integrations/oauth.js`
+
+```js
+new OAuthClient(options)
+client.authorize({ prompt, extra }?) -> Promise<string>
+client.completeAuthorization() -> Promise<TokenResponse | null>
+client.getToken() -> TokenResponse | null
+client.getAccessToken({ minValiditySeconds }?) -> string | null
+client.clear() -> void
+```
+
+- Implements browser Authorization Code + PKCE with state validation.
+- Stores the transaction and token response in caller-selected session storage; tokens are never placed in URLs.
+- Resource indicators, scopes, endpoints, and redirect URIs are explicit configuration.
+- Callback parameters are removed with `history.replaceState` before application code continues.
+- Refresh policy, consent UI, API clients, and persistent cross-session login are deliberately outside this module.
+
 ### `files/read.js`
 
 ```js
