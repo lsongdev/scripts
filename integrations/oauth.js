@@ -27,7 +27,7 @@ export class OAuthClient {
     tokenEndpoint,
     storage = globalThis.sessionStorage,
     storageKey,
-    fetch: fetchImplementation = globalThis.fetch,
+    fetch: fetchImplementation = defaultFetch,
     location = globalThis.location,
     history = globalThis.history,
     crypto: cryptoImplementation = globalThis.crypto,
@@ -155,6 +155,10 @@ export class OAuthClient {
     }
     this.#history?.replaceState?.(null, '', `${callback.pathname}${callback.search}${callback.hash}`);
   }
+}
+
+function defaultFetch(...args) {
+  return globalThis.fetch(...args);
 }
 
 function normalizedIssuer(value) {

@@ -57,3 +57,26 @@ test('OAuthClient rejects callback state mismatches before token exchange', asyn
   await assert.rejects(client.completeAuthorization(), error => error.code === 'invalid_state');
   assert.equal(fetched, false);
 });
+
+test('OAuthClient calls the browser fetch implementation with its global receiver', async () => {
+  const session = storage();
+  const location = { href: 'https://app.example/callback', assign(value) { this.assigned = value; } };
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = function (_url, init) {
+    assert.equal(this, globalThis);
+    assert.equal(init.body.get('grant_type'), 'authorization_code');
+    return Promise.resolve(Response.json({ access_token: 'access-token', token_type: 'Bearer', expires_in: 600 }));
+  };
+  try {
+    const client = new OAuthClient({
+      issuer: 'https://identity.example', clientId: 'client-web', redirectUri: 'https://app.example/callback',
+      storage: session, location, history: { replaceState() {} }, crypto: webcrypto,
+    });
+    await client.authorize();
+    const authorize = new URL(location.assigned);
+    location.href = `https://app.example/callback?code=code-1&state=${authorize.searchParams.get('state')}`;
+    assert.equal((await client.completeAuthorization()).access_token, 'access-token');
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
