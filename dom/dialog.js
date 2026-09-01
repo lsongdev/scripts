@@ -83,16 +83,22 @@ export function showDialog(dialog, {
 
 /** Create a semantic form-method=dialog with safe text/Node content. */
 export function createSimpleDialog(title, content, buttons = []) {
+  const dialog = document.createElement('dialog');
+  dialog.className = 'dialog';
+
   const heading = document.createElement('h3');
   heading.textContent = title;
   const header = document.createElement('header');
+  header.className = 'dialog-header';
   header.append(heading);
 
   const body = document.createElement('div');
+  body.className = 'dialog-body';
   if (content instanceof Node) body.append(content);
   else body.textContent = String(content);
 
   const footer = document.createElement('footer');
+  footer.className = 'dialog-footer';
   for (const { text, value, className = '' } of buttons) {
     const button = document.createElement('button');
     button.type = 'submit';
@@ -105,7 +111,8 @@ export function createSimpleDialog(title, content, buttons = []) {
   const form = document.createElement('form');
   form.method = 'dialog';
   form.append(header, body, footer);
-  return createDialog(form);
+  dialog.append(form);
+  return dialog;
 }
 
 /** Show a self-cleaning confirmation dialog. */
