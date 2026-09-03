@@ -1,5 +1,6 @@
 import { h } from '../react.js';
 
-export const Link = ({ to = 'javascript:void(0)', children, onClick }) => {
-  return h('a', { href: to, onClick }, children)
+/** Preserve `to` while accepting native anchor attributes (href, target, ARIA, etc.). */
+export const Link = ({ to = 'javascript:void(0)', href = to, children, ...props }) => {
+  return h('a', { ...props, href }, children)
 };

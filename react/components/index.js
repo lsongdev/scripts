@@ -5,3 +5,5 @@ export * from "./panel.js";
 export * from "./header.js";
 export * from "./button.js";
 export * from './progressbar.js';
+export * from './range-field.js';
+export * from './dialog.js';
