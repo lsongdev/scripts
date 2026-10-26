@@ -71,6 +71,9 @@ All three use `field.css`.
 - `PageHeader({ title, subtitle, actions })`: `page.css`.
 - `Tabs({ tabs, active, onChange })`: `tabs` are `[id, label]` pairs or `{ id, label }`
   objects; the current tab has `aria-selected="true"`. `tabs.css`.
+- `Table({ framed = true, children })`: a `.table` in a `.table-scroll` container, which scrolls
+  sideways on narrow screens instead of wrapping cells; `framed` draws a border (use `false`
+  inside a card). `table.css`.
 - `KeyValue({ items })`: a definition list from `[label, value]` pairs, skipping empty
   values. `key-value.css`.
 - `LogView({ lines, follow, empty })`: `lines` are strings or `{ text, stream }` objects;
