@@ -23,13 +23,27 @@ export function createDialogFromHTMLUnsafe(html) {
   return dialog;
 }
 
-/** Bind explicit close controls and optional backdrop dismissal. */
+/**
+ * Bind explicit close controls and optional backdrop dismissal. A backdrop
+ * click closes only when the press also started on the backdrop, so a text
+ * selection dragged out of the dialog does not dismiss it.
+ */
 export function bindDialog(dialog, {
   closeOnBackdrop = true,
   signal,
 } = {}) {
   assertDialog(dialog);
   signal?.throwIfAborted();
+
+  const outside = event => {
+    const bounds = dialog.getBoundingClientRect();
+    return event.clientX < bounds.left || event.clientX > bounds.right
+      || event.clientY < bounds.top || event.clientY > bounds.bottom;
+  };
+  let pressedOutside = false;
+  const pointerdown = event => {
+    pressedOutside = event.target === dialog && outside(event);
+  };
 
   const click = event => {
     const target = event.target instanceof Element ? event.target : null;
@@ -40,15 +54,17 @@ export function bindDialog(dialog, {
       return;
     }
 
-    if (!closeOnBackdrop || event.target !== dialog) return;
-    const bounds = dialog.getBoundingClientRect();
-    const outside = event.clientX < bounds.left || event.clientX > bounds.right
-      || event.clientY < bounds.top || event.clientY > bounds.bottom;
-    if (outside) dialog.close('cancel');
+    if (!closeOnBackdrop || event.target !== dialog || !pressedOutside) return;
+    pressedOutside = false;
+    if (outside(event)) dialog.close('cancel');
   };
 
+  dialog.addEventListener('pointerdown', pointerdown, { signal });
   dialog.addEventListener('click', click, { signal });
-  return () => dialog.removeEventListener('click', click);
+  return () => {
+    dialog.removeEventListener('pointerdown', pointerdown);
+    dialog.removeEventListener('click', click);
+  };
 }
 
 /** Show a dialog and restore focus after it closes. */

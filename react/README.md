@@ -9,7 +9,7 @@ Styles are provided separately by the sibling `stylesheets` library.
 `Button({ type = 'button', variant = 'normal', className, text, children, ...nativeProps })`
 
 - `type` accepts native `button`, `submit`, `reset`. The default does not submit forms.
-- `variant` selects the CSS variant (`primary`, `secondary`, etc.).
+- `variant` selects the CSS variant (`primary`, `secondary`, etc.); `size` is `small` or `large`.
 - Legacy `type="primary"` remains a visual variant and uses native `type="button"`.
 - Native events, disabled, name/value, form, title, data and ARIA attributes are forwarded.
 - `text` remains supported; otherwise use children. No app-specific loading policy.
@@ -33,10 +33,54 @@ The default input accessible name is label; override with `aria-label` if label 
 
 ## Dialog
 
-`Dialog({ open, onClose, onCancel, className, children, ...dialogProps })`
+`Dialog({ open, onClose, onCancel, title, footer, closeLabel = 'Close', closeOnBackdrop = true, className, children, ...dialogProps })`
 
-Controlled native modal dialog: set `open`, and set it false in `onClose` (including Escape).
-`onCancel` may prevent the native Escape dismissal when a workflow requires it.
-Use `aria-labelledby` or `aria-label`; compose native forms and header/body/footer slots
-with `.dialog-header`, `.dialog-body`, `.dialog-footer` from `dialog.css`.
-Native dialog handles focus containment and return; no custom overlay/focus trap.
+Controlled native modal built on `dom/dialog.js`: set `open`, and set it false in `onClose`,
+which also runs for Escape, any `[data-dialog-close]` button and a backdrop click (a press
+that starts and ends outside the dialog). Focus returns to where it was when the dialog closes.
+With `title` or `footer`, content goes into the `.dialog-header`, `.dialog-body` and
+`.dialog-footer` slots of `dialog.css`, with a close button; otherwise children fill the dialog.
+`onCancel` may prevent the native Escape dismissal. Unrendering an open dialog closes it.
+
+`openDialog(render)` renders `render(close)` in the application's `DialogHost` until `close()`
+is called, for dialogs opened from event handlers or after an async step.
+
+## Feedback
+
+- `Alert({ variant, error, children })`: `variant` is `info` (default), `success`, `warning`
+  or `danger`; an `error` without children shows its message as a danger alert. Renders
+  nothing when given neither. `alert.css`.
+- `Badge({ variant, dot, children })`: `variant` is `info`, `success`, `warning` or `danger`;
+  `dot` adds a `.badge-dot`. `badge.css`.
+- `Spinner()`, `Loading({ children = 'Loading…' })`: `spinner.css`. `Empty({ children })`: `utils.css`.
+- `toast(message, variant)` shows a message in the application's `Toaster`; `variant` is
+  `info`, `success` or `danger`. The stack is a manual popover so it shows above modal
+  dialogs. `toast.css`.
+
+## Forms
+
+- `Field({ label, hint, error, required, children })` labels a control; `error` replaces the hint.
+- `Check({ label, ...inputProps })` is a checkbox (or `type="radio"`) with its label.
+- `ListInput({ values, onChange, placeholder, inputClassName, removeLabel })` edits a list of
+  strings, keeping one empty row to type in.
+
+All three use `field.css`.
+
+## Layout and content
+
+- `PageHeader({ title, subtitle, actions })`: `page.css`.
+- `Tabs({ tabs, active, onChange })`: `tabs` are `[id, label]` pairs or `{ id, label }`
+  objects; the current tab has `aria-selected="true"`. `tabs.css`.
+- `KeyValue({ items })`: a definition list from `[label, value]` pairs, skipping empty
+  values. `key-value.css`.
+- `LogView({ lines, follow, empty })`: `lines` are strings or `{ text, stream }` objects;
+  `stream: 'stderr'` marks a line. Follows new lines while scrolled to the end. `log.css`.
+
+## Actions
+
+- `CopyButton({ text, label, copiedLabel })` copies to the clipboard (secure contexts only).
+- `ConfirmButton({ label, title, description, checkbox, confirmLabel, cancelLabel, danger, onConfirm })`
+  asks in a dialog before running `onConfirm(checked)`; a rejected promise shows its error in
+  the dialog.
+
+Every component takes English default labels; pass the label props to translate them.

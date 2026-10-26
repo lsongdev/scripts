@@ -128,7 +128,7 @@ test('browser contract harness passes', async ({ page }) => {
   await page.goto('/tests/browser.html');
   await expect(page.locator('html')).toHaveAttribute('data-status', 'passed');
   await expect(page.locator('html')).toHaveAttribute('data-failures', '0');
-  await expect(page.locator('#results li')).toHaveCount(23);
+  await expect(page.locator('#results li')).toHaveCount(24);
   expect(errors).toEqual([]);
 });
 

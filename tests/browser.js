@@ -421,6 +421,31 @@ test('dialog text is safe by default and lifecycle is explicit', async () => {
   dialog.remove();
 });
 
+test('dialog backdrop dismissal needs the press to start outside', async () => {
+  const dialog = createDialog('content');
+  dialog.style.cssText = 'width: 100px; height: 100px; padding: 0;';
+  const dispose = bindDialog(dialog);
+  showDialog(dialog);
+  const bounds = dialog.getBoundingClientRect();
+  const at = (type, x, y) => dialog.dispatchEvent(new (type === 'click' ? MouseEvent : PointerEvent)(type, {
+    bubbles: true, cancelable: true, clientX: x, clientY: y,
+  }));
+  const inside = [bounds.left + 10, bounds.top + 10];
+  const outside = [bounds.left - 10, bounds.top - 10];
+
+  at('pointerdown', ...inside);
+  at('click', ...outside);
+  assert(dialog.open, 'a drag from inside keeps the dialog open');
+
+  const close = new Promise(resolve => dialog.addEventListener('close', resolve, { once: true }));
+  at('pointerdown', ...outside);
+  at('click', ...outside);
+  await close;
+  assert(dialog.returnValue === 'cancel');
+  dispose();
+  dialog.remove();
+});
+
 test('movable and resizable initialize explicitly with Pointer Events', () => {
   const movable = createElement('div');
   movable.setAttribute('movable', '');
