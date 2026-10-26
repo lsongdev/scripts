@@ -1,9 +1,47 @@
 {
   "name": "@lsongdev/scripts",
   "version": "0.1.0-rc.1",
-  "private": true,
+  "description": "Small, composable ES modules that fill recurring gaps in the Web Platform.",
   "license": "MIT",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lsongdev/scripts.git"
+  },
+  "homepage": "https://github.com/lsongdev/scripts",
+  "sideEffects": false,
+  "exports": {
+    "./*.js": "./*.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "animation/",
+    "array/",
+    "async/",
+    "browser/",
+    "crypto/",
+    "datetime/",
+    "devices/",
+    "dom/",
+    "elements/",
+    "encoding/",
+    "files/",
+    "graphics/",
+    "integrations/",
+    "localization/",
+    "media/",
+    "navigation/",
+    "net/",
+    "react/",
+    "storage/",
+    "streams/",
+    "text/",
+    "THIRD_PARTY_NOTICES.md"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "tag": "next"
+  },
   "scripts": {
     "check": "npm run check:static && npm run test:unit && npm run test:browser",
     "check:static": "node tools/validate-repository.js",

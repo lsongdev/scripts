@@ -74,6 +74,16 @@ on($('#save'), 'click', save);
 
 For an immutable release-candidate URL, replace the relative prefix with `https://cdn.jsdelivr.net/gh/lsongdev/scripts@v0.1.0-rc.1/`. A floating `latest` URL is not recommended for production use.
 
+The same files are published to npm unchanged, with no bundle and no entry point; import leaves by path:
+
+```sh
+npm install @lsongdev/scripts@next
+```
+
+```js
+import { delay } from '@lsongdev/scripts/async/delay.js';
+```
+
 ## Compatibility policy
 
 Core modules target the standard API directly. Vendor-prefixed APIs, deprecated signatures, forwarding files, and behavior compatibility are not maintained in the core.
