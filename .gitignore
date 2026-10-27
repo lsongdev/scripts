@@ -4,3 +4,6 @@
 node_modules/
 playwright-report/
 test-results/
+react/preact.js
+react/preact-hooks.js
+react/htm.js

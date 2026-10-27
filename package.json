@@ -43,7 +43,9 @@
     "tag": "next"
   },
   "scripts": {
-    "check": "npm run check:static && npm run test:unit && npm run test:browser",
+    "vendor": "node tools/vendor-react.js",
+    "prepack": "npm run vendor",
+    "check": "npm run vendor && npm run check:static && npm run test:unit && npm run test:browser",
     "check:static": "node tools/validate-repository.js",
     "test": "npm run test:unit",
     "test:unit": "node --test",
@@ -52,6 +54,8 @@
   },
   "devDependencies": {
     "@playwright/test": "1.62.1",
+    "htm": "3.1.1",
+    "preact": "11.0.2",
     "ws": "8.21.3"
   }
 }

@@ -2,6 +2,10 @@
 
 Import `html`, hooks and standard components from `./index.js`. The shared
 `react.js` entry owns the HTM/Preact runtime; consumers must not import another copy.
+It serves Preact, its hooks and HTM from copies beside it (`preact.js`,
+`preact-hooks.js`, `htm.js`), pinned in `package.json` and generated from the
+npm packages when this package is packed, so pages work offline and nothing
+loads from a CDN. In a checkout, run `npm run vendor` first.
 Styles are provided separately by the sibling `stylesheets` library.
 
 ## Button
