@@ -1,6 +1,6 @@
-import decodeQR from '../../media/qrcode/decode.js';
-import { requestCamera } from '../../media/capture.js';
-import { defineElement } from '../../elements/define.js';
+import decodeQR from '../media/qrcode/decode.js';
+import { requestCamera } from '../media/capture.js';
+import { defineElement } from './define.js';
 
 export class XScanner extends HTMLElement {
   constructor() {

@@ -1,6 +1,6 @@
-import encodeQR from '../../media/qrcode/index.js';
-import { svgToPng } from '../../media/qrcode/dom.js';
-import { defineElement } from '../../elements/define.js';
+import encodeQR from '../media/qrcode/index.js';
+import { svgToPng } from '../media/qrcode/dom.js';
+import { defineElement } from './define.js';
 
 export class XRCode extends HTMLElement {
   static get observedAttributes() {
