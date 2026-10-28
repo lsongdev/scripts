@@ -8,7 +8,7 @@ Project-owned source is MIT licensed. Optional adapters and isolated vendor snap
 | [`lit-html`](https://github.com/lit/lit) | 3.3.3 | BSD-3-Clause | `adapters/lit.js` |
 | [`qr`](https://github.com/paulmillr/qr) | 0.6.0 snapshot | MIT OR Apache-2.0 | `vendor/qr/`, experimental QR elements |
 | [`marked`](https://github.com/markedjs/marked) | 4.2.12 snapshot | MIT | `vendor/marked.js` |
-| [`preact`](https://github.com/preactjs/preact) | 11.0.2 | MIT | `react/preact.js`, `react/preact-hooks.js` (copied from the package when packing) |
-| [`htm`](https://github.com/developit/htm) | 3.1.1 | Apache-2.0 | `react/htm.js` (copied from the package when packing) |
+| [`preact`](https://github.com/preactjs/preact) | 11.0.2 | MIT | `react/preact.js`, `react/preact-hooks.js` (generated copies committed for GitHub Pages and refreshed when packing) |
+| [`htm`](https://github.com/developit/htm) | 3.1.1 | Apache-2.0 | `react/htm.js` (generated copy committed for GitHub Pages and refreshed when packing) |
 
 Installed development-only test tools do not form part of the browser module runtime. Exact dependency versions and integrity hashes are recorded in `package-lock.json`; included vendor source carries its corresponding license files and provenance under `vendor/`.

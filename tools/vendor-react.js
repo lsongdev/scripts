@@ -1,7 +1,8 @@
 // Copies Preact, Preact's hooks and HTM from node_modules into react/, so
 // react/react.js serves a pinned, offline copy instead of loading them from
 // a CDN. The copies are generated (npm run vendor, and before packing) and
-// not committed: package.json pins their versions.
+// committed so branch-based GitHub Pages serves the same runtime as npm.
+// package.json pins their versions; CI checks the generated copies are current.
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';

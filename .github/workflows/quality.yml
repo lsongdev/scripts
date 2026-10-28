@@ -25,6 +25,11 @@ jobs:
       - name: Install development dependencies
         run: npm ci
 
+      - name: Verify published browser runtime copies
+        run: |
+          npm run vendor
+          git diff --exit-code -- react/preact.js react/preact-hooks.js react/htm.js
+
       - name: Install browser engines
         run: npx playwright install --with-deps
 
