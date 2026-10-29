@@ -1,6 +1,6 @@
 {
   "name": "@lsongdev/scripts",
-  "version": "0.1.0-rc.5",
+  "version": "0.1.0-rc.6",
   "description": "Small, composable ES modules that fill recurring gaps in the Web Platform.",
   "license": "MIT",
   "type": "module",
