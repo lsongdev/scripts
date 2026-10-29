@@ -72,7 +72,15 @@ All three use `field.css`.
 
 ## Layout and content
 
-- `PageHeader({ title, subtitle, actions })`: `page.css`.
+- `PageHeader({ title, subtitle, actions, back })`: `back` is `{ href, label }`, a return
+  link at the far right of the title row that stays there on narrow screens. `page.css`.
+- `Sidebar({ brand, href, mark, groups, items, footer })`: side navigation. `groups` are
+  `{ title, items }` and items `{ href, title, icon, badge, active }` (or pass `items` for one
+  untitled group). Its toggle collapses it to icons on wide screens and opens it as a menu on
+  narrow ones, closing again on a link or Escape. `sidebar.css` and `menu.css`.
+- `Navbar({ brand, href, mark, items, children })`: top navigation; items are
+  `{ href, title, active }`, children trail on the right. `navbar.css`.
+- `FormSection({ title, description, children })`: a titled `fieldset` of fields. `field.css`.
 - `Tabs({ tabs, active, onChange })`: `tabs` are `[id, label]` pairs or `{ id, label }`
   objects; the current tab has `aria-selected="true"`. `tabs.css`.
 - `Table({ framed = true, children })`: a `.table` in a `.table-scroll` container, which scrolls
