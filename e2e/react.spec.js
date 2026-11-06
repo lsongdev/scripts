@@ -14,7 +14,7 @@ test('Table renders columns and rows, sorts from headers and shows an empty row'
     const root = document.createElement('div');
     document.body.append(root);
     const columns = [
-      { key: 'name', title: 'Name', sort: true },
+      { key: 'name', title: 'Name', sort: true, width: 120 },
       { key: 'size', title: 'Size', align: 'end', sort: true, render: row => `${row.size} B` },
       { key: 'note', title: 'Note', grow: true, className: 'extra' },
     ];
@@ -33,6 +33,7 @@ test('Table renders columns and rows, sorts from headers and shows an empty row'
     out.align = root.querySelector('tbody td:nth-child(2)').style.textAlign;
     out.rowAttr = root.querySelector('tbody tr').dataset.id;
     out.grow = root.querySelector('tbody td:nth-child(3)').className;
+    out.width = root.querySelector('th').style.width;
     root.querySelector('th:nth-child(2) button').click();
     await tick();
     out.ascending = text();
@@ -59,6 +60,7 @@ test('Table renders columns and rows, sorts from headers and shows an empty row'
   expect(result.align).toBe('end');
   expect(result.rowAttr).toBe('a');
   expect(result.grow).toBe('table-grow extra');
+  expect(result.width).toBe('120px');
   // Empty values sort last in both directions' natural order; text uses the locale.
   expect(result.ascending).toEqual(['Alpha|2 B|n', 'beta|10 B|', 'gamma|null B|']);
   expect(result.ascendingState).toEqual(['none', 'ascending', null]);
@@ -396,8 +398,8 @@ test('Table pages its rows, keeps a footer and returns to page one on sort', asy
   expect(result.third).toEqual([21, 22, 23, 24, 25]);
   expect(result.clamped).toEqual([11, 12]);
   expect(result.sorted).toEqual([1, '1']);
-  // A single page needs no pagination; the footer area stays for consistency.
-  expect(result.noPager).toEqual([null, true]);
+  // A single page needs no pagination, so nothing renders below the rows.
+  expect(result.noPager).toEqual([null, false]);
 });
 
 test('ProgressBar exposes its value', async ({ page }) => {
