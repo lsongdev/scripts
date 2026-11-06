@@ -312,3 +312,109 @@ test('debounced value and callback settle after the wait', async ({ page }) => {
   expect(result.sawB).toBe(false);
   expect(result.calls).toEqual(['c:2']);
 });
+
+test('Pagination moves between numbered pages, jumps and works without a count', async ({ page }) => {
+  const result = await page.evaluate(async () => {
+    const { html, render } = await import('/react/react.js');
+    const { Pagination } = await import('/react/components/pagination.js');
+    const tick = () => new Promise(r => setTimeout(r, 20));
+    const root = document.createElement('div');
+    document.body.append(root);
+    const asked = [];
+    const draw = props => render(html`<${Pagination} onChange=${n => asked.push(n)} ...${props} />`, root);
+    const items = () => [...root.querySelectorAll('.pagination > *')]
+      .filter(el => !el.matches('label'))
+      .map(el => (el.getAttribute('aria-current') ? `[${el.textContent}]` : el.disabled ? `(${el.textContent})` : el.textContent));
+    const out = {};
+    draw({ page: 1, pageCount: 1 });
+    await tick();
+    out.single = root.innerHTML;
+    draw({ page: 5, pageCount: 10, jump: true, labels: { jump: '跳至', page: n => `第 ${n} 页` } });
+    await tick();
+    out.middle = items();
+    out.label = root.querySelector('[aria-current="page"]').getAttribute('aria-label');
+    root.querySelector('[aria-label="Next page"]').click();
+    root.querySelectorAll('.pagination-item')[1].click(); // page 1
+    const input = root.querySelector('.pagination-jump input');
+    out.jumpLabel = root.querySelector('.pagination-jump').textContent;
+    input.value = '42';
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    await tick();
+    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    draw({ page: 1, pageCount: 10 });
+    await tick();
+    out.first = items();
+    draw({ page: 3, hasMore: false });
+    await tick();
+    out.open = items();
+    return { ...out, asked };
+  });
+  expect(result.single).toBe('');
+  expect(result.middle).toEqual(['‹', '1', '…', '4', '[5]', '6', '…', '10', '›']);
+  expect(result.label).toBe('第 5 页');
+  expect(result.jumpLabel).toBe('跳至');
+  expect(result.first).toEqual(['(‹)', '[1]', '2', '…', '10', '›']);
+  expect(result.open).toEqual(['‹', '[Page 3]', '(›)']);
+  expect(result.asked).toEqual([6, 1, 10]);
+});
+
+test('Table pages its rows, keeps a footer and returns to page one on sort', async ({ page }) => {
+  const result = await page.evaluate(async () => {
+    const { html, render } = await import('/react/react.js');
+    const { Table } = await import('/react/components/table.js');
+    const tick = () => new Promise(r => setTimeout(r, 20));
+    const root = document.createElement('div');
+    document.body.append(root);
+    const rows = Array.from({ length: 25 }, (_, i) => ({ n: i + 1 }));
+    const columns = [{ key: 'n', title: 'N', sort: true }];
+    const cells = () => [...root.querySelectorAll('tbody td')].map(td => Number(td.textContent));
+    const draw = list => render(html`<${Table} columns=${columns} rows=${list} pageSize=${10}
+      footer=${html`<span class="count">${list.length} rows</span>`} />`, root);
+    draw(rows);
+    await tick();
+    const out = { first: cells(), footer: root.querySelector('.table-footer .count').textContent };
+    out.structure = [root.firstElementChild.className, root.querySelector('.table-framed > .table-scroll > table') !== null];
+    root.querySelector('[aria-label="Page 3"]').click();
+    await tick();
+    out.third = cells();
+    draw(rows.slice(0, 12)); // shrinks to two pages
+    await tick();
+    out.clamped = cells();
+    root.querySelector('th button').click(); // sort asc: back to page one
+    await tick();
+    out.sorted = [cells()[0], root.querySelector('[aria-current="page"]').textContent];
+    render(html`<${Table} columns=${columns} rows=${rows.slice(0, 3)} pageSize=${10} />`, root);
+    await tick();
+    out.noPager = [root.querySelector('.pagination'), root.querySelector('.table-footer') !== null];
+    return out;
+  });
+  expect(result.first).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+  expect(result.footer).toBe('25 rows');
+  expect(result.structure).toEqual(['table-framed', true]);
+  expect(result.third).toEqual([21, 22, 23, 24, 25]);
+  expect(result.clamped).toEqual([11, 12]);
+  expect(result.sorted).toEqual([1, '1']);
+  // A single page needs no pagination; the footer area stays for consistency.
+  expect(result.noPager).toEqual([null, true]);
+});
+
+test('ProgressBar exposes its value', async ({ page }) => {
+  const result = await page.evaluate(async () => {
+    const { html, render } = await import('/react/react.js');
+    const { ProgressBar } = await import('/react/components/progressbar.js');
+    const root = document.createElement('div');
+    document.body.append(root);
+    render(html`<${ProgressBar} value=${30} max=${120} label="Download" />`, root);
+    await new Promise(r => setTimeout(r, 20));
+    const bar = root.querySelector('[role="progressbar"]');
+    const zero = document.createElement('div');
+    render(html`<${ProgressBar} value=${5} max=${0} />`, zero);
+    await new Promise(r => setTimeout(r, 20));
+    return {
+      aria: ['aria-label', 'aria-valuenow', 'aria-valuemax'].map(a => bar.getAttribute(a)),
+      width: bar.firstElementChild.style.width,
+      zero: zero.querySelector('.progress-bar-inner').style.width,
+    };
+  });
+  expect(result).toEqual({ aria: ['Download', '30', '120'], width: '25%', zero: '0%' });
+});

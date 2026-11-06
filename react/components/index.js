@@ -23,3 +23,4 @@ export * from './sidebar.js';
 export * from './navbar.js';
 export * from './form-section.js';
 export * from './router.js';
+export * from './pagination.js';

@@ -1,5 +1,6 @@
 import { h, useState } from '../react.js';
 import { cls } from '../../dom/stylesheets.js';
+import { Pagination } from './pagination.js';
 
 /**
  * A table that scrolls sideways on narrow screens instead of wrapping its
@@ -22,27 +23,50 @@ import { cls } from '../../dom/stylesheets.js';
  * `rowProps(row, index)` adds attributes to a row, such as a class or a
  * click handler. With no rows, `empty` shows in a single cell.
  *
+ * `pageSize` shows that many rows at a time, with a Pagination below them;
+ * `pagination` passes it props such as `jump` or `labels`. Sorting returns
+ * to the first page. Rows paged by a server instead are shown as given, with
+ * your own Pagination in `footer`, which renders below the rows inside the
+ * frame.
+ *
  * Without columns, children are the table's sections and rows.
  */
 export function Table({
   columns, rows = [], rowKey, rowProps, empty, caption,
   sort: controlled, defaultSort = null, onSort,
+  pageSize, pagination, footer,
   framed = true, className = '', children, ...props
 }) {
   const [own, setOwn] = useState(defaultSort);
+  const [wanted, setPage] = useState(1);
   const sort = controlled !== undefined ? controlled : own;
+  let shown = columns ? sorted(rows, columns, sort) : rows;
+  let pager = null;
+  if (columns && pageSize > 0) {
+    const pageCount = Math.max(1, Math.ceil(shown.length / pageSize));
+    const page = Math.min(wanted, pageCount); // the rows may have shrunk
+    shown = shown.slice((page - 1) * pageSize, page * pageSize);
+    pager = h(Pagination, { ...pagination, page, pageCount, onChange: setPage });
+  }
   const content = columns
     ? [
       caption != null && h('caption', { key: 'caption' }, caption),
       h('thead', { key: 'head' }, h('tr', null, columns.map(column => header(column, sort, next => {
         if (controlled === undefined) setOwn(next);
+        setPage(1);
         onSort?.(next);
       })))),
-      h('tbody', { key: 'body' }, body(columns, sorted(rows, columns, sort), rowKey, rowProps, empty)),
+      h('tbody', { key: 'body' }, body(columns, shown, rowKey, rowProps, empty)),
     ]
     : children;
-  return h('div', { className: cls('table-scroll', framed && 'table-framed') },
-    h('table', { ...props, className: cls('table', className) }, content));
+  const table = h('table', { ...props, className: cls('table', className) }, content);
+  if (footer == null && !pager) {
+    return h('div', { className: cls('table-scroll', framed && 'table-framed') }, table);
+  }
+  // The footer stays put while a wide table scrolls sideways above it.
+  return h('div', { className: cls(framed && 'table-framed') },
+    h('div', { className: 'table-scroll' }, table),
+    h('div', { className: 'table-footer' }, footer, pager));
 }
 
 const aligns = { start: 'start', center: 'center', end: 'end', left: 'left', right: 'right' };
