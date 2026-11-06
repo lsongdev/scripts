@@ -16,7 +16,7 @@ test('Table renders columns and rows, sorts from headers and shows an empty row'
     const columns = [
       { key: 'name', title: 'Name', sort: true },
       { key: 'size', title: 'Size', align: 'end', sort: true, render: row => `${row.size} B` },
-      { key: 'note', title: 'Note' },
+      { key: 'note', title: 'Note', grow: true, className: 'extra' },
     ];
     const rows = [
       { id: 'a', name: 'beta', size: 10 },
@@ -32,6 +32,7 @@ test('Table renders columns and rows, sorts from headers and shows an empty row'
     const out = { initial: text(), headers: [...root.querySelectorAll('th')].map(th => th.textContent), sortState: sortState() };
     out.align = root.querySelector('tbody td:nth-child(2)').style.textAlign;
     out.rowAttr = root.querySelector('tbody tr').dataset.id;
+    out.grow = root.querySelector('tbody td:nth-child(3)').className;
     root.querySelector('th:nth-child(2) button').click();
     await tick();
     out.ascending = text();
@@ -57,6 +58,7 @@ test('Table renders columns and rows, sorts from headers and shows an empty row'
   expect(result.sortState).toEqual(['none', 'none', null]);
   expect(result.align).toBe('end');
   expect(result.rowAttr).toBe('a');
+  expect(result.grow).toBe('table-grow extra');
   // Empty values sort last in both directions' natural order; text uses the locale.
   expect(result.ascending).toEqual(['Alpha|2 B|n', 'beta|10 B|', 'gamma|null B|']);
   expect(result.ascendingState).toEqual(['none', 'ascending', null]);

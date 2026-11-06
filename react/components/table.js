@@ -9,11 +9,12 @@ import { Pagination } from './pagination.js';
  *
  * Give it `columns` and `rows` to have it render the header and body:
  *
- *   columns: [{ key, title, render(row, index), align, className, sort }]
+ *   columns: [{ key, title, render(row, index), align, grow, className, sort }]
  *
  * A cell shows `render(row, index)`, or `row[key]` without render. `align`
- * ("start", "center", "end") aligns the header and cells; `className` goes
- * on both. `sort` makes the column sortable from its header: true compares
+ * ("start", "center", "end") aligns the header and cells; `grow` lets the
+ * column take the free width and wrap (cells otherwise stay on one line);
+ * `className` goes on both. `sort` makes the column sortable from its header: true compares
  * `row[key]` (numbers numerically, text in the user's locale, empty values
  * last), or pass a compare(a, b) function of rows. Sorting is the table's
  * own state, starting from `defaultSort` ({ key, direction: "asc" | "desc" }),
@@ -73,7 +74,7 @@ const aligns = { start: 'start', center: 'center', end: 'end', left: 'left', rig
 
 function cellProps(column) {
   return {
-    className: column.className || undefined,
+    className: cls(column.grow && 'table-grow', column.className) || undefined,
     style: column.align ? { textAlign: aligns[column.align] || column.align } : undefined,
   };
 }
