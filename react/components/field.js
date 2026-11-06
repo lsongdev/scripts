@@ -16,6 +16,17 @@ export const Check = ({ label, className = '', ...inputProps }) =>
     label);
 
 /**
+ * An on/off switch: a native checkbox with role="switch", so it keeps focus,
+ * keyboard use and form submission. The label is optional; without one, give
+ * it an aria-label or title. Input props such as checked, disabled and
+ * onChange go to the checkbox. Load switch.css.
+ */
+export const Switch = ({ label, className = '', ...inputProps }) =>
+  h('label', { className: cls('switch', className) },
+    h('input', { type: 'checkbox', role: 'switch', ...inputProps }),
+    label);
+
+/**
  * Edits a list of strings, always keeping one empty row to type in.
  * Load field.css.
  */

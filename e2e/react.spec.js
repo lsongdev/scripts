@@ -422,3 +422,21 @@ test('ProgressBar exposes its value', async ({ page }) => {
   });
   expect(result).toEqual({ aria: ['Download', '30', '120'], width: '25%', zero: '0%' });
 });
+
+test('Switch is a native checkbox with the switch role', async ({ page }) => {
+  const result = await page.evaluate(async () => {
+    const { html, render } = await import('/react/react.js');
+    const { Switch } = await import('/react/components/field.js');
+    const root = document.createElement('div');
+    document.body.append(root);
+    const seen = [];
+    render(html`<${Switch} label="Wi-Fi" checked=${false} onChange=${e => seen.push(e.currentTarget.checked)} />`, root);
+    await new Promise(r => setTimeout(r, 20));
+    const input = root.querySelector('label.switch > input');
+    input.focus();
+    const focused = document.activeElement === input;
+    input.click();
+    return { role: input.getAttribute('role'), type: input.type, text: root.textContent, focused, seen };
+  });
+  expect(result).toEqual({ role: 'switch', type: 'checkbox', text: 'Wi-Fi', focused: true, seen: [true] });
+});
