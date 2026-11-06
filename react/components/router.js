@@ -5,7 +5,8 @@ import { Alert } from './alert.js';
 
 /**
  * A page component that loads its module on first render, for routes that
- * should not all load up front: `lazy(() => import('./pages/user.js'))`.
+ * should not all load up front: pass a function that imports the page's
+ * module, such as `() => import(url)`.
  * The module's default export is rendered with the same props. While it
  * loads, `loading` shows (a Loading message by default); a failed import
  * shows its error.
