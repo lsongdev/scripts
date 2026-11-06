@@ -22,3 +22,4 @@ export * from './table.js';
 export * from './sidebar.js';
 export * from './navbar.js';
 export * from './form-section.js';
+export * from './router.js';

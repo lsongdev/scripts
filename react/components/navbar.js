@@ -8,10 +8,15 @@ import { cls } from '../../dom/stylesheets.js';
  * items are `{ href, title, active }`; the active one is marked for
  * navbar.css and assistive technology, and scrolled into view where the
  * links scroll sideways (narrow screens).
+ *
+ * Instead of marking items, pass `current`, the href of the current page
+ * (such as `router.href(route.path)`): the item whose href is the longest
+ * prefix of it, at a path segment, is active. A root href ("/" or "#/") is
+ * only active on the root itself.
  */
-export function Navbar({ brand, href = '#/', mark, items = [], label = 'Menu', className = '', children, ...props }) {
+export function Navbar({ brand, href = '#/', mark, items = [], current, label = 'Menu', className = '', children, ...props }) {
   const links = useRef(null);
-  const active = items.find(item => item.active)?.href;
+  const active = items.find(item => item.active)?.href ?? activeHref(items, current);
   useEffect(() => {
     const nav = links.current;
     const link = nav?.querySelector('a.active');
@@ -23,6 +28,22 @@ export function Navbar({ brand, href = '#/', mark, items = [], label = 'Menu', c
       mark && h('span', { className: 'navbar-brand-mark', 'aria-hidden': 'true' }, mark),
       h('h1', null, brand)),
     h('nav', { ref: links, 'aria-label': label }, items.map(item =>
-      h('a', { key: item.href, href: item.href, className: cls(item.active && 'active'), 'aria-current': item.active ? 'page' : undefined }, item.title))),
+      h('a', { key: item.href, href: item.href, className: cls(item.href === active && 'active'), 'aria-current': item.href === active ? 'page' : undefined }, item.title))),
     children && h('nav', null, children));
+}
+
+const pathOf = href => href.split('?')[0];
+
+/** The href among items' that is the longest segment prefix of current. */
+function activeHref(items, current) {
+  if (current == null) return undefined;
+  const here = pathOf(current);
+  let best;
+  for (const { href } of items) {
+    const path = pathOf(href);
+    const root = path === '/' || path === '#/';
+    const hit = here === path || (!root && here.startsWith(path.endsWith('/') ? path : path + '/'));
+    if (hit && (!best || path.length > pathOf(best).length)) best = href;
+  }
+  return best;
 }

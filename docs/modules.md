@@ -70,7 +70,7 @@ There are currently no `stable` modules.
 | `media/session.js` | `candidate` | Explicit Media Session metadata, playback, action, position, camera, and microphone workflows with no silent unsupported fallback. |
 | `media/recording.js` | `candidate` | Returns the native MediaRecorder plus an explicit stop/result lifecycle, rejects with AbortSignal reason, and leaves MediaStream track ownership to the caller. |
 | `media/spectrum.js` | `candidate` | One-frame spectrum drawing preserves Canvas state; the renderer owns exactly one cancellable RAF loop around a native AnalyserNode. |
-| `navigation/router.js` | `candidate` | Inert URLPattern router, real History state, explicit start, navigation, and prior-route abort have Chromium/WebKit coverage; deepen navigation edge cases. |
+| `navigation/router.js` | `candidate` | Inert URLPattern router, real History state or (with `hash`) fragment routes for static pages, explicit start, navigation, `href`/`setQuery` links and query updates, and prior-route abort have Chromium/WebKit coverage; deepen navigation edge cases. |
 | `net/websocket.js` | `candidate` | A real local server verifies standard WebSocket/MessageEvent, echo, stream cancellation, and AbortSignal close in Chromium/WebKit; add failure and abnormal-close cases. |
 | `net/webrtc.js` | `candidate` | Returns the native RTCPeerConnection and native local descriptions; configuration and ICE servers are caller-owned, with no prefixed constructors. |
 | `storage/local.js` | `candidate` | Namespaced string semantics and clear/cache isolation are tested; add StorageEvent policy if needed. |
