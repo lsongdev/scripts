@@ -440,3 +440,56 @@ test('Switch is a native checkbox with the switch role', async ({ page }) => {
   });
   expect(result).toEqual({ role: 'switch', type: 'checkbox', text: 'Wi-Fi', focused: true, seen: [true] });
 });
+
+test('Sidebar renders one nested menu tree and discloses collapsible groups', async ({ page }) => {
+  const result = await page.evaluate(async () => {
+    const { html, render } = await import('/react/react.js');
+    const { Sidebar } = await import('/react/components/sidebar.js');
+    const tick = () => new Promise(r => setTimeout(r, 20));
+    const root = document.createElement('div');
+    document.body.append(root);
+    const items = active => [
+      { href: '#/', title: 'Dashboard' },
+      { id: 'docker', title: 'Docker', items: [{ href: '#/c', title: 'Containers', active: active === 'c' }] },
+      { id: 'storage', title: 'Storage', open: false, items: [
+        { href: '#/disks', title: 'Disks', active: active === 'disks', items: [{ href: '#/disks/smart', title: 'SMART' }] },
+      ] },
+    ];
+    const shape = list => [...list.children].map(li => li.classList.contains('menu-group')
+      ? { group: li.querySelector(':scope > .menu-heading').textContent, tag: li.querySelector(':scope > .menu-heading').localName, hidden: li.querySelector(':scope > ul').hidden, items: shape(li.querySelector(':scope > ul')) }
+      : { link: li.querySelector(':scope > a').textContent, ...(li.querySelector(':scope > ul') && { items: shape(li.querySelector(':scope > ul')) }) });
+    const menu = () => root.querySelector('nav > ul.menu.menu-vertical');
+    render(html`<${Sidebar} brand="B" items=${items('c')} />`, root);
+    await tick();
+    const out = { static: shape(menu()) };
+    const heading = root.querySelector('.menu-group .menu-heading');
+    out.labelled = root.querySelector(`ul[aria-labelledby="${heading.id}"]`) !== null;
+    render(null, root);
+    render(html`<${Sidebar} brand="B" items=${items('c')} collapsible menuClassName="menu-tree" />`, root);
+    await tick();
+    out.tree = menu().classList.contains('menu-tree');
+    const storage = [...root.querySelectorAll('button.menu-heading')][1];
+    out.closed = [storage.getAttribute('aria-expanded'), document.getElementById(storage.getAttribute('aria-controls')).hidden];
+    storage.click();
+    await tick();
+    out.opened = [storage.getAttribute('aria-expanded'), document.getElementById(storage.getAttribute('aria-controls')).hidden];
+    storage.click();
+    await tick();
+    render(html`<${Sidebar} brand="B" items=${items('disks')} collapsible menuClassName="menu-tree" />`, root);
+    await tick();
+    out.activeOpens = storage.getAttribute('aria-expanded');
+    return out;
+  });
+  expect(result).toEqual({
+    static: [
+      { link: '•Dashboard' },
+      { group: 'Docker', tag: 'span', hidden: false, items: [{ link: '•Containers' }] },
+      { group: 'Storage', tag: 'span', hidden: false, items: [{ link: '•Disks', items: [{ link: '•SMART' }] }] },
+    ],
+    labelled: true,
+    tree: true,
+    closed: ['false', true],
+    opened: ['true', false],
+    activeOpens: 'true',
+  });
+});

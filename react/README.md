@@ -74,10 +74,14 @@ All three use `field.css`.
 
 - `PageHeader({ title, subtitle, actions, back })`: `back` is `{ href, label }`, a return
   link at the far right of the title row that stays there on narrow screens. `page.css`.
-- `Sidebar({ brand, href, mark, groups, items, footer })`: side navigation. `groups` are
-  `{ title, items }` and items `{ href, title, icon, badge, active }` (or pass `items` for one
-  untitled group). Its toggle collapses it to icons on wide screens and opens it as a menu on
-  narrow ones, closing again on a link or Escape. `sidebar.css` and `menu.css`.
+- `Sidebar({ brand, href, mark, items, footer, collapsible, menuClassName })`: side navigation over one menu
+  tree. Links are `{ href, title, icon, badge, active, items }`; groups are
+  `{ id, title, items, open }` and render as `<li class="menu-group">` with a `.menu-heading`
+  and a list of their own. `collapsible` makes headings disclosure buttons (groups start open
+  unless `open: false`; the group holding the active link opens). Its toggle collapses it to
+  icons on wide screens and opens it as a menu on narrow ones, closing again on a link or
+  Escape. `menuClassName: 'menu-tree'` draws group headings as items. `sidebar.css` and
+  `menu.css`.
 - `Navbar({ brand, href, mark, items, children })`: top navigation; items are
   `{ href, title, active }`, children trail on the right. `navbar.css`.
 - `FormSection({ title, description, children })`: a titled `fieldset` of fields. `field.css`.
