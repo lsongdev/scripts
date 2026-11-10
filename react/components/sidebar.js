@@ -55,14 +55,16 @@ function Group({ node }) {
   const current = active != null && contains(node, active);
   if (flyouts) return h(Flyout, { node, heading, list, current });
   const expanded = !collapsed.has(key(node));
+  // Like a link: the icon, when the group has one, then the label.
+  const label = [node.icon != null && h('i', { 'aria-hidden': 'true' }, node.icon), h('span', null, node.title)];
   return h('li', { className: cls('menu-group', current && 'menu-group-active') },
     collapsible
       ? h('button', {
         type: 'button', id: heading, className: 'menu-heading',
         'aria-expanded': String(expanded), 'aria-controls': list,
         onClick: () => toggle(key(node)),
-      }, h('span', null, node.title))
-      : h('span', { id: heading, className: 'menu-heading' }, node.title),
+      }, label)
+      : h('span', { id: heading, className: 'menu-heading' }, label),
     h(List, { nodes: node.items, id: list, 'aria-labelledby': heading, hidden: collapsible && !expanded }));
 }
 
@@ -135,16 +137,17 @@ const Node = ({ node }) => isGroup(node)
  * sidebar.css and menu.css.
  *
  * items is the menu tree. Links are `{ href, title, icon, badge, active,
- * items }`; groups are `{ id, title, items, open }` and render as
- * `<li class="menu-group">` holding a `.menu-heading` and their own list.
+ * items }`; groups are `{ id, title, icon, items, open }` and render as
+ * `<li class="menu-group">` holding a `.menu-heading` (icon and label, like
+ * a link) and their own list.
  * collapsible makes the headings disclosure buttons: groups start open
  * unless `open: false`, and the groups holding the active link open when it
  * becomes active. The toggle collapses the sidebar to its icons on wide
  * screens, where each group is one icon (`icon`, or its first link's) whose
  * links open in a panel beside the sidebar, and opens it as a menu on
  * narrow ones, where following a link or pressing Escape closes it again.
- * menuClassName picks the menu's look, e.g. 'menu-tree' (menu.css) to draw
- * group headings as items.
+ * menuClassName adds classes to the menu list, for an application's own
+ * look (e.g. small labels for headings).
  */
 export function Sidebar({
   brand, href = '#/', mark, items = [], footer, collapsible = false, menuClassName = '', label = 'Menu',

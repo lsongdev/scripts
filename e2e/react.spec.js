@@ -450,7 +450,7 @@ test('Sidebar renders one nested menu tree and discloses collapsible groups', as
     document.body.append(root);
     const items = active => [
       { href: '#/', title: 'Dashboard' },
-      { id: 'docker', title: 'Docker', items: [{ href: '#/c', title: 'Containers', active: active === 'c' }] },
+      { id: 'docker', title: 'Docker', icon: 'D', items: [{ href: '#/c', title: 'Containers', active: active === 'c' }] },
       { id: 'storage', title: 'Storage', open: false, items: [
         { href: '#/disks', title: 'Disks', active: active === 'disks', items: [{ href: '#/disks/smart', title: 'SMART' }] },
       ] },
@@ -465,9 +465,9 @@ test('Sidebar renders one nested menu tree and discloses collapsible groups', as
     const heading = root.querySelector('.menu-group .menu-heading');
     out.labelled = root.querySelector(`ul[aria-labelledby="${heading.id}"]`) !== null;
     render(null, root);
-    render(html`<${Sidebar} brand="B" items=${items('c')} collapsible menuClassName="menu-tree" />`, root);
+    render(html`<${Sidebar} brand="B" items=${items('c')} collapsible menuClassName="menu-custom" />`, root);
     await tick();
-    out.tree = menu().classList.contains('menu-tree');
+    out.tree = menu().classList.contains('menu-custom');
     const storage = [...root.querySelectorAll('button.menu-heading')][1];
     out.closed = [storage.getAttribute('aria-expanded'), document.getElementById(storage.getAttribute('aria-controls')).hidden];
     storage.click();
@@ -475,7 +475,7 @@ test('Sidebar renders one nested menu tree and discloses collapsible groups', as
     out.opened = [storage.getAttribute('aria-expanded'), document.getElementById(storage.getAttribute('aria-controls')).hidden];
     storage.click();
     await tick();
-    render(html`<${Sidebar} brand="B" items=${items('disks')} collapsible menuClassName="menu-tree" />`, root);
+    render(html`<${Sidebar} brand="B" items=${items('disks')} collapsible menuClassName="menu-custom" />`, root);
     await tick();
     out.activeOpens = storage.getAttribute('aria-expanded');
     return out;
@@ -483,7 +483,7 @@ test('Sidebar renders one nested menu tree and discloses collapsible groups', as
   expect(result).toEqual({
     static: [
       { link: '•Dashboard' },
-      { group: 'Docker', tag: 'span', hidden: false, items: [{ link: '•Containers' }] },
+      { group: 'DDocker', tag: 'span', hidden: false, items: [{ link: '•Containers' }] },
       { group: 'Storage', tag: 'span', hidden: false, items: [{ link: '•Disks', items: [{ link: '•SMART' }] }] },
     ],
     labelled: true,
