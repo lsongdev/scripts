@@ -94,6 +94,11 @@ All three use `field.css`.
   inside a card). `table.css`.
 - `KeyValue({ items })`: a definition list from `[label, value]` pairs, skipping empty
   values. `key-value.css`.
+- `Terminal({ load, css, connect, readOnly, options, onError })`: xterm.js in a
+  `.terminal-frame`, fitted to it. `load` resolves to `{ Terminal, FitAddon }` from the app's
+  copy of xterm and `css` is its xterm.css URL (added to the document or the shadow root it
+  renders in). `connect(term)` attaches the session and returns a function that detaches it;
+  remount with a new `key` to reconnect. `log.css`.
 - `LogView({ lines, follow, empty })`: `lines` are strings or `{ text, stream }` objects;
   `stream: 'stderr'` marks a line. Follows new lines while scrolled to the end. `log.css`.
 

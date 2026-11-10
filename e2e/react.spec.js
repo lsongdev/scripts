@@ -569,3 +569,64 @@ test('Sidebar remembers its icons-only state and open groups under storageKey', 
   await expect(page.locator('.sidebar')).not.toHaveClass(/sidebar-open/);
   await expect(heading('B')).toHaveAttribute('aria-expanded', 'false');
 });
+
+test('Terminal loads the emulator into its frame, connects it and detaches on unmount', async ({ page }) => {
+  const result = await page.evaluate(async () => {
+    const { html, render } = await import('/react/react.js');
+    const { Terminal } = await import('/react/components/terminal.js');
+    const tick = () => new Promise(r => setTimeout(r, 30));
+    const log = [];
+    // A stand-in for xterm with the parts the component uses.
+    class FakeTerm {
+      constructor(options) { this.options = options; log.push('new'); }
+      loadAddon(addon) { this.addon = addon; }
+      open(el) {
+        this.element = document.createElement('div');
+        this.element.className = 'terminal xterm';
+        this.element.innerHTML = '<div class="xterm-viewport"></div>';
+        el.append(this.element);
+      }
+      write(text) { log.push('write ' + text); }
+      dispose() { log.push('dispose'); }
+    }
+    class FakeFit { fit() { log.push('fit'); } }
+    const load = () => Promise.resolve({ Terminal: FakeTerm, FitAddon: FakeFit });
+    const connect = term => { term.write('hello'); return () => log.push('detach'); };
+
+    const host = document.createElement('div');
+    document.body.append(host);
+    const shadow = host.attachShadow({ mode: 'open' });
+    const root = document.createElement('div');
+    shadow.append(root);
+    render(html`<${Terminal} load=${load} css="/x.css" connect=${connect} readOnly options=${{ fontSize: 15 }} />`, root);
+    await tick();
+    const frame = shadow.querySelector('.terminal-frame');
+    const term = frame.querySelector('.xterm');
+    const out = {
+      links: shadow.querySelectorAll('link[href="/x.css"]').length,
+      inDocument: document.head.querySelectorAll('link[href="/x.css"]').length,
+      height: term.style.height,
+      viewport: term.querySelector('.xterm-viewport').style.backgroundColor,
+    };
+    render(null, root);
+    render(html`<${Terminal} load=${load} css="/x.css" />`, root);
+    await tick();
+    out.linksAfterRemount = shadow.querySelectorAll('link[href="/x.css"]').length;
+    render(null, root);
+    await tick();
+    out.log = log.filter(l => l !== 'fit');
+    out.fitted = log.includes('fit');
+    let error;
+    render(html`<${Terminal} load=${() => Promise.reject(new Error('nope'))} onError=${e => { error = e.message; }} />`, root);
+    await tick();
+    out.error = error;
+    out.failed = root.querySelector('.terminal-frame').dataset.failed;
+    return out;
+  });
+  expect(result).toEqual({
+    links: 1, inDocument: 0, height: '100%', viewport: 'transparent',
+    linksAfterRemount: 1,
+    log: ['new', 'write hello', 'detach', 'dispose', 'new', 'dispose'],
+    fitted: true, error: 'nope', failed: 'true',
+  });
+});

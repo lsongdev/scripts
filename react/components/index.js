@@ -15,6 +15,7 @@ export * from './key-value.js';
 export * from './feedback.js';
 export * from './page-header.js';
 export * from './log-view.js';
+export * from './terminal.js';
 export * from './toast.js';
 export * from './copy-button.js';
 export * from './confirm-button.js';
