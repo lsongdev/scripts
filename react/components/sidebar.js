@@ -1,4 +1,4 @@
-import { createContext, h, useContext, useEffect, useId, useRef, useState } from '../react.js';
+import { createContext, h, useContext, useEffect, useId, useLayoutEffect, useRef, useState } from '../react.js';
 import { cls } from '../../dom/stylesheets.js';
 
 // sidebar.css switches to its mobile layout at this width.
@@ -28,6 +28,9 @@ const groupKeys = (nodes, test, out = []) => {
   return out;
 };
 
+// A group's icon in the icons-only sidebar: its own, or its first link's.
+const groupIcon = node => node.icon ?? (node.items || []).map(groupIcon).find(Boolean);
+
 const MenuState = createContext({ collapsible: false, collapsed: new Set(), toggle() {} });
 
 const Link = ({ node }) =>
@@ -45,12 +48,14 @@ const List = ({ nodes, ...props }) =>
   h('ul', props, nodes.map(node => h(Node, { key: key(node), node })));
 
 function Group({ node }) {
-  const { collapsible, collapsed, toggle } = useContext(MenuState);
+  const { collapsible, collapsed, toggle, active, flyouts } = useContext(MenuState);
   const id = useId();
   const heading = `${id}-heading`;
   const list = `${id}-list`;
+  const current = active != null && contains(node, active);
+  if (flyouts) return h(Flyout, { node, heading, list, current });
   const expanded = !collapsed.has(key(node));
-  return h('li', { className: 'menu-group' },
+  return h('li', { className: cls('menu-group', current && 'menu-group-active') },
     collapsible
       ? h('button', {
         type: 'button', id: heading, className: 'menu-heading',
@@ -59,6 +64,66 @@ function Group({ node }) {
       }, h('span', null, node.title))
       : h('span', { id: heading, className: 'menu-heading' }, node.title),
     h(List, { nodes: node.items, id: list, 'aria-labelledby': heading, hidden: collapsible && !expanded }));
+}
+
+// In the icons-only sidebar a group is an icon button, and its own list
+// opens as a panel beside the sidebar: on hover with a mouse, or on click
+// or Enter. It closes when the pointer or focus leaves it, on Escape, on a
+// click elsewhere, and on following a link.
+function Flyout({ node, heading, list, current }) {
+  const { flyout, setFlyout } = useContext(MenuState);
+  const k = key(node);
+  const open = flyout === k;
+  const item = useRef(null);
+  const button = useRef(null);
+  const panel = useRef(null);
+  const timer = useRef(null);
+  const show = () => { clearTimeout(timer.current); setFlyout(k); };
+  const hide = (delay = 0) => {
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => setFlyout(f => (f === k ? null : f)), delay);
+  };
+  useEffect(() => () => clearTimeout(timer.current), []);
+  useEffect(() => {
+    if (!open) return;
+    const outside = event => { if (!item.current?.contains(event.target)) hide(); };
+    document.addEventListener('pointerdown', outside);
+    return () => document.removeEventListener('pointerdown', outside);
+  }, [open]);
+  // Beside the sidebar, level with the button, kept inside the viewport.
+  useLayoutEffect(() => {
+    if (!open) return;
+    const b = button.current.getBoundingClientRect();
+    const edge = button.current.closest('.sidebar')?.getBoundingClientRect().right ?? b.right;
+    const p = panel.current;
+    p.style.left = `${edge + 4}px`;
+    p.style.top = `${Math.max(8, Math.min(b.top, innerHeight - p.offsetHeight - 8))}px`;
+  }, [open]);
+  const mouse = fn => event => { if (event.pointerType === 'mouse') fn(); };
+  return h('li', {
+    ref: item,
+    className: cls('menu-group menu-flyout', current && 'menu-group-active', open && 'menu-flyout-open'),
+    onPointerEnter: mouse(show),
+    onPointerLeave: mouse(() => hide(200)),
+    onFocusOut: event => { if (!event.currentTarget.contains(event.relatedTarget)) hide(); },
+    onKeyDown: event => {
+      if (event.key !== 'Escape' || !open) return;
+      event.stopPropagation();
+      setFlyout(null);
+      button.current.focus();
+    },
+  },
+  h('button', {
+    type: 'button', ref: button, id: heading, className: 'menu-heading', title: node.title,
+    'aria-expanded': String(open), 'aria-controls': list,
+    onClick: show,
+  },
+  h('i', { 'aria-hidden': 'true' }, groupIcon(node) || '•'),
+  h('span', null, node.title)),
+  h('ul', {
+    ref: panel, id: list, 'aria-labelledby': heading, 'data-title': node.title, hidden: !open,
+    onClick: event => { if (event.target.closest('a')) setFlyout(null); },
+  }, node.items.map(n => h(Node, { key: key(n), node: n }))));
 }
 
 const Node = ({ node }) => isGroup(node)
@@ -75,7 +140,8 @@ const Node = ({ node }) => isGroup(node)
  * collapsible makes the headings disclosure buttons: groups start open
  * unless `open: false`, and the groups holding the active link open when it
  * becomes active. The toggle collapses the sidebar to its icons on wide
- * screens (headings hidden, so every group shows) and opens it as a menu on
+ * screens, where each group is one icon (`icon`, or its first link's) whose
+ * links open in a panel beside the sidebar, and opens it as a menu on
  * narrow ones, where following a link or pressing Escape closes it again.
  * menuClassName picks the menu's look, e.g. 'menu-tree' (menu.css) to draw
  * group headings as items.
@@ -87,6 +153,9 @@ export function Sidebar({
   className = '', ...props
 }) {
   const [open, setOpen] = useState(false);
+  // The group whose flyout is open in the icons-only sidebar; every change
+  // of layout or of open closes it.
+  const [flyout, setFlyout] = useState(null);
   const [mobile, setMobile] = useState(() => globalThis.matchMedia?.(MOBILE).matches ?? false);
   const [collapsed, setCollapsed] = useState(() => new Set(groupKeys(items, n => n.open === false)));
   const toggle = useRef(null);
@@ -94,7 +163,7 @@ export function Sidebar({
     const media = globalThis.matchMedia?.(MOBILE);
     if (!media) return;
     // Each layout has its own meaning of open, so a resize resets it.
-    const change = () => { setMobile(media.matches); setOpen(false); };
+    const change = () => { setMobile(media.matches); setOpen(false); setFlyout(null); };
     media.addEventListener('change', change);
     return () => media.removeEventListener('change', change);
   }, []);
@@ -122,7 +191,7 @@ export function Sidebar({
     return next;
   });
   const iconsOnly = open && !mobile;
-  const menu = { collapsible: collapsible && !iconsOnly, collapsed, toggle: toggleGroup };
+  const menu = { collapsible, collapsed, toggle: toggleGroup, active, flyouts: iconsOnly, flyout, setFlyout };
   const closeOnLink = event => { if (mobile && event.target.closest('a')) setOpen(false); };
   const toggleLabel = mobile ? (open ? closeLabel : openLabel) : (open ? expandLabel : collapseLabel);
   return h('aside', { ...props, className: cls('sidebar', open && 'sidebar-open', className) },
@@ -133,7 +202,7 @@ export function Sidebar({
       h('button', {
         type: 'button', ref: toggle, className: 'sidebar-toggle',
         'aria-label': toggleLabel, title: toggleLabel, 'aria-expanded': String(mobile ? open : !open),
-        onClick: () => setOpen(o => !o),
+        onClick: () => { setOpen(o => !o); setFlyout(null); },
       }, mobile && open ? '✕' : '☰')),
     h('nav', { 'aria-label': label, className: 'sidebar-nav', onClick: closeOnLink },
       h(MenuState.Provider, { value: menu }, h(List, { nodes: items, className: cls('menu menu-vertical', menuClassName) }))),

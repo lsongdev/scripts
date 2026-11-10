@@ -493,3 +493,38 @@ test('Sidebar renders one nested menu tree and discloses collapsible groups', as
     activeOpens: 'true',
   });
 });
+
+test('Sidebar collapsed to icons opens each group in a flyout panel', async ({ page }) => {
+  await page.setViewportSize({ width: 1200, height: 700 });
+  await page.evaluate(async () => {
+    const { html, render } = await import('/react/react.js');
+    const { Sidebar } = await import('/react/components/sidebar.js');
+    const root = document.createElement('div');
+    document.body.append(root);
+    const items = [
+      { href: '#/', title: 'Dashboard', icon: 'D' },
+      { id: 'docker', title: 'Docker', items: [{ href: '#/c', title: 'Containers', icon: 'C', active: true }, { href: '#/i', title: 'Images', icon: 'I' }] },
+    ];
+    render(html`<${Sidebar} brand="B" items=${items} />`, root);
+  });
+  await page.click('.sidebar-toggle');
+  const button = page.locator('.menu-flyout > button.menu-heading');
+  const panel = page.locator('.menu-flyout > ul');
+  await expect(button).toHaveText('CDocker'); // the first link's icon stands in for the group's
+  await expect(page.locator('.menu-flyout')).toHaveClass(/menu-group-active/);
+  await expect(panel).toBeHidden();
+  await button.focus();
+  await page.keyboard.press('Enter');
+  await expect(panel).toBeVisible();
+  await expect(button).toHaveAttribute('aria-expanded', 'true');
+  await expect(panel).toHaveAttribute('aria-labelledby', await button.getAttribute('id'));
+  await page.keyboard.press('Escape');
+  await expect(panel).toBeHidden();
+  await expect(button).toBeFocused();
+  await page.keyboard.press('Enter');
+  await page.mouse.click(600, 600);
+  await expect(panel).toBeHidden();
+  await page.click('.sidebar-toggle');
+  await expect(page.locator('.menu-flyout')).toHaveCount(0);
+  await expect(page.locator('.menu-group > ul')).toBeVisible();
+});
