@@ -630,3 +630,97 @@ test('Terminal loads the emulator into its frame, connects it and detaches on un
     fitted: true, error: 'nope', failed: 'true',
   });
 });
+
+test('LogView renders ANSI colours, custom lines and keeps following at the cap', async ({ page }) => {
+  const result = await page.evaluate(async () => {
+    const { html, render } = await import('/react/react.js');
+    const { LogView } = await import('/react/components/log-view.js');
+    const tick = () => new Promise(r => setTimeout(r, 30));
+    const root = document.createElement('div');
+    document.body.append(root);
+    render(html`<${LogView} ansi lines=${['plain', '\x1b[1;31merr\x1b[0m ok', { text: 'x', stream: 'stderr' }, '\x1b[38;5;196mhot']} />`, root);
+    await tick();
+    const spans = [...root.querySelectorAll('.log-line')];
+    const out = {
+      text: root.querySelector('pre').textContent,
+      red: root.querySelector('.ansi-fg-1.ansi-bold')?.textContent,
+      stderr: spans[2].classList.contains('log-stderr'),
+      hot: spans[3].querySelector('span').style.color,
+    };
+    render(html`<${LogView} lines=${[{ text: 'a', level: 'warn', key: 'k1' }]} renderLine=${l => html`<b class=${l.level}>${l.text}</b>`} />`, root);
+    await tick();
+    out.custom = root.querySelector('.log-line b.warn')?.textContent;
+    // A capped buffer keeps its length; following must not depend on it.
+    const many = n => Array.from({ length: 50 }, (_, i) => `line ${n + i}`);
+    render(html`<${LogView} style="height:100px;overflow:auto" lines=${many(0)} />`, root);
+    await tick();
+    render(html`<${LogView} style="height:100px;overflow:auto" lines=${many(1)} />`, root);
+    await tick();
+    const pre = root.querySelector('pre');
+    out.atEnd = pre.scrollHeight - pre.scrollTop - pre.clientHeight < 2;
+    return out;
+  });
+  expect(result).toEqual({
+    text: 'plain\nerr ok\nx\nhot\n', red: 'err', stderr: true, hot: 'rgb(255, 0, 0)',
+    custom: 'a', atEnd: true,
+  });
+});
+
+test('useLineStream reads SSE, WebSocket and fetch sources into lines', async ({ page }) => {
+  await page.route('**/sse-test', route => route.fulfill({
+    status: 200,
+    headers: { 'Content-Type': 'text/event-stream' },
+    body: 'event: line\ndata: {"text":"one","stream":"stdout"}\n\nevent: line\ndata: {"text":"two","stream":"stderr"}\n\nevent: end\ndata: null\n\n',
+  }));
+  await page.route('**/sse-fail', route => route.fulfill({
+    status: 200, headers: { 'Content-Type': 'text/event-stream' },
+    body: 'event: error\ndata: {"message":"no such container"}\n\n',
+  }));
+  await page.route('**/fetch-test', route => route.fulfill({ status: 200, body: 'a\nb\r\nc' }));
+  await page.routeWebSocket('**/ws-test', ws => {
+    // Give the page its open event before the messages and the close.
+    setTimeout(() => {
+      ws.send('first li');
+      ws.send(Buffer.from('ne\nsecond\n'));
+      setTimeout(() => ws.close({ code: 1000 }), 50);
+    }, 50);
+  });
+  // WebSocket routes apply to pages loaded after them.
+  await page.reload();
+  const result = await page.evaluate(async () => {
+    const { html, render } = await import('/react/react.js');
+    const { useLineStream, sseLines, webSocketLines, fetchLines } = await import('/react/hooks/line-stream.js');
+    const until = async test => { for (let i = 0; i < 100 && !test(); i++) await new Promise(r => setTimeout(r, 20)); };
+    const run = async source => {
+      let state;
+      const Probe = () => { state = useLineStream(source); return null; };
+      const root = document.createElement('div');
+      document.body.append(root);
+      render(html`<${Probe} />`, root);
+      await until(() => ['ended', 'failed'].includes(state?.status));
+      render(null, root);
+      return { lines: state.lines, status: state.status, error: state.error?.message };
+    };
+    return {
+      sse: await run(sseLines('/sse-test', { event: 'line', endEvent: 'end', parse: JSON.parse })),
+      sseError: await run(sseLines('/sse-fail', { event: 'line', errorEvent: 'error' })),
+      ws: await run(webSocketLines(`ws://${location.host}/ws-test`)),
+      fetch: await run(fetchLines('/fetch-test', { parse: t => (t === 'b' ? null : t.toUpperCase()) })),
+      idle: await (async () => {
+        let state;
+        const Probe = () => { state = useLineStream(null); return null; };
+        const root = document.createElement('div');
+        render(html`<${Probe} />`, root);
+        await new Promise(r => setTimeout(r, 20));
+        return state.status;
+      })(),
+    };
+  });
+  expect(result).toEqual({
+    sse: { lines: [{ text: 'one', stream: 'stdout' }, { text: 'two', stream: 'stderr' }], status: 'ended', error: undefined },
+    sseError: { lines: [], status: 'failed', error: 'no such container' },
+    ws: { lines: ['first line', 'second'], status: 'ended', error: undefined },
+    fetch: { lines: ['A', 'C'], status: 'ended', error: undefined },
+    idle: 'idle',
+  });
+});

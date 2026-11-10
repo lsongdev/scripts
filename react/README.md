@@ -99,8 +99,20 @@ All three use `field.css`.
   copy of xterm and `css` is its xterm.css URL (added to the document or the shadow root it
   renders in). `connect(term)` attaches the session and returns a function that detaches it;
   remount with a new `key` to reconnect. `log.css`.
-- `LogView({ lines, follow, empty })`: `lines` are strings or `{ text, stream }` objects;
-  `stream: 'stderr'` marks a line. Follows new lines while scrolled to the end. `log.css`.
+- `LogView({ lines, follow, empty, ansi, renderLine, lineKey })`: `lines` are strings or
+  `{ text, stream, className, key }` objects; `stream: 'stderr'` marks a line. Follows new
+  lines while scrolled to the end. `ansi` renders terminal colours (`text/ansi.js`);
+  `renderLine(line, i)` draws structured entries. It does not fetch: feed it from polling or
+  from `useLineStream`. `log.css`.
+
+## Live lines
+
+`useLineStream(source, { max })` (`hooks/line-stream.js`) follows a source and returns
+`{ lines, status, error, clear }`, batching lines per frame and keeping the newest `max`.
+Sources: `sseLines(url, { event, parse, endEvent, errorEvent })`, `webSocketLines(url, { parse })`
+and `fetchLines(url, { parse, init })`; `parse(text)` turns a message or line into a line, an
+array of them or null. Any `{ key, open(sink) }` object is a source too, for another transport
+or protocol.
 
 ## Actions
 

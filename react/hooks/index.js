@@ -5,6 +5,7 @@ export * from './http.js';
 export * from './router.js';
 export * from './resource.js';
 export * from './event-source.js';
+export * from './line-stream.js';
 export * from './debounce.js';
 export function useThrottle(fn, delay) {
   const { current } = useRef({ fn, timer: null })
