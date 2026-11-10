@@ -31,6 +31,18 @@ const groupKeys = (nodes, test, out = []) => {
 // A group's icon in the icons-only sidebar: its own, or its first link's.
 const groupIcon = node => node.icon ?? (node.items || []).map(groupIcon).find(Boolean);
 
+// The remembered layout under storageKey: { compact, groups: { key: expanded } }.
+// Storage can be missing or refuse (private windows, blocked site data), so
+// both directions fail quietly and the sidebar falls back to its defaults.
+const load = storageKey => {
+  if (!storageKey) return {};
+  try { return JSON.parse(localStorage.getItem(storageKey)) || {}; } catch { return {}; }
+};
+const save = (storageKey, value) => {
+  if (!storageKey) return;
+  try { localStorage.setItem(storageKey, JSON.stringify(value)); } catch { /* not remembered */ }
+};
+
 const MenuState = createContext({ collapsible: false, collapsed: new Set(), toggle() {} });
 
 const Link = ({ node }) =>
@@ -146,26 +158,36 @@ const Node = ({ node }) => isGroup(node)
  * screens, where each group is one icon (`icon`, or its first link's) whose
  * links open in a panel beside the sidebar, and opens it as a menu on
  * narrow ones, where following a link or pressing Escape closes it again.
+ * storageKey remembers, in localStorage under that key, whether the sidebar
+ * is collapsed to icons and which groups are open; without it they reset
+ * on every load.
  * menuClassName adds classes to the menu list, for an application's own
  * look (e.g. small labels for headings).
  */
 export function Sidebar({
-  brand, href = '#/', mark, items = [], footer, collapsible = false, menuClassName = '', label = 'Menu',
+  brand, href = '#/', mark, items = [], footer, collapsible = false, menuClassName = '', storageKey, label = 'Menu',
   openLabel = 'Open menu', closeLabel = 'Close menu',
   collapseLabel = 'Collapse menu', expandLabel = 'Expand menu',
   className = '', ...props
 }) {
+  const remembered = useRef(null);
+  remembered.current ??= load(storageKey);
+  // Wide screens: collapsed to icons (remembered). Narrow: the menu is open.
+  const [compact, setCompact] = useState(() => remembered.current.compact === true);
   const [open, setOpen] = useState(false);
   // The group whose flyout is open in the icons-only sidebar; every change
-  // of layout or of open closes it.
+  // of layout or of compact closes it.
   const [flyout, setFlyout] = useState(null);
   const [mobile, setMobile] = useState(() => globalThis.matchMedia?.(MOBILE).matches ?? false);
-  const [collapsed, setCollapsed] = useState(() => new Set(groupKeys(items, n => n.open === false)));
+  const [collapsed, setCollapsed] = useState(() => new Set(groupKeys(items, n => {
+    const expanded = remembered.current.groups?.[key(n)];
+    return typeof expanded === 'boolean' ? !expanded : n.open === false;
+  })));
   const toggle = useRef(null);
   useEffect(() => {
     const media = globalThis.matchMedia?.(MOBILE);
     if (!media) return;
-    // Each layout has its own meaning of open, so a resize resets it.
+    // A resize closes the narrow-screen menu; compact waits for wide screens.
     const change = () => { setMobile(media.matches); setOpen(false); setFlyout(null); };
     media.addEventListener('change', change);
     return () => media.removeEventListener('change', change);
@@ -180,6 +202,11 @@ export function Sidebar({
     addEventListener('keydown', escape);
     return () => removeEventListener('keydown', escape);
   }, [open, mobile]);
+  useEffect(() => {
+    const groups = {};
+    for (const k of groupKeys(items, () => true)) groups[k] = !collapsed.has(k);
+    save(storageKey, { compact, groups });
+  }, [storageKey, compact, collapsed]);
   // Open the groups holding the active link whenever it changes.
   const active = findActive(items);
   const activeKey = active ? key(active) : null;
@@ -193,19 +220,20 @@ export function Sidebar({
     if (!next.delete(k)) next.add(k);
     return next;
   });
-  const iconsOnly = open && !mobile;
+  const iconsOnly = compact && !mobile;
+  const openClass = mobile ? open : compact;
   const menu = { collapsible, collapsed, toggle: toggleGroup, active, flyouts: iconsOnly, flyout, setFlyout };
   const closeOnLink = event => { if (mobile && event.target.closest('a')) setOpen(false); };
-  const toggleLabel = mobile ? (open ? closeLabel : openLabel) : (open ? expandLabel : collapseLabel);
-  return h('aside', { ...props, className: cls('sidebar', open && 'sidebar-open', className) },
+  const toggleLabel = mobile ? (open ? closeLabel : openLabel) : (compact ? expandLabel : collapseLabel);
+  return h('aside', { ...props, className: cls('sidebar', openClass && 'sidebar-open', className) },
     h('div', { className: 'sidebar-header' },
       h('a', { className: 'sidebar-brand', href, onClick: closeOnLink },
         mark && h('span', { className: 'sidebar-brand-mark', 'aria-hidden': 'true' }, mark),
         h('h1', null, brand)),
       h('button', {
         type: 'button', ref: toggle, className: 'sidebar-toggle',
-        'aria-label': toggleLabel, title: toggleLabel, 'aria-expanded': String(mobile ? open : !open),
-        onClick: () => { setOpen(o => !o); setFlyout(null); },
+        'aria-label': toggleLabel, title: toggleLabel, 'aria-expanded': String(mobile ? open : !compact),
+        onClick: () => { if (mobile) setOpen(o => !o); else setCompact(c => !c); setFlyout(null); },
       }, mobile && open ? '✕' : '☰')),
     h('nav', { 'aria-label': label, className: 'sidebar-nav', onClick: closeOnLink },
       h(MenuState.Provider, { value: menu }, h(List, { nodes: items, className: cls('menu menu-vertical', menuClassName) }))),

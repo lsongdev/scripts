@@ -74,14 +74,15 @@ All three use `field.css`.
 
 - `PageHeader({ title, subtitle, actions, back })`: `back` is `{ href, label }`, a return
   link at the far right of the title row that stays there on narrow screens. `page.css`.
-- `Sidebar({ brand, href, mark, items, footer, collapsible, menuClassName })`: side navigation over one menu
+- `Sidebar({ brand, href, mark, items, footer, collapsible, storageKey, menuClassName })`: side navigation over one menu
   tree. Links are `{ href, title, icon, badge, active, items }`; groups are
   `{ id, title, icon, items, open }` and render as `<li class="menu-group">` with a
   `.menu-heading` (icon and label, sized like a link) and a list of their own. `collapsible` makes headings disclosure buttons (groups start open
   unless `open: false`; the group holding the active link opens). Its toggle collapses it to
   icons on wide screens, where each group is one icon (its `icon`, or its first link's) whose
   links open in a panel beside the sidebar on hover, click or Enter; on narrow screens it
-  opens as a menu, closing again on a link or Escape. `menuClassName` adds classes to the menu list for an application's own look. `sidebar.css` and
+  opens as a menu, closing again on a link or Escape. `storageKey` remembers (in
+  `localStorage`) whether it is collapsed to icons and which groups are open. `menuClassName` adds classes to the menu list for an application's own look. `sidebar.css` and
   `menu.css`.
 - `Navbar({ brand, href, mark, items, children })`: top navigation; items are
   `{ href, title, active }`, children trail on the right. `navbar.css`.

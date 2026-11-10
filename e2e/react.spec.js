@@ -528,3 +528,44 @@ test('Sidebar collapsed to icons opens each group in a flyout panel', async ({ p
   await expect(page.locator('.menu-flyout')).toHaveCount(0);
   await expect(page.locator('.menu-group > ul')).toBeVisible();
 });
+
+test('Sidebar remembers its icons-only state and open groups under storageKey', async ({ page }) => {
+  await page.setViewportSize({ width: 1200, height: 700 });
+  const mount = () => page.evaluate(async () => {
+    const { html, render } = await import('/react/react.js');
+    const { Sidebar } = await import('/react/components/sidebar.js');
+    document.body.replaceChildren();
+    const root = document.createElement('div');
+    document.body.append(root);
+    const items = [
+      { id: 'a', title: 'A', items: [{ href: '#/a', title: 'A1' }] },
+      { id: 'b', title: 'B', open: false, items: [{ href: '#/b', title: 'B1' }] },
+    ];
+    render(html`<${Sidebar} brand="B" items=${items} collapsible storageKey="test-sidebar" />`, root);
+    await new Promise(r => setTimeout(r, 30));
+  });
+  await page.evaluate(() => localStorage.removeItem('test-sidebar'));
+  await mount();
+  const heading = title => page.locator('button.menu-heading', { hasText: title });
+  await expect(heading('A')).toHaveAttribute('aria-expanded', 'true');
+  await expect(heading('B')).toHaveAttribute('aria-expanded', 'false');
+  await heading('A').click();
+  await heading('B').click();
+  await page.click('.sidebar-toggle');
+  await expect(page.locator('.sidebar')).toHaveClass(/sidebar-open/);
+  await page.evaluate(() => new Promise(r => requestAnimationFrame(() => setTimeout(r, 20))));
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('test-sidebar'))))
+    .toEqual({ compact: true, groups: { a: false, b: true } });
+  await mount();
+  await expect(page.locator('.sidebar')).toHaveClass(/sidebar-open/);
+  await page.click('.sidebar-toggle');
+  await expect(heading('A')).toHaveAttribute('aria-expanded', 'false');
+  await expect(heading('B')).toHaveAttribute('aria-expanded', 'true');
+  // Unreadable storage falls back to the defaults. (Wait for the save the
+  // last click scheduled: Preact runs effects after the next frame.)
+  await page.evaluate(() => new Promise(r => requestAnimationFrame(() => setTimeout(r, 20))));
+  await page.evaluate(() => localStorage.setItem('test-sidebar', '{not json'));
+  await mount();
+  await expect(page.locator('.sidebar')).not.toHaveClass(/sidebar-open/);
+  await expect(heading('B')).toHaveAttribute('aria-expanded', 'false');
+});
