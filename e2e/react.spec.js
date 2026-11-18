@@ -555,7 +555,7 @@ test('Sidebar remembers its icons-only state and open groups under storageKey', 
   await expect(page.locator('.sidebar')).toHaveClass(/sidebar-open/);
   await page.evaluate(() => new Promise(r => requestAnimationFrame(() => setTimeout(r, 20))));
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('test-sidebar'))))
-    .toEqual({ compact: true, groups: { a: false, b: true } });
+    .toEqual({ compact: true, groups: { a: false, b: true }, scrollTop: 0 });
   await mount();
   await expect(page.locator('.sidebar')).toHaveClass(/sidebar-open/);
   await page.click('.sidebar-toggle');
@@ -568,6 +568,34 @@ test('Sidebar remembers its icons-only state and open groups under storageKey', 
   await mount();
   await expect(page.locator('.sidebar')).not.toHaveClass(/sidebar-open/);
   await expect(heading('B')).toHaveAttribute('aria-expanded', 'false');
+});
+
+test('Sidebar restores the scroll position without overwriting its group state', async ({ page }) => {
+  await page.setViewportSize({ width: 1200, height: 700 });
+  const mount = () => page.evaluate(async () => {
+    const { html, render } = await import('/react/react.js');
+    const { Sidebar } = await import('/react/components/sidebar.js');
+    const root = document.querySelector('#sidebar-scroll-test') ?? document.body.appendChild(document.createElement('div'));
+    root.id = 'sidebar-scroll-test';
+    render(null, root);
+    const items = [{ id: 'a', title: 'A', items: Array.from({ length: 30 }, (_, i) => ({ href: `#/${i}`, title: `Link ${i}` })) }];
+    render(html`<${Sidebar} brand="B" items=${items} collapsible storageKey="test-scroll" />`, root);
+    const menu = root.querySelector('.sidebar-nav > .menu');
+    Object.assign(menu.style, { height: '100px', overflow: 'auto' });
+    return menu.scrollTop;
+  });
+  await page.evaluate(() => {
+    localStorage.setItem('test-scroll', JSON.stringify({ compact: false, groups: { a: true } }));
+    localStorage.setItem('test-scroll.scrollTop', '80');
+  });
+  await mount();
+  const menu = page.locator('#sidebar-scroll-test nav > .menu');
+  await expect.poll(() => menu.evaluate(el => el.scrollTop)).toBe(80);
+  await menu.evaluate(el => { el.scrollTop = 120; });
+  await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('test-scroll'))))
+    .toEqual({ compact: false, groups: { a: true }, scrollTop: 120 });
+  await mount();
+  await expect.poll(() => menu.evaluate(el => el.scrollTop)).toBe(120);
 });
 
 test('Terminal loads the emulator into its frame, connects it and detaches on unmount', async ({ page }) => {

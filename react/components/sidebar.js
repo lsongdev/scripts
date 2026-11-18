@@ -31,12 +31,16 @@ const groupKeys = (nodes, test, out = []) => {
 // A group's icon in the icons-only sidebar: its own, or its first link's.
 const groupIcon = node => node.icon ?? (node.items || []).map(groupIcon).find(Boolean);
 
-// The remembered layout under storageKey: { compact, groups: { key: expanded } }.
+// The remembered layout under storageKey includes compact, groups and scrollTop.
 // Storage can be missing or refuse (private windows, blocked site data), so
 // both directions fail quietly and the sidebar falls back to its defaults.
 const load = storageKey => {
   if (!storageKey) return {};
-  try { return JSON.parse(localStorage.getItem(storageKey)) || {}; } catch { return {}; }
+  try {
+    const layout = JSON.parse(localStorage.getItem(storageKey)) || {};
+    const scrollTop = Number(layout.scrollTop ?? localStorage.getItem(`${storageKey}.scrollTop`));
+    return { ...layout, scrollTop: Number.isFinite(scrollTop) ? Math.max(0, scrollTop) : 0 };
+  } catch { return {}; }
 };
 const save = (storageKey, value) => {
   if (!storageKey) return;
@@ -56,8 +60,8 @@ const Link = ({ node }) =>
   h('span', null, node.title),
   node.badge != null && h('span', { className: 'menu-badge' }, node.badge));
 
-const List = ({ nodes, ...props }) =>
-  h('ul', props, nodes.map(node => h(Node, { key: key(node), node })));
+const List = ({ nodes, listRef, ...props }) =>
+  h('ul', { ...props, ref: listRef }, nodes.map(node => h(Node, { key: key(node), node })));
 
 function Group({ node }) {
   const { collapsible, collapsed, toggle, active, flyouts } = useContext(MenuState);
@@ -159,8 +163,7 @@ const Node = ({ node }) => isGroup(node)
  * links open in a panel beside the sidebar, and opens it as a menu on
  * narrow ones, where following a link or pressing Escape closes it again.
  * storageKey remembers, in localStorage under that key, whether the sidebar
- * is collapsed to icons and which groups are open; without it they reset
- * on every load.
+ * is collapsed to icons, which groups are open and the menu scroll position.
  * menuClassName adds classes to the menu list, for an application's own
  * look (e.g. small labels for headings).
  */
@@ -184,6 +187,28 @@ export function Sidebar({
     return typeof expanded === 'boolean' ? !expanded : n.open === false;
   })));
   const toggle = useRef(null);
+  const list = useRef(null);
+  const restored = useRef(false);
+  const restoreScroll = () => {
+    const el = list.current;
+    if (!storageKey || restored.current || !el || !el.clientHeight || el.scrollHeight <= el.clientHeight) return;
+    el.scrollTop = remembered.current.scrollTop || 0;
+    restored.current = true;
+  };
+  useLayoutEffect(restoreScroll);
+  useEffect(() => {
+    if (!storageKey || restored.current || !globalThis.ResizeObserver) return;
+    const observer = new ResizeObserver(restoreScroll);
+    observer.observe(list.current);
+    return () => observer.disconnect();
+  }, [storageKey]);
+  const rememberScroll = event => {
+    const el = event.currentTarget;
+    if (!storageKey || !restored.current || el.scrollTop === remembered.current.scrollTop ||
+        !el.clientHeight || el.scrollHeight <= el.clientHeight) return;
+    remembered.current = { ...remembered.current, scrollTop: el.scrollTop };
+    save(storageKey, remembered.current);
+  };
   useEffect(() => {
     const media = globalThis.matchMedia?.(MOBILE);
     if (!media) return;
@@ -205,7 +230,8 @@ export function Sidebar({
   useEffect(() => {
     const groups = {};
     for (const k of groupKeys(items, () => true)) groups[k] = !collapsed.has(k);
-    save(storageKey, { compact, groups });
+    remembered.current = { ...remembered.current, compact, groups };
+    save(storageKey, remembered.current);
   }, [storageKey, compact, collapsed]);
   // Open the groups holding the active link whenever it changes.
   const active = findActive(items);
@@ -236,6 +262,6 @@ export function Sidebar({
         onClick: () => { if (mobile) setOpen(o => !o); else setCompact(c => !c); setFlyout(null); },
       }, mobile && open ? '✕' : '☰')),
     h('nav', { 'aria-label': label, className: 'sidebar-nav', onClick: closeOnLink },
-      h(MenuState.Provider, { value: menu }, h(List, { nodes: items, className: cls('menu menu-vertical', menuClassName) }))),
+      h(MenuState.Provider, { value: menu }, h(List, { nodes: items, listRef: list, onScroll: rememberScroll, className: cls('menu menu-vertical', menuClassName) }))),
     footer && h('div', { className: 'sidebar-footer' }, footer));
 }
